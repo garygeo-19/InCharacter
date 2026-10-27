@@ -1,0 +1,16 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.wrangler/
+
+# Keys never go in the repo (AGENTS.md)
+.env
+.env.*
+!.env.example
+
+# Local files
+.DS_Store
+*.log
