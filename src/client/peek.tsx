@@ -1,13 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Peek } from '../shared/types';
 import type { Outline } from '../shared/notes';
+import {
+  PEEK_HOLD_MS,
+  beginHold,
+  holdTimerFired,
+  releaseHold,
+  type PeekHoldPhase,
+} from '../shared/peek';
 
 // Hold-to-peek on the outline (§5). A peek starts after a 300 ms hold, ends
 // on release, slide-off or cancel; the timer and recording keep running.
 // Tap mode (accessibility setting) opens on tap and closes on a second tap
 // or after 10 seconds. One note visible at a time.
 
-const HOLD_MS = 300;
 const TAP_CLOSE_MS = 10_000;
 
 export function OutlinePeek(props: {
@@ -22,11 +28,16 @@ export function OutlinePeek(props: {
   const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const peekStart = useRef<number>(0);
   const peekingId = useRef<string | null>(null);
+  // Whether a hold is still pending ('holding') or has opened a peek
+  // ('open'). The fired timer must clear 'holding' or release is mistaken
+  // for an early tap and the note stays open.
+  const holdPhase = useRef<PeekHoldPhase>('idle');
 
   const clearTimers = () => {
     if (holdTimer.current) clearTimeout(holdTimer.current);
     if (tapTimer.current) clearTimeout(tapTimer.current);
     holdTimer.current = tapTimer.current = null;
+    holdPhase.current = 'idle';
   };
 
   useEffect(() => clearTimers, []);
@@ -52,18 +63,29 @@ export function OutlinePeek(props: {
   const startHold = (id: string) => {
     if (props.peekStyle === 'tap') return;
     clearTimers();
-    holdTimer.current = setTimeout(() => openPeek(id), HOLD_MS);
+    holdPhase.current = beginHold();
+    holdTimer.current = setTimeout(() => {
+      holdTimer.current = null;
+      holdPhase.current = holdTimerFired(holdPhase.current);
+      if (holdPhase.current === 'open') openPeek(id);
+    }, PEEK_HOLD_MS);
   };
 
   const endHold = () => {
     if (props.peekStyle === 'tap') return;
-    if (holdTimer.current) {
+    const release = releaseHold(holdPhase.current);
+    holdPhase.current = release.phase;
+    if (release.action === 'discard') {
       // released before 300 ms: a tap or scroll, records nothing (§5)
-      clearTimeout(holdTimer.current);
+      if (holdTimer.current) clearTimeout(holdTimer.current);
       holdTimer.current = null;
       return;
     }
-    finishPeek(openId);
+    if (release.action === 'close') {
+      // peekingId is the source of truth: it can't go stale the way the
+      // rendered openId closed over by the key/pointer handler can.
+      finishPeek(peekingId.current ?? openId);
+    }
   };
 
   const tapRow = (id: string) => {
