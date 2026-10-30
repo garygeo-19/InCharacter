@@ -11,6 +11,8 @@
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "eval": "tsx scripts/eval.ts",
     "typecheck": "tsc --noEmit",
     "check:day1": "tsx scripts/day1-check1.ts"
   },

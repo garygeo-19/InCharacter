@@ -35,7 +35,22 @@ Stack (§10.3): TypeScript, React + Vite, Hono (Node in dev, Workers-ready), Zod
 | Day-1 check 1: Muse Spark structured output with an enum | Passed 29 Oct 2026: `muse-spark-1.3`, Chat Completions `response_format` json_schema with `strict: true` (§9.1, structured-output docs), schema `Day1Check` with `verdict` enum `covered\|partial\|missed\|wrong`. Returned `{ verdict: "covered", reason: "Teacher explicitly stated la propina is the tip…" }` — valid against the schema. Re-run with `npm run check:day1`. Key read from `.dev.vars`, never printed or logged |
 | Day-1 checks 2–5 | Deferred — see Decisions |
 
-Not yet built (later milestones): the M1 text simulation, banks, voice, art and hosting. The home page is an M0 placeholder that only proves the stack and the `/api/health` wiring.
+Not yet built (later milestones): voice, art and hosting.
+
+## M1 — Text simulation, Type mode (§12)
+
+Done 30 Oct 2026, Type mode only. Flow: Home (live catalog, Keep teaching) → pack → class list → briefing → 3-2-1 → class (6:00 Type) → "Hands are going up…" (pick + class grade in parallel) → 3 questions (2:00 answers, outline drawer with peek) → grading → debrief with evidence quotes and score. History and best scores stay on the device.
+
+| Check | Result |
+|---|---|
+| Notes/outline builder (§6) | Unit test reproduces the §6.5 table and anchors exactly from a pack extract; a second test re-checks against the live pack (skips without network) |
+| Seed bank (§7.7) | `content/banks/spanish-food-shopping/p10-at-the-restaurant.json`, 12 checked questions, passes all §7.5 code checks |
+| Picking (§9.2) | Model choice validated (3 ids, difficulties 1-2-3, no shared notes, not recently asked), rules fallback probes skipped notes; 6 s timeout |
+| Grading + evidence (§8.5, §9.3, §9.4) | Every verdict quote-checked in code; fabricated quotes downgrade (covered/partial→missed, wrong→missed, moves/contradictions dropped) |
+| Scoring (§8) | §8.7 worked example gives exactly 72 ★★; Appendix C lesson scores 50 / 22.67 / 9.33 / 5.33 |
+| Fixtures end to end | `tests/eval-mock.test.ts`: all four classes grade to their labels with zero downgrades; injection first line changes nothing |
+| E2E (mocked) | `tests/e2e/flow.spec.ts` (390 × 844, `?fast=1`): Home → debrief scores 63, Keep teaching records Best 63 — written, needs a browser to run (none in this sandbox) |
+| Live eval | `npm run eval` hits the dev API with the fixtures — deferred to M5 (spends key budget) |
 
 ## Decisions
 
@@ -44,3 +59,9 @@ Choices made where the spec is silent, one line each with its date.
 - 29 Oct 2026 — Day-1 checks 2–5 are deferred to the milestones that need them: voice (check 2) before M3, art (check 3) before M4, ElevenLabs voices (check 4) before M3, hosting/9 MB upload (check 5) before M5. Only check 1 was run for M0, to keep the two-days-behind schedule lean.
 - 29 Oct 2026 — Dev runs Hono on Node (`@hono/node-server`, port 8787) behind the Vite proxy; the same Hono app deploys to Cloudflare Workers in M5, so no server rewrite is expected.
 - 29 Oct 2026 — `npm run dev` binds Vite to `0.0.0.0` so a phone on the same Wi-Fi can reach it, and the API to `127.0.0.1` only (the phone reaches it through Vite's proxy); production CORS stays limited to `APP_ORIGIN` (§10.4).
+- 30 Oct 2026 — Evidence words exclude a fixed English/Spanish function-word list (`src/shared/notes.ts`); the spec's list is open-ended ("and so on").
+- 30 Oct 2026 — Rate limit is 36 class-op calls/hour/IP (≈ 12 classes: pick + 2 grades each); transcriptions get their own counter in M3.
+- 30 Oct 2026 — M1 is Type-only: the Voice button is disabled, questions show captions only (no Replay) until M3 records audio.
+- 30 Oct 2026 — The client reads catalog/packs through `/api` (the server caches packs by `id@version`); note hashes use a dependency-free SHA-256 so the same module runs in the browser.
+- 30 Oct 2026 — `?fast=1` shortens timers (class 12 s, answers 8 s) for the mocked E2E and demos; real play uses the §8 config values.
+- 30 Oct 2026 — Model-call effects fire once via refs, so React StrictMode's dev double-mount can't double-spend.
