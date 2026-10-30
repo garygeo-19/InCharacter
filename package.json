@@ -14,7 +14,10 @@
     "test:e2e": "playwright test",
     "eval": "tsx scripts/eval.ts",
     "typecheck": "tsc --noEmit",
-    "check:day1": "tsx scripts/day1-check1.ts"
+    "check:day1": "tsx scripts/day1-check1.ts",
+    "bank:build": "tsx scripts/bank-build.ts",
+    "bank:review": "tsx scripts/bank-review.ts",
+    "bank:approve": "tsx scripts/bank-approve.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",

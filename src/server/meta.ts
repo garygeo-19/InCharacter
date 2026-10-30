@@ -9,6 +9,14 @@ export function createMetaClient(apiKey: string): OpenAI {
 
 export type JsonSchema = Record<string, unknown>;
 
+/** Token counts from one Chat Completions call, for cost reporting. */
+export type TokenUsage = {
+  input: number;
+  output: number;
+  total: number;
+  reasoning?: number;
+};
+
 function isRetryable(status: number | undefined): boolean {
   return status === 429 || (status !== undefined && status >= 500);
 }
@@ -21,9 +29,16 @@ export async function chatStructured<T>(opts: {
   user: string;
   schemaName: string;
   schema: JsonSchema;
-  reasoningEffort?: 'low' | 'medium' | 'high';
+  // Effort levels per the reasoning docs; "max" is supported by
+  // muse-wonder-1.0 and muse-spark-1.3 (not the contributor variants).
+  // See https://dev.meta.ai/docs/reasoning
+  reasoningEffort?: 'low' | 'medium' | 'high' | 'max';
+  // Reasoning tokens share the output budget, so bank calls pass a generous
+  // maxTokens. See https://dev.meta.ai/docs/reasoning ("Token usage").
+  maxTokens?: number;
+  onUsage?: (u: TokenUsage) => void;
 }): Promise<T> {
-  const { client, model, system, user, schemaName, schema, reasoningEffort } = opts;
+  const { client, model, system, user, schemaName, schema, reasoningEffort, maxTokens, onUsage } = opts;
   let lastError: unknown;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
@@ -37,9 +52,31 @@ export async function chatStructured<T>(opts: {
           type: 'json_schema',
           json_schema: { name: schemaName, schema, strict: true },
         },
-        ...(reasoningEffort ? { reasoning_effort: reasoningEffort } : {}),
+        // Cast: the API accepts "max" (see reasoning docs) but the SDK's
+        // ReasoningEffort type lags behind; the string passes through as-is.
+        ...(reasoningEffort
+          ? {
+              reasoning_effort: reasoningEffort as NonNullable<
+                OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming['reasoning_effort']
+              >,
+            }
+          : {}),
+        ...(maxTokens ? { max_tokens: maxTokens } : {}),
       };
       const res = await client.chat.completions.create(params);
+      const usage = res.usage;
+      if (usage && onUsage) {
+        try {
+          onUsage({
+            input: usage.prompt_tokens ?? 0,
+            output: usage.completion_tokens ?? 0,
+            total: usage.total_tokens ?? 0,
+            reasoning: usage.completion_tokens_details?.reasoning_tokens ?? undefined,
+          });
+        } catch {
+          // Reporting must never break the call.
+        }
+      }
       const content = res.choices[0]?.message?.content;
       if (!content) throw new Error('Model returned no content');
       return JSON.parse(content) as T;

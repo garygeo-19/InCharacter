@@ -1,0 +1,927 @@
+{
+  "schemaVersion": 1,
+  "packId": "spanish-food-shopping",
+  "packVersion": "1.0.9",
+  "lessonId": "l4-food",
+  "partId": "p12-drinks-sweets",
+  "builtAt": "2026-10-30",
+  "notes": [
+    {
+      "id": "fact-zumo-vs-jugo",
+      "hash": "de4b20c710bf4734acebb409ee049f2529ba517fbb513282948d9f872dda86f2"
+    },
+    {
+      "id": "fact-cana-y-vino-tinto",
+      "hash": "b002f7c270ebe18e64be06de55921dcfc39326431cbd4047bca9bf1bfe3f8865"
+    },
+    {
+      "id": "fact-postre-flan-natillas",
+      "hash": "58bed649e969126bf69ef47cb0fdd1b2b96849b7bb6877d737bad4299d56121d"
+    },
+    {
+      "id": "fi-ot-drink-not",
+      "hash": "c20f905404954bf50996b98d5042e0d5b39610e4da40a317adb9b084172e88a4"
+    },
+    {
+      "id": "fi-ot-cerveza-meaning",
+      "hash": "d0d00fe1c7c8509ba2f14ec55c62b4ff79b382f5c46a59ef5441c58f4e09c83d"
+    },
+    {
+      "id": "pair-refresco",
+      "hash": "06435e9a9c4c43f9aee0ddcf618c626fc70657bc11f32ed64e6f4087d87564ef"
+    },
+    {
+      "id": "pair-zumo",
+      "hash": "6b6e7be139a22481b51a928d3fc833b7ba104a3d9a9a604b11c134d6ef3bddf1"
+    },
+    {
+      "id": "pair-cerveza",
+      "hash": "f44acdb3e1d7bd6c46d73ad9ea7ec3af88e3a0198bce0639ee9861f18a57dfb0"
+    },
+    {
+      "id": "pair-vino",
+      "hash": "26c5d8bad3ee17640ce9f29873668cc369029be47d042242cafaec3db5a22263"
+    },
+    {
+      "id": "pair-postre",
+      "hash": "e706d6f00aeacb6f854f47382e70b290c457695a62768c23c9ebf3ae1ff77663"
+    },
+    {
+      "id": "pair-dulce",
+      "hash": "76857467449169395234a1ca073f3f7c9271587b4f96f0665cd7218acaf5abee"
+    }
+  ],
+  "questions": [
+    {
+      "id": "maya-1",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does refresco mean in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-refresco"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-refresco"
+          ],
+          "point": "Refresco means soft drink / soda."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "maya-1: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "maya-2",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "Could you clarify what jugo means in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-zumo"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-zumo"
+          ],
+          "point": "Jugo means juice."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "maya-2: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "maya-3",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does cerveza mean in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-cerveza"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-cerveza"
+          ],
+          "point": "Cerveza means beer."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "maya-3: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "maya-4",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does vino mean in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-vino"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-vino"
+          ],
+          "point": "Vino means wine."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "maya-4: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "maya-5",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does el postre mean in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-postre"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-postre"
+          ],
+          "point": "El postre means the dessert."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "maya-5: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "maya-6",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does dulce mean in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-dulce"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-dulce"
+          ],
+          "point": "Dulce means sweet."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "maya-6: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "maya-7",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "Is el postre a drink like cerveza or vino?",
+      "ttsText": null,
+      "noteIds": [
+        "fi-ot-drink-not"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-ot-drink-not"
+          ],
+          "point": "El postre means dessert."
+        },
+        {
+          "noteIds": [
+            "fi-ot-drink-not"
+          ],
+          "point": "Refresco, cerveza, and vino are all drinks."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "maya-7: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "leo-1",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "In a bar in Spain, should I order cerveza or una caña for a small draft beer?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-cana-y-vino-tinto"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-cana-y-vino-tinto"
+          ],
+          "point": "Order una caña."
+        },
+        {
+          "noteIds": [
+            "fact-cana-y-vino-tinto"
+          ],
+          "point": "Una caña is a small draft beer."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "leo-1: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "leo-2",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "In Spain after the postre, what comes next before the bill?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-postre-flan-natillas"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "After the postre comes un café."
+        },
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "Un café is an espresso by default, and then the bill."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "leo-2: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "leo-3",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "I'm in Mexico City and want juice, should I say jugo or zumo?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-zumo-vs-jugo"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-zumo-vs-jugo"
+          ],
+          "point": "Juice is jugo through most of Latin America."
+        },
+        {
+          "noteIds": [
+            "fact-zumo-vs-jugo"
+          ],
+          "point": "Zumo is in Spain but will be understood perfectly in Mexico City."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "leo-3: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "leo-4",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "In Spain I want red wine, should I ask for tinto or rojo?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-cana-y-vino-tinto"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-cana-y-vino-tinto"
+          ],
+          "point": "Ask for tinto."
+        },
+        {
+          "noteIds": [
+            "fact-cana-y-vino-tinto"
+          ],
+          "point": "Red wine is normally called tinto, not rojo."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "leo-4: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "leo-5",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "In Spain I want a custard dessert, what postre could I try?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-postre-flan-natillas"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "El postre often means custards and creams."
+        },
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "Try flan, natillas, or crema catalana."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "leo-5: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "leo-6",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "My friend wants something sweet, how can I use dulce to help?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-postre-flan-natillas",
+        "pair-dulce"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas",
+            "pair-dulce"
+          ],
+          "point": "Dulce is the flavor sweet."
+        },
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "Dulce is also the noun for a sweet treat."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "leo-6: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "leo-7",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "I want a soft drink, not juice or cerveza, should I say refresco?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-refresco",
+        "pair-zumo",
+        "pair-cerveza"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-refresco"
+          ],
+          "point": "Say refresco for soft drink / soda."
+        },
+        {
+          "noteIds": [
+            "pair-zumo",
+            "pair-cerveza"
+          ],
+          "point": "Jugo is juice and cerveza is beer."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "leo-7: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "priya-1",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "Why would zumo de naranja in Mexico City show I learned Spanish in Spain?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-zumo-vs-jugo"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-zumo-vs-jugo"
+          ],
+          "point": "Jugo is used through most of Latin America."
+        },
+        {
+          "noteIds": [
+            "fact-zumo-vs-jugo"
+          ],
+          "point": "Zumo is used in Spain."
+        },
+        {
+          "noteIds": [
+            "fact-zumo-vs-jugo"
+          ],
+          "point": "Zumo de naranja in Mexico City will be understood perfectly."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "priya-1: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "priya-2",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "Why is red wine called tinto and not rojo in Spain?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-cana-y-vino-tinto"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-cana-y-vino-tinto"
+          ],
+          "point": "Wine comes tinto (red) or blanco (white)."
+        },
+        {
+          "noteIds": [
+            "fact-cana-y-vino-tinto"
+          ],
+          "point": "Red wine is normally called tinto, not rojo."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "priya-2: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "priya-3",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "How does dulce work both as a flavor and as a thing?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-postre-flan-natillas",
+        "pair-dulce"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas",
+            "pair-dulce"
+          ],
+          "point": "Dulce is the flavor sweet."
+        },
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "Dulce is also the noun for a sweet treat."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "priya-3: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "priya-4",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "How is el postre different from refresco, cerveza, and vino?",
+      "ttsText": null,
+      "noteIds": [
+        "fi-ot-drink-not"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-ot-drink-not"
+          ],
+          "point": "El postre means dessert."
+        },
+        {
+          "noteIds": [
+            "fi-ot-drink-not"
+          ],
+          "point": "Refresco, cerveza, and vino are all drinks."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "priya-4: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "priya-5",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "How is cerveza different from vino, jugo, and agua?",
+      "ttsText": null,
+      "noteIds": [
+        "fi-ot-cerveza-meaning"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-ot-cerveza-meaning"
+          ],
+          "point": "Cerveza is beer."
+        },
+        {
+          "noteIds": [
+            "fi-ot-cerveza-meaning"
+          ],
+          "point": "Distinct from vino (wine), jugo (juice), and agua (water)."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "priya-5: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "priya-6",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "Why do you order una caña instead of just cerveza in a Spanish bar?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-cana-y-vino-tinto",
+        "pair-cerveza"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-cana-y-vino-tinto",
+            "pair-cerveza"
+          ],
+          "point": "Cerveza is beer."
+        },
+        {
+          "noteIds": [
+            "fact-cana-y-vino-tinto"
+          ],
+          "point": "Una caña is a small draft beer heard constantly in a bar in Spain."
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "priya-6: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "sam-1",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "Jugo is Spain's word and zumo is Latin America's, right?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-zumo-vs-jugo"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-zumo-vs-jugo"
+          ],
+          "point": "Correction: jugo is through most of Latin America and zumo is in Spain."
+        },
+        {
+          "noteIds": [
+            "fact-zumo-vs-jugo"
+          ],
+          "point": "Zumo de naranja in Mexico City will be understood perfectly."
+        }
+      ],
+      "misconception": "Jugo is Spain's word and zumo is Latin America's.",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "sam-1: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "sam-2",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "Cerveza means wine, so I'll order cerveza for red wine, right?",
+      "ttsText": null,
+      "noteIds": [
+        "fi-ot-cerveza-meaning",
+        "pair-cerveza",
+        "pair-vino"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-ot-cerveza-meaning",
+            "pair-cerveza"
+          ],
+          "point": "Correction: cerveza is beer, not wine."
+        },
+        {
+          "noteIds": [
+            "fi-ot-cerveza-meaning",
+            "pair-vino"
+          ],
+          "point": "Vino is wine, distinct from cerveza."
+        }
+      ],
+      "misconception": "Cerveza means wine.",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "sam-2: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "sam-3",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "El postre is just another drink like refresco, right?",
+      "ttsText": null,
+      "noteIds": [
+        "fi-ot-drink-not",
+        "pair-postre"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-ot-drink-not",
+            "pair-postre"
+          ],
+          "point": "Correction: el postre means dessert, not a drink."
+        },
+        {
+          "noteIds": [
+            "fi-ot-drink-not"
+          ],
+          "point": "Refresco, cerveza, and vino are all drinks."
+        }
+      ],
+      "misconception": "El postre is a drink like refresco.",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "sam-3: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "sam-4",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "Refresco means juice in Spanish, right? I'll order refresco de naranja.",
+      "ttsText": null,
+      "noteIds": [
+        "pair-refresco",
+        "pair-zumo"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-refresco"
+          ],
+          "point": "Correction: refresco means soft drink / soda."
+        },
+        {
+          "noteIds": [
+            "pair-zumo"
+          ],
+          "point": "Jugo means juice."
+        }
+      ],
+      "misconception": "Refresco means juice.",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "sam-4: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "sam-5",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "Dulce only means the flavor sweet, never a treat, right?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-postre-flan-natillas",
+        "pair-dulce"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "Correction: dulce does double duty, not only the flavor sweet."
+        },
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "It is also the noun for a sweet treat."
+        }
+      ],
+      "misconception": "Dulce only means the flavor sweet, never a treat.",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "sam-5: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "sam-6",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "In Spain after postre you get the bill at once, no coffee, right?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-postre-flan-natillas"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "Correction: after the postre comes un café, then the bill."
+        },
+        {
+          "noteIds": [
+            "fact-postre-flan-natillas"
+          ],
+          "point": "Un café is an espresso by default."
+        }
+      ],
+      "misconception": "After postre in Spain you get the bill at once with no coffee.",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:34:31.275Z",
+        "note": "sam-6: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    }
+  ]
+}

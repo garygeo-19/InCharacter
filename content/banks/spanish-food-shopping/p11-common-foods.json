@@ -1,0 +1,927 @@
+{
+  "schemaVersion": 1,
+  "packId": "spanish-food-shopping",
+  "packVersion": "1.0.9",
+  "lessonId": "l4-food",
+  "partId": "p11-common-foods",
+  "builtAt": "2026-10-30",
+  "notes": [
+    {
+      "id": "fact-pescado-vs-pez",
+      "hash": "4274dbac23c645e6c25ca3080ae02c70f97142cb45e2299c0c579f19e9c84bf4"
+    },
+    {
+      "id": "fact-cuatro-carnes",
+      "hash": "3df7e52e8d60421eac698956eee341180f0381f8ab0aa36cc94618c59e022e64"
+    },
+    {
+      "id": "fact-despensa-aceite-arroz",
+      "hash": "a22ad64d84b036c186af241e90d84770d897fcd13886eaa0f8fe90ba95c7b2bc"
+    },
+    {
+      "id": "fi-ot-legumbres",
+      "hash": "70b4f1638969681acfc1f2aa28b7738a872de82412bddc5f1f78e43fbd802968"
+    },
+    {
+      "id": "fi-mcq-meat-types",
+      "hash": "5b39f908cf72906d8464bc31556620388b77da506cfe3983ad78fb83b2aebfee"
+    },
+    {
+      "id": "pair-aceite",
+      "hash": "8f4e5f053a376778bbd2418dd0543b11ab6e2d578c6833c2fc322649d28afb07"
+    },
+    {
+      "id": "pair-arroz",
+      "hash": "4d773ce7ebd3762bd54c6404db6599526606291378c79a0c5309b1a05559d345"
+    },
+    {
+      "id": "pair-pollo",
+      "hash": "e5b09d354b2344397fccb01b5f1a945ec3605e827faf51d755fdc96ae2729a83"
+    },
+    {
+      "id": "pair-pescado",
+      "hash": "f4eb1bc820d561f69e49586dd7940ba5eb876f3a4fdc5dbccec28c33f30f9ece"
+    },
+    {
+      "id": "pair-verduras",
+      "hash": "178387bdba6896236fd9f9ef5eaab20e290cffb12d0f8aa556298e08cae3e2ba"
+    },
+    {
+      "id": "pair-fruta",
+      "hash": "a0194f3154867d9a8ff8c8b68b419c28f46f155ba75835572c08c1d8d8230eb5"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q01",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does pollo mean when I see it on a Spanish menu?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-pollo"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-pollo"
+          ],
+          "point": "pollo means chicken"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q01: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q02",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "Can you remind me what arroz means in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-arroz"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-arroz"
+          ],
+          "point": "arroz means rice"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q02: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q03",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does aceite de oliva mean in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-aceite"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-aceite"
+          ],
+          "point": "aceite de oliva means olive oil"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q03: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q04",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does verduras mean in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-verduras"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-verduras"
+          ],
+          "point": "verduras means vegetables"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q04: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q05",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does fruta mean in English?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-fruta"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-fruta"
+          ],
+          "point": "fruta means fruit"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q05: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q06",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does pescado mean when I order food?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-pescado"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-pescado"
+          ],
+          "point": "pescado means fish as food"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q06: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q07",
+      "status": "rejected",
+      "type": "clarify",
+      "difficulty": 1,
+      "studentId": "maya",
+      "text": "What does legumbres mean — can you give the examples?",
+      "ttsText": null,
+      "noteIds": [
+        "fi-ot-legumbres"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-ot-legumbres"
+          ],
+          "point": "legumbres means legumes like lentils and chickpeas"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q07: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q08",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "At a restaurant in Madrid I want chicken — should I order pollo?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-pollo",
+        "fact-cuatro-carnes"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-pollo",
+            "fact-cuatro-carnes"
+          ],
+          "point": "order pollo, it means chicken"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q08: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q09",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "I'm making paella at home — do I need arroz for the rice?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-arroz",
+        "fact-despensa-aceite-arroz"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-arroz",
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "arroz means rice"
+        },
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "pan and arroz are two basic starches"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q09: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q10",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "My paella needs seasoning — should I use aceite de oliva?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-aceite",
+        "fact-despensa-aceite-arroz"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-aceite",
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "use aceite de oliva"
+        },
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "la paella lleva mucho aceite de oliva"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q10: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q11",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "I want fish for dinner at a restaurant — do I ask for pescado or pez?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-pescado",
+        "fact-pescado-vs-pez"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-pescado",
+            "fact-pescado-vs-pez"
+          ],
+          "point": "ask for pescado for fish food"
+        },
+        {
+          "noteIds": [
+            "fact-pescado-vs-pez"
+          ],
+          "point": "pez is alive in water, pescado caught on plate"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q11: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q12",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "My friend wants vegetables — should I teach them verduras?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-verduras",
+        "fact-despensa-aceite-arroz"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-verduras",
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "teach verduras, it covers vegetables broadly"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q12: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q13",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "In Mexico I want beef — should I look for carne de res?",
+      "ttsText": null,
+      "noteIds": [
+        "fi-mcq-meat-types",
+        "fact-cuatro-carnes"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-mcq-meat-types",
+            "fact-cuatro-carnes"
+          ],
+          "point": "look for carne de res for beef in Mexico"
+        },
+        {
+          "noteIds": [
+            "fi-mcq-meat-types",
+            "fact-cuatro-carnes"
+          ],
+          "point": "it is common in Mexico and much of Latin America"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q13: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q14",
+      "status": "rejected",
+      "type": "apply",
+      "difficulty": 2,
+      "studentId": "leo",
+      "text": "My friend wants fruit after dinner — should they ask for fruta?",
+      "ttsText": null,
+      "noteIds": [
+        "pair-fruta"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-fruta"
+          ],
+          "point": "ask for fruta for fruit"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q14: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q15",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "Why do we say pez in the water but pescado on a plate?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-pescado-vs-pez",
+        "pair-pescado"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-pescado-vs-pez"
+          ],
+          "point": "pez is fish alive in water"
+        },
+        {
+          "noteIds": [
+            "fact-pescado-vs-pez",
+            "pair-pescado"
+          ],
+          "point": "pescado is caught and put on plate"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q15: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q16",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "How are verduras and legumbres different in Spanish?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-despensa-aceite-arroz",
+        "fi-ot-legumbres",
+        "pair-verduras"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz",
+            "pair-verduras"
+          ],
+          "point": "verduras covers vegetables broadly"
+        },
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz",
+            "fi-ot-legumbres"
+          ],
+          "point": "legumbres are lentils, chickpeas, beans with own word"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q16: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q17",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "Why is ternera veal in Mexico but beef in Spain?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-cuatro-carnes",
+        "fi-mcq-meat-types"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-cuatro-carnes",
+            "fi-mcq-meat-types"
+          ],
+          "point": "ternera is veal in Mexico"
+        },
+        {
+          "noteIds": [
+            "fact-cuatro-carnes"
+          ],
+          "point": "in Spain ternera is usual word for beef, young beef"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q17: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q18",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "On a Mexico menu how is carne de res different from ternera?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-cuatro-carnes",
+        "fi-mcq-meat-types"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-cuatro-carnes",
+            "fi-mcq-meat-types"
+          ],
+          "point": "carne de res is beef in Mexico"
+        },
+        {
+          "noteIds": [
+            "fact-cuatro-carnes",
+            "fi-mcq-meat-types"
+          ],
+          "point": "ternera is veal in Mexico"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q18: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q19",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "Why do pan and arroz both count as basic starches?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-despensa-aceite-arroz",
+        "pair-arroz"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz",
+            "pair-arroz"
+          ],
+          "point": "pan means bread, arroz means rice"
+        },
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "they are two basic starches"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q19: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q20",
+      "status": "rejected",
+      "type": "compare",
+      "difficulty": 3,
+      "studentId": "priya",
+      "text": "What makes aceite de oliva so central in the Spanish pantry?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-despensa-aceite-arroz",
+        "pair-aceite"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "aceite de oliva and sal season nearly everything"
+        },
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "la paella lleva mucho aceite de oliva"
+        },
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "Spain is world's largest producer as of 2020s"
+        }
+      ],
+      "misconception": null,
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q20: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q21",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "I can order pez for dinner — that's the food word, right?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-pescado-vs-pez",
+        "pair-pescado"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-pescado-vs-pez",
+            "pair-pescado"
+          ],
+          "point": "pescado is the food word, caught and on plate"
+        },
+        {
+          "noteIds": [
+            "fact-pescado-vs-pez"
+          ],
+          "point": "pez is alive in water, ordering pez orders aquarium"
+        }
+      ],
+      "misconception": "pez is the food word to order for dinner",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q21: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q22",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "Verduras and legumbres mean the same thing — I'm right, aren't I?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-despensa-aceite-arroz",
+        "fi-ot-legumbres",
+        "pair-verduras"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz",
+            "pair-verduras"
+          ],
+          "point": "they differ, verduras covers vegetables broadly"
+        },
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz",
+            "fi-ot-legumbres"
+          ],
+          "point": "legumbres are lentils, chickpeas, beans with own word"
+        }
+      ],
+      "misconception": "verduras and legumbres mean the same thing",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q22: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q23",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "Ternera always means veal everywhere — tell me I'm right?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-cuatro-carnes",
+        "fi-mcq-meat-types"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-cuatro-carnes",
+            "fi-mcq-meat-types"
+          ],
+          "point": "no, ternera is veal in Mexico but beef in Spain"
+        },
+        {
+          "noteIds": [
+            "fact-cuatro-carnes"
+          ],
+          "point": "in Spain it is usual word for beef, young beef"
+        }
+      ],
+      "misconception": "ternera always means veal everywhere",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q23: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q24",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "Carne de res is the usual beef word in Spain — I'm right, right?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-cuatro-carnes",
+        "fi-mcq-meat-types"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-cuatro-carnes",
+            "fi-mcq-meat-types"
+          ],
+          "point": "no, carne de res is beef in Mexico and much of Latin America"
+        },
+        {
+          "noteIds": [
+            "fact-cuatro-carnes"
+          ],
+          "point": "in Spain usual word for beef is ternera"
+        }
+      ],
+      "misconception": "carne de res is usual beef word in Spain",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q24: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q25",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "Pollo means pork on Spanish menus — I'm right, aren't I?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-cuatro-carnes",
+        "pair-pollo"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-pollo",
+            "fact-cuatro-carnes"
+          ],
+          "point": "no, pollo means chicken"
+        },
+        {
+          "noteIds": [
+            "fact-cuatro-carnes"
+          ],
+          "point": "cerdo means pork"
+        }
+      ],
+      "misconception": "pollo means pork",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q25: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    },
+    {
+      "id": "q26",
+      "status": "rejected",
+      "type": "misconception",
+      "difficulty": 3,
+      "studentId": "sam",
+      "text": "Spain isn't big on aceite de oliva — I'm right, aren't I?",
+      "ttsText": null,
+      "noteIds": [
+        "fact-despensa-aceite-arroz",
+        "pair-aceite"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz"
+          ],
+          "point": "no, Spain is world's largest producer as of 2020s"
+        },
+        {
+          "noteIds": [
+            "fact-despensa-aceite-arroz",
+            "pair-aceite"
+          ],
+          "point": "aceite de oliva seasons nearly everything"
+        }
+      ],
+      "misconception": "Spain isn't big on aceite de oliva",
+      "check": null,
+      "review": {
+        "by": "code-checks",
+        "at": "2026-10-30T04:33:53.342Z",
+        "note": "q26: id must be \"q-\" plus a slug"
+      },
+      "audio": null
+    }
+  ]
+}

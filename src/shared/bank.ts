@@ -158,6 +158,125 @@ export function checkQuestionText(text: string, blob: NotesBlob, where: string):
   return { errors, sceneNouns };
 }
 
+// --- §7.5 steps 4–5: the checker verdicts and the selection ---------------------
+
+export type CheckerCheck = { pass: boolean; reason: string };
+
+/** One B.5 result row: five pass/fail checks plus the keep/drop verdict. */
+export type CheckerResult = {
+  questionId: string;
+  answerableFromNotes: CheckerCheck;
+  keyCorrect: CheckerCheck;
+  notTrivial: CheckerCheck;
+  clear: CheckerCheck;
+  safe: CheckerCheck;
+  verdict: 'keep' | 'drop';
+};
+
+const CHECK_KEYS = [
+  'answerableFromNotes',
+  'keyCorrect',
+  'notTrivial',
+  'clear',
+  'safe',
+] as const;
+
+/** Errors from checkBank that belong to one question (§7.5 step 3).
+ *  Bank-level errors (counts, coverage of other notes) match no question. */
+export function questionCodeErrors(questionId: string, errors: string[]): string[] {
+  return errors.filter(
+    (e) => e.startsWith(`${questionId}:`) || e.startsWith(`${questionId} `),
+  );
+}
+
+/** Apply §7.5 step 4: any failing check — or a drop verdict, or a missing
+ *  verdict — makes the question `rejected`, with the reason recorded in
+ *  `check`. Passing questions keep their status and get `check` recorded. */
+export function applyCheckerResults(
+  questions: BankQuestion[],
+  results: CheckerResult[],
+  model: string,
+  at: string,
+): BankQuestion[] {
+  const byId = new Map(results.map((r) => [r.questionId, r]));
+  return questions.map((q) => {
+    const r = byId.get(q.id);
+    const checks: Record<string, CheckerCheck> = {};
+    for (const k of CHECK_KEYS) {
+      checks[k] = r
+        ? r[k]
+        : { pass: false, reason: 'No checker verdict for this question.' };
+    }
+    const failed = CHECK_KEYS.some((k) => !checks[k].pass);
+    const rejected = !r || r.verdict === 'drop' || failed;
+    return {
+      ...q,
+      status: rejected ? ('rejected' as const) : q.status,
+      check: { model, at, results: checks },
+    };
+  });
+}
+
+/** Draft target: two more than the note count, clamped to 6–14 (§7.3). */
+export function targetCount(noteCount: number): number {
+  return Math.min(14, Math.max(6, noteCount + 2));
+}
+
+/** §7.5 step 5: keep the passing (`draft`) questions that meet §7.3,
+ *  preferring variety (different notes, least-covered first), marked
+ *  `checked`. Deterministic: ties break by bank order (sorts are stable). */
+export function selectBank(candidates: BankQuestion[], notes: Note[]): BankQuestion[] {
+  const remaining = candidates.filter((q) => q.status === 'draft');
+  const target = targetCount(notes.length);
+  const needMisconception = notes.some((n) => n.kind !== 'word');
+  const picked: BankQuestion[] = [];
+  const coverCount = new Map<string, number>();
+  const covered = (id: string): number => coverCount.get(id) ?? 0;
+  const take = (q: BankQuestion): void => {
+    picked.push(q);
+    remaining.splice(remaining.indexOf(q), 1);
+    for (const id of q.noteIds) coverCount.set(id, covered(id) + 1);
+  };
+  // Least-covered notes first, so questions probe different notes.
+  const variety = (q: BankQuestion): number =>
+    q.noteIds.reduce((s, id) => s + covered(id), 0);
+  const byVariety = (a: BankQuestion, b: BankQuestion): number => variety(a) - variety(b);
+
+  // Phase 1: cover every note, preferring questions that cover the most
+  // uncovered notes (with a nudge for a misconception question when one is
+  // required and none is picked yet).
+  for (;;) {
+    if (!notes.some((n) => covered(n.id) === 0) || remaining.length === 0) break;
+    const wantMis = needMisconception && !picked.some((q) => q.type === 'misconception');
+    const scored = [...remaining].sort((a, b) => {
+      const cover = (q: BankQuestion): number =>
+        q.noteIds.filter((id) => covered(id) === 0).length +
+        (wantMis && q.type === 'misconception' ? 0.5 : 0);
+      return cover(b) - cover(a);
+    });
+    if (scored[0].noteIds.every((id) => covered(id) > 0)) break;
+    take(scored[0]);
+  }
+  // Phase 2: at least two questions at each difficulty.
+  for (const d of [1, 2, 3] as Difficulty[]) {
+    while (picked.filter((q) => q.difficulty === d).length < 2) {
+      const cands = remaining.filter((q) => q.difficulty === d).sort(byVariety);
+      if (cands.length === 0) break;
+      take(cands[0]);
+    }
+  }
+  // Phase 3: fill to the target, least-covered notes first.
+  while (picked.length < target && remaining.length > 0) {
+    let pool = remaining;
+    if (needMisconception && !picked.some((q) => q.type === 'misconception')) {
+      const misc = remaining.filter((q) => q.type === 'misconception');
+      if (misc.length > 0) pool = misc;
+    }
+    take([...pool].sort(byVariety)[0]);
+  }
+  return picked.map((q) => ({ ...q, status: 'checked' as const }));
+}
+
 /** Full §7.5 code checks for a bank against the part's notes. */
 export function checkBank(bank: Bank, notes: Note[]): string[] {
   const errors: string[] = [];

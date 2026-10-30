@@ -128,6 +128,137 @@ export function gradeClassSchema(noteIds: string[]): Record<string, unknown> {
   };
 }
 
+// --- Bank pipeline prompts (Appendix A.4/A.5, verbatim) and schemas (B.4/B.5).
+// {count} and {minPerDifficulty} are filled per part; the wording is the spec's.
+
+const BANK_WRITE_TEMPLATE = `You write the questions four students will ask a learner who has just taught a 3-minute class from these notes.
+The learner studied only these notes, so every question must be answerable from the notes alone.
+
+The students:
+- Maya asks to clarify one note (type clarify, difficulty 1).
+- Leo asks how to use a note in a situation (type apply, difficulty 2).
+- Priya asks how two notes differ, or why something is so (type compare, difficulty 3).
+- Sam states a confident mistake that a note corrects and asks to be told he's right (type misconception, difficulty 3).
+
+Rules:
+- Every fact an answer needs must be in the notes. A question may set a scene (a restaurant in Madrid, a friend
+  asking for advice), but never ask about anything the notes leave out: amounts, places, variants, history, or details
+  they don't state. Write from the note text only.
+- Prefer questions that make the teacher apply, compare or correct over ones that repeat a line.
+- Each question asks one thing, sounds natural spoken aloud, has at most 160 characters, and is in English with the
+  notes' own terms.
+- expectedPoints: 1 to 3 short points a full answer makes, each with the ids of the notes it comes from. Use the notes'
+  wording where you can. For a misconception question, put the wrong belief in "misconception" and make the first
+  expected point the correction.
+- Cover every note at least once. Write {count} questions, at least {minPerDifficulty} at each difficulty.
+- Be kind and respectful. No medical, legal, financial or political advice.`;
+
+export function bankWriteSystem(count: number, minPerDifficulty: number): string {
+  return BANK_WRITE_TEMPLATE.replace('{count}', String(count)).replace(
+    '{minPerDifficulty}',
+    String(minPerDifficulty),
+  );
+}
+
+export const BANK_CHECK_SYSTEM = `You check questions written for a teaching simulation. A learner studied ONLY the notes given and taught a short
+class; now a student asks each question. Be strict: drop any question whose answer needs a fact the notes don't state.
+
+For each question, give pass or fail, with a one-sentence reason, for each check:
+- answerableFromNotes: a learner who knows only these notes can answer it fully.
+- keyCorrect: every expected point follows from the notes, adds nothing, and cites the right note ids.
+- notTrivial: for difficulty 2 and 3, answering takes applying, comparing or correcting, not repeating a line.
+  Difficulty 1 passes.
+- clear: one clear thing to answer, in natural spoken English, and not a trick.
+- safe: respectful, with no medical, legal, financial or political advice.
+
+The verdict is "keep" only if every check passes; otherwise it's "drop".`;
+
+export function bankWriteSchema(noteIds: string[]): Record<string, unknown> {
+  return {
+    type: 'object',
+    additionalProperties: false,
+    required: ['questions'],
+    properties: {
+      questions: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: false,
+          required: [
+            'id', 'type', 'difficulty', 'studentId', 'text',
+            'noteIds', 'expectedPoints', 'misconception',
+          ],
+          properties: {
+            id: { type: 'string' },
+            type: { type: 'string', enum: ['clarify', 'apply', 'compare', 'misconception'] },
+            difficulty: { type: 'integer', enum: [1, 2, 3] },
+            studentId: { type: 'string', enum: ['maya', 'leo', 'priya', 'sam'] },
+            text: { type: 'string' },
+            noteIds: {
+              type: 'array',
+              items: { type: 'string', enum: noteIds },
+            },
+            expectedPoints: {
+              type: 'array',
+              items: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['point', 'noteIds'],
+                properties: {
+                  point: { type: 'string' },
+                  noteIds: {
+                    type: 'array',
+                    items: { type: 'string', enum: noteIds },
+                  },
+                },
+              },
+            },
+            misconception: { type: ['string', 'null'] },
+          },
+        },
+      },
+    },
+  };
+}
+
+const CHECK_DEF = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['pass', 'reason'],
+  properties: { pass: { type: 'boolean' }, reason: { type: 'string' } },
+};
+
+export function bankCheckSchema(questionIds: string[]): Record<string, unknown> {
+  return {
+    type: 'object',
+    additionalProperties: false,
+    required: ['results'],
+    $defs: { check: CHECK_DEF },
+    properties: {
+      results: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: false,
+          required: [
+            'questionId', 'answerableFromNotes', 'keyCorrect', 'notTrivial',
+            'clear', 'safe', 'verdict',
+          ],
+          properties: {
+            questionId: { type: 'string', enum: questionIds },
+            answerableFromNotes: { $ref: '#/$defs/check' },
+            keyCorrect: { $ref: '#/$defs/check' },
+            notTrivial: { $ref: '#/$defs/check' },
+            clear: { $ref: '#/$defs/check' },
+            safe: { $ref: '#/$defs/check' },
+            verdict: { type: 'string', enum: ['keep', 'drop'] },
+          },
+        },
+      },
+    },
+  };
+}
+
 export function gradeAnswersSchema(
   questionIds: string[],
   noteIds: string[],
