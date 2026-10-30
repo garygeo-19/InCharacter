@@ -182,9 +182,14 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
       await page.getByRole('button', { name: 'Done' }).click();
     }
 
-    // Grading screen is transient under mocked grades: wait for the score.
+    // Grading screen is transient under mocked grades: wait for the
+    // celebration headline, then the counted-up score.
     // 61, not flow.spec's 63: this audit holds one peek above, and each peek costs 2 points (§8.4).
-    await expect(page.getByRole('heading', { name: '61 / 100' })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole('heading', { name: "Good effort — here's what to teach next time." })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('61 / 100')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole('heading', { name: 'How your score was calculated' })).toBeVisible();
+    await expect(page.getByText(/1 peek, .* → −2/)).toBeVisible();
+    await expect(page.getByText(/Total: 13\.33 \+ 50 − 2 = 61/)).toBeVisible();
     await noOverflow(page, 'debrief');
     await tapTargets(page, 'debrief');
   });

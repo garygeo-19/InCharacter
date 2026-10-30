@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 // M1 text simulation end to end at 390 × 844 (§13): Home → debrief in Type
 // mode with the model calls mocked. Timers run short via ?fast=1.
-// Expected score: lesson 13.33 + questions 50 − peeks 0 = 63, one star.
+// Expected score: lesson 13.33 + questions 50 − peeks 0 = 63, one star,
+// with the celebration headline and a breakdown that adds up to the total.
 
 const DEMO = JSON.parse(readFileSync('tests/fixtures/demo-part.json', 'utf8')) as {
   packId: string; packName: string; packVersion: string; language: string;
@@ -43,7 +44,7 @@ const PARTS_JSON = {
   }],
 };
 
-test('teach a class in Type mode, mocked grading', async ({ page }) => {
+async function mockAll(page: Page) {
   await page.route('**/api/catalog', (r) => r.fulfill({
     json: { packs: [{ id: DEMO.packId, name: 'Spanish: Food & Shopping', icon: '🍽️', version: '1.0.9', language: 'es', lessonCount: 1, cardCount: 25 }] },
   }));
@@ -91,7 +92,9 @@ test('teach a class in Type mode, mocked grading', async ({ page }) => {
       dropped: 0,
     },
   }));
+}
 
+async function driveToDebrief(page: Page) {
   await page.goto('/?fast=1');
   await expect(page.getByRole('heading', { name: 'Experience it to learn it.' })).toBeVisible();
   await page.getByRole('button', { name: /Spanish: Food & Shopping/ }).click();
@@ -128,14 +131,49 @@ test('teach a class in Type mode, mocked grading', async ({ page }) => {
     await answerBox.fill(answer);
     await page.getByRole('button', { name: 'Done' }).click();
   }
+}
 
-  // Same transient-state race as choosing: with mocked grades the
+test('teach a class in Type mode, mocked grading', async ({ page }) => {
+  await mockAll(page);
+  await driveToDebrief(page);
+
+  // Celebration for one star: the encouraging headline, the score counted
+  // up to 63, then the breakdown, all read from the score object.
+  // (Same transient-state race as choosing: with mocked grades the
   // "Grading your class…" screen can resolve before its assertion runs,
-  // so wait for the score directly.
-  await expect(page.getByRole('heading', { name: '63 / 100' })).toBeVisible({ timeout: 15000 });
+  // so wait for the headline directly.)
+  await expect(page.getByRole('heading', { name: "Good effort — here's what to teach next time." })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText('63 / 100')).toBeVisible({ timeout: 15000 });
+  // The count-up finishes in about 1.4 s, dismissing its skip hint.
+  await expect(page.getByText('Tap to skip.')).toBeHidden({ timeout: 15000 });
+  await expect(page.getByRole('heading', { name: 'How your score was calculated' })).toBeVisible();
+  // The breakdown adds up: lesson 13.33 + questions 50 − peeks 0 = 63.
+  await expect(page.getByText('Notes: 4 covered, 0 partly, 6 missed, 0 not quite right (5 of 15 weight → 13.33 of 40)')).toBeVisible();
+  await expect(page.getByText('Teaching moves: none → 0 of 10')).toBeVisible();
+  await expect(page.getByText('Lesson: 13.33 of 50')).toBeVisible();
+  await expect(page.getByText('Question 1: 15 of 15')).toBeVisible();
+  await expect(page.getByText('Question 3: 20 of 20')).toBeVisible();
+  await expect(page.getByText('Questions: 50 of 50')).toBeVisible();
+  await expect(page.getByText('Peeks: 0 peeks, 0.0s → no penalty')).toBeVisible();
+  await expect(page.getByText('Total: 13.33 + 50 − 0 = 63')).toBeVisible();
+  // Screen readers get the final headline and score announced once.
+  await expect(page.getByRole('status')).toContainText("Good effort — here's what to teach next time. Your score is 63 out of 100.");
   await expect(page.getByText('Covered', { exact: true }).first()).toBeVisible();
 
   await page.getByRole('button', { name: 'Home' }).click();
   await expect(page.getByText('Keep teaching')).toBeVisible();
   await expect(page.getByText('Best 63')).toBeVisible();
+});
+
+test('debrief shows its final state at once under prefers-reduced-motion', async ({ page }) => {
+  await mockAll(page);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await driveToDebrief(page);
+
+  await expect(page.getByRole('heading', { name: "Good effort — here's what to teach next time." })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText('63 / 100')).toBeVisible({ timeout: 15000 });
+  // No count-up, no sparkle burst, no skip hint: fully still.
+  await expect(page.locator('.spark')).toHaveCount(0);
+  await expect(page.getByText('Tap to skip.')).toHaveCount(0);
+  await expect(page.getByText('Total: 13.33 + 50 − 0 = 63')).toBeVisible();
 });

@@ -395,6 +395,49 @@ button:disabled { opacity: 0.45; cursor: default; }
 
 .stars { font-size: 30px; color: var(--accent); letter-spacing: 4px; }
 
+/* Debrief celebration: headline, count-up score, appearing stars and a
+   short sparkle burst for 2–3 stars. The burst stays inside the header
+   (overflow hidden) so it never causes horizontal scrolling. */
+.celebration {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 12px 4px 8px;
+}
+.celebration h1 { margin-bottom: 4px; }
+.score-number {
+  font-size: 56px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.star-dim { color: var(--line); }
+.star-pop { display: inline-block; animation: star-pop 0.45s ease-out; }
+@keyframes star-pop {
+  from { transform: scale(0.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.burst { position: absolute; inset: 0; pointer-events: none; }
+.spark {
+  position: absolute;
+  top: 24%;
+  border-radius: 2px;
+  opacity: 0;
+  animation: burst 1.6s ease-out forwards;
+}
+@keyframes burst {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  100% { transform: translate(var(--drift, 0px), 130px) rotate(var(--spin, 90deg)); opacity: 0; }
+}
+.breakdown {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.breakdown li { line-height: 1.55; }
+
 .sheet-backdrop {
   position: fixed;
   inset: 0;

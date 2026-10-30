@@ -78,6 +78,45 @@ export function totalScore(lesson: number, questions: number, penalty: number): 
   return { lesson, questions, peekPenalty: penalty, total, stars: starsFor(total) };
 }
 
+/** Celebration headline for a result, from the stars (§8.6). Warm for a
+ *  strong class, encouraging for a weak one, never mocking. */
+export function headlineFor(stars: number): string {
+  if (stars >= 3) return 'Congratulations, class dismissed!';
+  if (stars === 2) return 'Great class — congratulations!';
+  if (stars === 1) return "Good effort — here's what to teach next time.";
+  return "Good start. Here's what to teach next time.";
+}
+
+/** Show a score with at most 2 decimals, trimming zeros (29.33, 46.25, 6). */
+export function formatPoints(n: number): string {
+  return String(Math.round(n * 100) / 100);
+}
+
+/** Every number the debrief breakdown shows, read straight from the score
+ *  object so the breakdown always matches the total. The UI must not
+ *  recompute any of these. */
+export type ScoreBreakdown = {
+  noteCount: number;
+  covered: number;
+  partial: number;
+  missed: number;
+  wrong: number;
+  earnedWeight: number;
+  totalWeight: number;
+  coverage: number;
+  moves: string[];
+  movesPoints: number;
+  accuracyPenalty: number;
+  lesson: number;
+  perQuestion: { score: number; max: number }[];
+  questions: number;
+  peekCount: number;
+  peekSeconds: number;
+  peekPenalty: number;
+  total: number;
+  stars: number;
+};
+
 /** Full debrief score from checked grades. */
 export function scoreSession(input: {
   classGrades: CheckedNoteGrade[];
@@ -85,12 +124,13 @@ export function scoreSession(input: {
   moves: { move: string }[];
   answers: CheckedAnswerGrade[];
   peeks: Pick<Peek, 'ms'>[];
-}): Score & { lessonDetail: LessonScore; perQuestion: number[] } {
+}): Score & { lessonDetail: LessonScore; perQuestion: number[]; breakdown: ScoreBreakdown } {
   const weights = new Map(input.notes.map((n) => [n.id, n.weight]));
-  const lessonDetail = scoreLesson(
-    input.classGrades.map((g) => ({ weight: weights.get(g.noteId) ?? 0, verdict: g.verdict })),
-    input.moves.length,
-  );
+  const graded = input.classGrades.map((g) => ({
+    weight: weights.get(g.noteId) ?? 0,
+    verdict: g.verdict,
+  }));
+  const lessonDetail = scoreLesson(graded, input.moves.length);
   const { questions, perQuestion } = scoreAnswers(
     input.answers.map((a) => ({
       points: a.points,
@@ -98,6 +138,27 @@ export function scoreSession(input: {
       empty: a.empty,
     })),
   );
-  const { penalty } = peekPenalty(input.peeks);
-  return { ...totalScore(lessonDetail.lesson, questions, penalty), lessonDetail, perQuestion };
+  const peeks = peekPenalty(input.peeks);
+  const score = totalScore(lessonDetail.lesson, questions, peeks.penalty);
+  const counts = { covered: 0, partial: 0, missed: 0, wrong: 0 };
+  for (const g of input.classGrades) counts[g.verdict]++;
+  const breakdown: ScoreBreakdown = {
+    noteCount: input.classGrades.length,
+    ...counts,
+    earnedWeight: graded.reduce((s, g) => s + g.weight * creditFor(g.verdict), 0),
+    totalWeight: graded.reduce((s, g) => s + g.weight, 0),
+    coverage: lessonDetail.coverage,
+    moves: input.moves.map((m) => m.move),
+    movesPoints: lessonDetail.movesPoints,
+    accuracyPenalty: lessonDetail.accuracyPenalty,
+    lesson: lessonDetail.lesson,
+    perQuestion: perQuestion.map((s, i) => ({ score: s, max: SCORING_CONFIG.questionPoints[i] ?? 0 })),
+    questions,
+    peekCount: peeks.count,
+    peekSeconds: peeks.seconds,
+    peekPenalty: peeks.penalty,
+    total: score.total,
+    stars: score.stars,
+  };
+  return { ...score, lessonDetail, perQuestion, breakdown };
 }

@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { splitTextToLines } from '../shared/lines';
 import { buildNotes, buildOutline, PackSchema, stripPrefix, type Note } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
-import { scoreSession } from '../shared/scoring';
+import { formatPoints, headlineFor, scoreSession } from '../shared/scoring';
 import type { Line, Peek } from '../shared/types';
 import { api, type BankDisplay, type LineIn } from './api';
-import { Segments, Stars, VerdictChip, mmss } from './format';
+import { Segments, VerdictChip, mmss } from './format';
 import { captureToWav, startCapture, type VoiceCapture } from './voice';
 import {
   excludeIds,
@@ -705,6 +705,122 @@ function NoScoreDebrief(props: {
   );
 }
 
+function useReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  );
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return reduced;
+}
+
+// The celebration at the top of the debrief: the headline, the score
+// counting up with the stars appearing, and a short sparkle burst for 2–3
+// stars. Under prefers-reduced-motion the final state shows at once; a tap
+// skips the animation. No sound. The visible score stays silent for screen
+// readers while counting; one live region announces the final headline and
+// score once.
+function Celebration({ headline, total, stars }: { headline: string; total: number; stars: number }) {
+  const reduceMotion = useReducedMotion();
+  const [shown, setShown] = useState(reduceMotion ? total : 0);
+  const done = shown >= total;
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setShown(total);
+      return;
+    }
+    setShown(0);
+    let raf = 0;
+    const start = performance.now();
+    const DURATION_MS = 1400;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / DURATION_MS);
+      setShown(Math.round((1 - Math.pow(1 - p, 3)) * total));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [total, reduceMotion]);
+
+  // Stars appear one by one as the count climbs.
+  const revealed = done || total <= 0 ? stars : Math.min(stars, Math.floor((shown / total) * (stars + 1)));
+
+  const pieces = useMemo(
+    () =>
+      Array.from({ length: 26 }, (_, i) => ({
+        left: (i * 37.7) % 100,
+        delay: ((i * 53) % 300) / 1000,
+        size: 6 + ((i * 29) % 8),
+        color: ['#9a3412', '#e0b84f', '#1b5e20', '#d98a85'][i % 4],
+        drift: ((i * 41) % 120) - 60,
+        spin: ((i * 67) % 360) - 180,
+      })),
+    [],
+  );
+
+  return (
+    <>
+      <section
+        className="celebration"
+        aria-label="Your score"
+        onClick={() => setShown(total)}
+      >
+        {stars >= 2 && !reduceMotion && (
+          <div className="burst" aria-hidden="true">
+            {pieces.map((p, i) => (
+              <span
+                key={i}
+                className="spark"
+                style={
+                  {
+                    left: `${p.left}%`,
+                    width: p.size,
+                    height: p.size,
+                    background: p.color,
+                    animationDelay: `${p.delay}s`,
+                    '--drift': `${p.drift}px`,
+                    '--spin': `${p.spin}deg`,
+                  } as CSSProperties
+                }
+              />
+            ))}
+          </div>
+        )}
+        <h1>{headline}</h1>
+        <div className="score-number" aria-hidden="true">
+          {shown} / 100
+        </div>
+        {stars <= 0 ? (
+          <span className="stars">Keep practicing</span>
+        ) : (
+          <span className="stars" aria-hidden="true">
+            {Array.from({ length: 3 }, (_, i) => (
+              <span key={`${i}-${i < revealed ? 'on' : 'off'}`} className={i < revealed ? 'star-pop' : 'star-dim'}>
+                {i < revealed ? '★' : '☆'}
+              </span>
+            ))}
+          </span>
+        )}
+        {!done && <p className="fine">Tap to skip.</p>}
+      </section>
+      {done && (
+        <p className="sr-only" role="status">
+          {headline} Your score is {total} out of 100.
+        </p>
+      )}
+    </>
+  );
+}
+
 function Debrief(props: {
   notes: Note[];
   bankById: Map<string, BankDisplay>;
@@ -723,8 +839,9 @@ function Debrief(props: {
   const [expanded, setExpanded] = useState<string | null>(null);
   const notesById = useMemo(() => new Map(props.notes.map((n) => [n.id, n])), [props.notes]);
 
+  // The breakdown below reads every number from this score object, so it
+  // always matches the total. Nothing here recomputes scoring math.
   const score = useMemo(() => {
-    const weights = new Map(props.notes.map((n) => [n.id, n.weight]));
     return scoreSession({
       classGrades: props.classGrade.notes,
       notes: props.notes.map((n) => ({ id: n.id, weight: n.weight })),
@@ -742,12 +859,46 @@ function Debrief(props: {
     }
   }, [score]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const peekSecs = props.peeks.reduce((s, p) => s + p.ms, 0) / 1000;
+  const b = score.breakdown;
+  const headline = headlineFor(score.stars);
 
   return (
     <>
-      <h1>{score.total} / 100</h1>
-      <Stars n={score.stars} />
+      <Celebration headline={headline} total={score.total} stars={score.stars} />
+      <section aria-label="How your score was calculated">
+        <h2>How your score was calculated</h2>
+        <ul className="breakdown">
+          <li>
+            Notes: {b.covered} covered, {b.partial} partly, {b.missed} missed,{' '}
+            {b.wrong} not quite right ({formatPoints(b.earnedWeight)} of {formatPoints(b.totalWeight)} weight →{' '}
+            {formatPoints(b.coverage)} of 40)
+          </li>
+          <li>
+            Teaching moves: {b.moves.length > 0 ? b.moves.join(', ') : 'none'} →{' '}
+            {formatPoints(b.movesPoints)} of 10
+          </li>
+          {b.accuracyPenalty > 0 && (
+            <li>Not quite right: −{formatPoints(b.accuracyPenalty)} (2 points per note)</li>
+          )}
+          <li>Lesson: {formatPoints(b.lesson)} of 50</li>
+          {b.perQuestion.map((q, i) => (
+            <li key={i}>
+              Question {i + 1}: {formatPoints(q.score)} of {q.max}
+            </li>
+          ))}
+          <li>Questions: {formatPoints(b.questions)} of 50</li>
+          <li>
+            Peeks: {b.peekCount} peek{b.peekCount === 1 ? '' : 's'}, {b.peekSeconds.toFixed(1)}s →{' '}
+            {b.peekPenalty > 0 ? `−${formatPoints(b.peekPenalty)}` : 'no penalty'}
+          </li>
+          <li>
+            <strong>
+              Total: {formatPoints(b.lesson)} + {formatPoints(b.questions)} − {formatPoints(b.peekPenalty)} ={' '}
+              {b.total}
+            </strong>
+          </li>
+        </ul>
+      </section>
       <section aria-label="Your class">
         <h2>Your class</h2>
         {props.classGrade.notes.map((g) => {
@@ -819,11 +970,11 @@ function Debrief(props: {
       <section aria-label="Peeks">
         <h2>Peeks</h2>
         <p>
-          {props.peeks.length} peek{props.peeks.length === 1 ? '' : 's'}, {peekSecs.toFixed(1)}s
+          {b.peekCount} peek{b.peekCount === 1 ? '' : 's'}, {b.peekSeconds.toFixed(1)}s
           {props.peeks.length > 0 && (
             <> on {[...new Set(props.peeks.map((p) => notesById.get(p.noteId)?.label ?? p.noteId))].join(', ')}</>
           )}
-          . −{score.peekPenalty} points.
+          . {b.peekPenalty > 0 ? `−${formatPoints(b.peekPenalty)} points` : 'no penalty'}.
         </p>
       </section>
 

@@ -3,6 +3,8 @@ import type { ClassVerdict } from './evidence';
 import { buildNotes } from './notes';
 import { loadDemoPack } from './demo-fixture';
 import {
+  formatPoints,
+  headlineFor,
   peekPenalty,
   scoreAnswers,
   scoreLesson,
@@ -121,6 +123,61 @@ describe('scoring (§8)', () => {
   it('awards stars at 85/65/40', () => {
     expect([85, 65, 40].map(starsFor)).toEqual([3, 2, 1]);
     expect([84, 64, 39].map(starsFor)).toEqual([2, 1, 0]);
+  });
+
+  it('reports a breakdown that adds up to the §8.7 total of 72', () => {
+    // Same worked example as above, through scoreSession: 5 facts
+    // (3 covered, 1 partial, 1 missed) + 5 words (4 covered, 1 wrong),
+    // 2 moves, Q1 hit / Q2 hit+partial / Q3 hit+hit, 2 peeks of 7.4 s.
+    const factVerdicts: ClassVerdict[] = ['covered', 'covered', 'covered', 'partial', 'missed'];
+    const wordVerdicts: ClassVerdict[] = ['covered', 'covered', 'covered', 'covered', 'wrong'];
+    const notes = [
+      ...factVerdicts.map((_, i) => ({ id: `fact-${i}`, weight: 2 })),
+      ...wordVerdicts.map((_, i) => ({ id: `word-${i}`, weight: 1 })),
+    ];
+    const score = scoreSession({
+      classGrades: [
+        ...factVerdicts.map((verdict, i) => ({ noteId: `fact-${i}`, verdict, quote: 'q', why: 'test' })),
+        ...wordVerdicts.map((verdict, i) => ({ noteId: `word-${i}`, verdict, quote: 'q', why: 'test' })),
+      ],
+      notes,
+      moves: [{ move: 'example' }, { move: 'recap' }],
+      answers: [
+        { questionId: 'q1', points: [{ index: 0, result: 'hit', quote: 'q' }], contradictions: [], empty: false },
+        { questionId: 'q2', points: [{ index: 0, result: 'hit', quote: 'q' }, { index: 1, result: 'partial', quote: 'q' }], contradictions: [], empty: false },
+        { questionId: 'q3', points: [{ index: 0, result: 'hit', quote: 'q' }, { index: 1, result: 'hit', quote: 'q' }], contradictions: [], empty: false },
+      ],
+      peeks: [{ ms: 5000 }, { ms: 2400 }],
+    });
+    const b = score.breakdown;
+    expect(b.noteCount).toBe(10);
+    expect([b.covered, b.partial, b.missed, b.wrong]).toEqual([7, 1, 1, 1]);
+    expect(b.earnedWeight).toBe(11);
+    expect(b.totalWeight).toBe(15);
+    expect(b.coverage).toBeCloseTo(29.33, 2);
+    expect(b.moves).toEqual(['example', 'recap']);
+    expect(b.movesPoints).toBe(4);
+    expect(b.accuracyPenalty).toBe(2);
+    expect(b.lesson).toBeCloseTo(31.33, 2);
+    expect(b.perQuestion.map((q) => q.score)).toEqual([15, 11.25, 20]);
+    expect(b.perQuestion.map((q) => q.max)).toEqual([15, 15, 20]);
+    expect(b.questions).toBeCloseTo(46.25, 2);
+    expect(b.peekCount).toBe(2);
+    expect(b.peekSeconds).toBeCloseTo(7.4, 5);
+    expect(b.peekPenalty).toBe(6);
+    // The breakdown adds up to the total shown: 31.33 + 46.25 − 6 = 71.58 → 72.
+    expect(Math.round(b.lesson + b.questions - b.peekPenalty)).toBe(b.total);
+    expect(b.total).toBe(72);
+    expect(b.stars).toBe(2);
+    expect(formatPoints(b.coverage)).toBe('29.33');
+    expect(formatPoints(b.questions)).toBe('46.25');
+  });
+
+  it('celebrates warmly for strong classes and kindly for weak ones', () => {
+    expect(headlineFor(3)).toBe('Congratulations, class dismissed!');
+    expect(headlineFor(2)).toBe('Great class — congratulations!');
+    expect(headlineFor(1)).toBe("Good effort — here's what to teach next time.");
+    expect(headlineFor(0)).toBe("Good start. Here's what to teach next time.");
   });
 
   it('scores a session end to end', () => {
