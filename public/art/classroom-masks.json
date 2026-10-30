@@ -1,0 +1,49 @@
+{
+  "image": "art/classroom.webp",
+  "width": 0,
+  "height": 0,
+  "source": "hand",
+  "prompt": "person",
+  "segments": [
+    {
+      "studentId": "maya",
+      "box": {
+        "x1": 0.1,
+        "x2": 0.335,
+        "y1": 0.375,
+        "y2": 0.84
+      },
+      "mask": null
+    },
+    {
+      "studentId": "leo",
+      "box": {
+        "x1": 0.36,
+        "x2": 0.6,
+        "y1": 0.36,
+        "y2": 0.85
+      },
+      "mask": null
+    },
+    {
+      "studentId": "priya",
+      "box": {
+        "x1": 0.6,
+        "x2": 0.83,
+        "y1": 0.355,
+        "y2": 0.85
+      },
+      "mask": null
+    },
+    {
+      "studentId": "sam",
+      "box": {
+        "x1": 0.825,
+        "x2": 0.998,
+        "y1": 0.32,
+        "y2": 0.86
+      },
+      "mask": null
+    }
+  ]
+}

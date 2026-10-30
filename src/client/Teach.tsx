@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import cast from '../../content/cast.json';
 import { buildNotes, buildOutline, PackSchema, stripPrefix, type Note } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { scoreSession } from '../shared/scoring';
@@ -14,6 +13,7 @@ import {
   type Settings,
 } from './history';
 import { OutlinePeek } from './peek';
+import { CastRow, ClassroomFigure, PortraitImg, studentById } from './art';
 
 type Phase =
   | { name: 'countdown'; count: number }
@@ -41,9 +41,9 @@ type AnswersGrade = {
   dropped: number;
 };
 
-const studentsById = new Map(
-  (cast.students as { id: string; name: string }[]).map((s) => [s.id, s.name]),
-);
+function studentName(id: string): string {
+  return studentById(id)?.name ?? id;
+}
 
 export function Teach(props: {
   packId: string;
@@ -428,11 +428,7 @@ function ClassScreen(props: {
       <div className="timer" role="timer" aria-live={warned ? 'polite' : 'off'}>
         {mmss(left)}
       </div>
-      <div className="classroom small" aria-label="Students listening">
-        {(cast.students as { id: string; name: string }[]).map((s) => (
-          <span className="student-dot" key={s.id}>{s.name[0]}</span>
-        ))}
-      </div>
+      <ClassroomFigure small alt="Your class listening" label="Students listening" />
       <OutlinePeek
         outline={props.outline} noteText={props.noteText} phase="class"
         peekStyle={props.peekStyle} onPeek={props.onPeek}
@@ -565,13 +561,19 @@ function QuestionScreen(props: {
   }, [props.asking, props.index]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!q) return <p>Loading question…</p>;
-  const student = studentsById.get(q.studentId) ?? q.studentId;
+  const student = studentName(q.studentId);
 
   return (
     <>
       <p className="fine">Question {props.index + 1} of 3.</p>
+      <ClassroomFigure
+        small
+        highlightId={q.studentId}
+        label={`${student} is asking`}
+        alt={`${student} is asking a question. The class listens.`}
+      />
       <div className="question">
-        <span className="portrait" aria-hidden>{student[0]}</span>
+        <PortraitImg id={q.studentId} />
         <div className="bubble">
           <p className="asker">{student}</p>
           <p>{q.text}</p>
@@ -650,11 +652,7 @@ function Grading(props: {
   return (
     <>
       <h1>Grading your class…</h1>
-      <div className="classroom small" aria-label="Students">
-        {(cast.students as { id: string; name: string }[]).map((s) => (
-          <span className="student-dot" key={s.id}>{s.name[0]}</span>
-        ))}
-      </div>
+      <CastRow />
     </>
   );
 }
@@ -770,7 +768,7 @@ function Debrief(props: {
           const lines = props.answers.find((x) => x.questionId === a.questionId)?.lines ?? [];
           return (
             <div className="grade-row" key={a.questionId}>
-              <p><strong>{studentsById.get(q?.studentId ?? '') ?? ''}:</strong> {q?.text}</p>
+              <p><strong>{studentName(q?.studentId ?? '')}:</strong> {q?.text}</p>
               <ul className="chat-lines">
                 {lines.length === 0 && <li className="chat-line empty-answer">(no answer — scored 0)</li>}
                 {lines.map((l) => (

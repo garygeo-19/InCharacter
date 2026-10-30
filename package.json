@@ -18,7 +18,8 @@
     "bank:build": "tsx scripts/bank-build.ts",
     "bank:review": "tsx scripts/bank-review.ts",
     "bank:approve": "tsx scripts/bank-approve.ts",
-    "bank:audio": "tsx scripts/bank-audio.ts"
+    "bank:audio": "tsx scripts/bank-audio.ts",
+    "art:build": "tsx scripts/art-build.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",

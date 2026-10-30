@@ -82,6 +82,36 @@ Live spend M3: ≈ $0.002 (the single day-1 call). Cumulative live spend: ≈ $0
 
 **Owner, please test by voice in the morning:** on iPhone Safari and a laptop, pick Voice in the briefing (mic check should show the meter), teach the demo class aloud for 3 minutes, answer all three questions by voice, and confirm the lines look right. Then read Appendix C fixture A aloud — M3 acceptance is ≥ 8 of its 10 notes covered. Separately: pick the four ElevenLabs voices (§15 item 3), set `ELEVENLABS_API_KEY`, run `npm run bank:audio -- content/banks/spanish-food-shopping/p10-at-the-restaurant.json`, and listen to every line by ear before approval.
 
+## M4 — The classroom (§12)
+
+Done 30 Oct 2026: `npm run art:build` (new `scripts/art-build.ts`) made all five pictures with Muse Image (`muse-image-1.0`, Responses API, prompt A.6 verbatim), then `art:build -- --finalize` compressed them and `--sam` / `--hand` handled the masks. Every request carried an `image_generation` tool with `enable_web_search: false, enable_image_search: false` (fictional people; the image guide's "Control the tools and reasoning"). Portraits used the classroom picture as the reference image.
+
+| Picture | Kept | Check |
+|---|---|---|
+| classroom | attempt 1 | Four distinct adults matching the cast left to right (mustard sweater, denim jacket + gray beard, glasses + teal cardigan, red hoodie); calm evening room (lamp, dusk window, plant, desks); blank papers only, no text or logos; flat illustration, no real likeness; nothing unsafe |
+| maya | attempt 1 | Same face/hair/sweater/style as the classroom; plain warm background; no text |
+| leo | attempt 1 | Same face/beard/jacket/style as the classroom; plain warm background; no text |
+| priya | attempt 1 | Same face/glasses/cardigan/style as the classroom; plain warm background; no text |
+| sam | attempt 1 | Same face/hair/hoodie/style as the classroom; plain warm background; no text |
+
+No regenerations were needed: 5 image calls of the 20-call budget, 1 attempt per picture of 3 allowed. Candidates lived in `/tmp/m4art/` (never in `public/`); each keeper was viewed before `--finalize` copied it.
+
+Final art (WebP, PIL quality 80): classroom 62,310 B; maya 23,436 B; leo 26,852 B; priya 24,652 B; sam 14,484 B — total 151,734 B (148.2 KB), under the 500 KB acceptance. `content/cast.json` validated complete (`voiceId` still `<pick>`).
+
+SAM 3.1 did not work: two calls (`sam-3.1`, Responses API, prompt `person` on the final classroom picture) each returned a single box around the central figure instead of four. Per §9.8 the Must fallback applies — `public/art/classroom-masks.json` holds hand-set boxes (`"source": "hand"`), verified by eye against a PIL box overlay (each box frames its student, left to right maya/leo/priya/sam). The questions screen outlines the asker and dims the rest from these boxes.
+
+Screens: briefing shows the classroom picture with a named portrait row; class shows it smaller; each question shows the asker's portrait beside the bubble plus the classroom with the asker outlined; grading shows the portrait row. Every picture has alt text (cast descriptions). Layout stays a centered 480 px column, which the spec allows on laptop instead of two panes — nothing overflows at 360/390/1280 px widths (images are `width: 100%`), but no browser lives in this sandbox, so confirm visually in the morning.
+
+Live spend M4: 5 images × $0.01 = $0.05, plus 2 SAM segmentations × $2.50/1,000 ≈ $0.005 — ≈ $0.055. Cumulative live spend: ≈ $0.599.
+
+**Owner, please look at the pictures in the morning:** briefing → Start class → teach → answer three questions, on a phone and a laptop. Check the four faces match their names, the asker lights up in the classroom picture each question, and nothing overflows at your screen size.
+
+### M4 decisions
+
+- 30 Oct 2026 — The client fetches `art/classroom-masks.json` at run time and falls back to the same hand boxes baked into `src/client/art.tsx` when the fetch fails, so the highlight never breaks offline.
+- 30 Oct 2026 — Mask overlays render as positioned divs (accent outline + dim), not decoded mask polygons: SAM returned no usable masks, and boxes are all the highlight needs.
+- 30 Oct 2026 — `tests/art.test.ts` pins the milestone: cast completeness, five WebP files under 500 KB total, four valid fractional boxes in cast order left to right.
+
 ## Decisions
 
 Choices made where the spec is silent, one line each with its date.

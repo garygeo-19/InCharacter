@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import cast from '../../content/cast.json';
 import comingSoon from '../../content/coming-soon.json';
+import { CastRow, ClassroomFigure } from './art';
 import { buildNotes, PackSchema, stripPrefix } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { api, type CatalogPack, type PartsResponse } from './api';
@@ -406,15 +406,8 @@ function Briefing(props: {
     <>
       <button type="button" className="secondary" onClick={props.onBack}>‹ Classes</button>
       {roleLine}
-      <div className="classroom" aria-label="Your class">
-        {(cast.students as { id: string; name: string; description: string }[]).map((s) => (
-          <figure className="student" key={s.id}>
-            <span className="portrait" aria-hidden>{s.name[0]}</span>
-            <figcaption>{s.name}</figcaption>
-          </figure>
-        ))}
-        <p className="fine">Classroom picture arrives in M4.</p>
-      </div>
+      <ClassroomFigure label="Your class" />
+      <CastRow />
       <section aria-label="How it works">
         <p>Study the notes. Teach for {mmss(SCORING_CONFIG.classSeconds.typed).replace(':', ' min ')} min, then answer three questions.</p>
         <p>Peeking at your notes during class costs points.</p>
