@@ -7,6 +7,9 @@ export default defineConfig({
   root: '.',
   server: {
     host: '0.0.0.0',
+    // Dev only: lets a free Cloudflare quick tunnel (https://*.trycloudflare.com) serve the app over HTTPS,
+    // which phones need before they allow the microphone.
+    allowedHosts: ['.trycloudflare.com'],
     port: 5173,
     strictPort: true,
     proxy: {
