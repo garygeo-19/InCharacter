@@ -181,7 +181,8 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
     }
 
     // Grading screen is transient under mocked grades: wait for the score.
-    await expect(page.getByRole('heading', { name: '63 / 100' })).toBeVisible({ timeout: 15000 });
+    // 61, not flow.spec's 63: this audit holds one peek above, and each peek costs 2 points (§8.4).
+    await expect(page.getByRole('heading', { name: '61 / 100' })).toBeVisible({ timeout: 15000 });
     await noOverflow(page, 'debrief');
     await tapTargets(page, 'debrief');
   });
