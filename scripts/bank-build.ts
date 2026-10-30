@@ -14,6 +14,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   applyCheckerResults,
+  assignQuestionIds,
   checkBank,
   checkQuestionText,
   isReady,
@@ -116,21 +117,26 @@ async function main() {
   });
   console.log(`Writer drafted ${written.questions.length} questions.`);
 
-  let drafts: BankQuestion[] = written.questions.map((q) => ({
-    id: q.id,
-    status: 'draft' as const,
-    type: q.type,
-    difficulty: q.difficulty,
-    studentId: q.studentId,
-    text: q.text,
-    ttsText: null,
-    noteIds: q.noteIds,
-    expectedPoints: q.expectedPoints,
-    misconception: q.misconception,
-    check: null,
-    review: null,
-    audio: null,
-  }));
+  // Root cause fix: ids are code-made ("q-" plus a slug of the text,
+  // de-duplicated), assigned before the code checks. Writer-supplied ids are
+  // ignored, so a draft with a bad id gets a valid id instead of being rejected.
+  let drafts: BankQuestion[] = assignQuestionIds(
+    written.questions.map((q) => ({
+      id: q.id,
+      status: 'draft' as const,
+      type: q.type,
+      difficulty: q.difficulty,
+      studentId: q.studentId,
+      text: q.text,
+      ttsText: null,
+      noteIds: q.noteIds,
+      expectedPoints: q.expectedPoints,
+      misconception: q.misconception,
+      check: null,
+      review: null,
+      audio: null,
+    })),
+  );
 
   // Duplicate ids: keep the first, reject the rest in code.
   const seen = new Set<string>();

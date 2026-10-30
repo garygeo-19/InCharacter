@@ -151,6 +151,8 @@ Rules:
   wording where you can. For a misconception question, put the wrong belief in "misconception" and make the first
   expected point the correction.
 - Cover every note at least once. Write {count} questions, at least {minPerDifficulty} at each difficulty.
+- id: "q-" plus a slug of the question text in lowercase letters and digits joined with hyphens
+  (for example "q-menu-in-madrid"), unique within the bank.
 - Be kind and respectful. No medical, legal, financial or political advice.`;
 
 export function bankWriteSystem(count: number, minPerDifficulty: number): string {

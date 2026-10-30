@@ -74,6 +74,39 @@ export function isReady(questions: BankQuestion[]): boolean {
   return [1, 2, 3].every((d) => questions.filter((q) => q.difficulty === d).length >= 2);
 }
 
+// --- Code-made question ids -----------------------------------------------------
+// Root cause fix: writer-supplied ids are ignored. Every draft gets a code-made
+// id ("q-" plus a slug of its text, de-duplicated) before the code checks run,
+// so a draft with a bad id gets a valid id instead of being rejected.
+
+const ID_RE = /^q-[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/** Slug of question text for a code-made id: lowercase alphanumerics joined with hyphens. */
+export function questionSlug(text: string): string {
+  const ascii = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const slug = ascii
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-')
+    .slice(0, 48)
+    .replace(/-+$/g, '');
+  return slug || 'question';
+}
+
+/** Assign every draft a code-made id, de-duplicated in bank order. */
+export function assignQuestionIds<T extends { id: string; text: string }>(drafts: T[]): T[] {
+  const seen = new Set<string>();
+  return drafts.map((q) => {
+    const base = `q-${questionSlug(q.text)}`;
+    let id = base;
+    let n = 2;
+    while (seen.has(id)) id = `${base}-${n++}`;
+    seen.add(id);
+    return { ...q, id };
+  });
+}
+
 // --- §7.5 code checks ----------------------------------------------------------
 
 const QUOTED_RE = /(?:^|[\s([{])'([^']+)'/g;
@@ -289,7 +322,7 @@ export function checkBank(bank: Bank, notes: Note[]): string[] {
   }
   const seen = new Set<string>();
   for (const q of bank.questions) {
-    if (!/^q-[a-z0-9]+(-[a-z0-9]+)*$/.test(q.id)) {
+    if (!ID_RE.test(q.id)) {
       errors.push(`${q.id}: id must be "q-" plus a slug`);
     }
     if (seen.has(q.id)) errors.push(`${q.id}: duplicate id`);

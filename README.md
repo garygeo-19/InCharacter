@@ -54,15 +54,15 @@ Done 30 Oct 2026, Type mode only. Flow: Home (live catalog, Keep teaching) → p
 
 ## M2 — Question banks (§12)
 
-30 Oct 2026, partial: 1 of 3 parts ready. `bank:build` (writer → code checks → checker → select), `bank:review` and `bank:approve` exist; the M2 checker test slips the four §7.1 ✗ questions into a draft and uses recorded B.5 verdicts, so it never spends credits.
+Done 30 Oct 2026: all 3 parts ready. `bank:build` (writer → code-made ids → code checks → checker → select), `bank:review` and `bank:approve` exist; the M2 checker test slips the four §7.1 ✗ questions into a draft and uses recorded B.5 verdicts, so it never spends credits. A code-ids unit test pins the root-cause fix (bad writer id → valid code-made id).
 
 | Part | Notes | Kept | Ready |
 |---|---|---|---|
 | p10 At the Restaurant | 10 | 12 checked (d1: 3, d2: 4, d3: 5) | Yes — verified fresh (hashes match live v1.0.9), not rebuilt |
-| p11 Common Foods | 11 | 0 (26 drafts, all rejected) | No |
-| p12 Drinks and Sweets | 11 | 0 (26 drafts, all rejected) | No |
+| p11 Common Foods | 11 | 13 checked (d1: 7, d2: 3, d3: 3) | Yes — rebuilt live once after the fix; code checks rejected 0, checker rejected 0 |
+| p12 Drinks and Sweets | 11 | 13 checked (d1: 7, d2: 3, d3: 3) | Yes — rebuilt live once after the fix; code checks rejected 0, checker rejected 1 |
 
-Live spend: p11 ≈ $0.056, p12 ≈ $0.061 (writer only; checker had nothing to check), total ≈ $0.117. Each part was built exactly once; no re-runs. See Decisions for why p11/p12 kept nothing and the proposed fix.
+Live spend: first p11/p12 builds ≈ $0.117 total (writer only; checker had nothing to check; files superseded). Rebuilds after the fix: p11 ≈ $0.196, p12 ≈ $0.229. M2 live total ≈ $0.542. Each part was rebuilt exactly once with owner approval; kept questions stay `checked` (human review/approval is later).
 
 ## Decisions
 
@@ -77,5 +77,5 @@ Choices made where the spec is silent, one line each with its date.
 - 30 Oct 2026 — The client reads catalog/packs through `/api` (the server caches packs by `id@version`); note hashes use a dependency-free SHA-256 so the same module runs in the browser.
 - 30 Oct 2026 — `?fast=1` shortens timers (class 12 s, answers 8 s) for the mocked E2E and demos; real play uses the §8 config values.
 - 30 Oct 2026 — Model-call effects fire once via refs, so React StrictMode's dev double-mount can't double-spend.
-- 30 Oct 2026 — M2 live builds: all 52 drafts for p11/p12 were rejected solely for id shape (`q01…`, `maya-1…` instead of `q-` slugs). The A.4 writer prompt never states the id format and the B.4 schema leaves `id` a free string, so the model invents ids. Proposed fix (not yet applied): add `"pattern": "^q-[a-z0-9]+(-[a-z0-9]+)*$"` to the writer schema's id field and/or state the format in the writer user message, then rebuild each part once with owner approval.
-- 30 Oct 2026 — The p11/p12 bank files are committed with 0 kept questions as the recorded output of their single allowed runs; the app treats those parts as not ready ("Coming soon") until rebuilt.
+- 30 Oct 2026 — M2 live builds: all 52 drafts for p11/p12 were rejected solely for id shape (`q01…`, `maya-1…` instead of `q-` slugs). The A.4 writer prompt never stated the id format and the B.4 schema leaves `id` a free string, so the model invented ids.
+- 30 Oct 2026 — M2 root-cause fix (applied): question ids no longer depend on the writer. `bank:build` assigns every draft a code-made id (`q-` plus a slug of its text, de-duplicated, in `assignQuestionIds`) before the code checks, so a bad writer id is repaired, never a rejection. The A.4 writer prompt now also states the id format (a one-line addition to the spec-verbatim prompt, since spec Appendix A omits it). The p11/p12 zero-kept files were superseded by one approved live rebuild each.

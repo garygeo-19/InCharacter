@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   applyCheckerResults,
+  assignQuestionIds,
   checkAnswerKey,
   checkBank,
   checkQuestionText,
@@ -10,6 +11,7 @@ import {
   notesBlob,
   parseUsableStatuses,
   questionCodeErrors,
+  questionSlug,
   selectBank,
   staleUsableIds,
   targetCount,
@@ -186,6 +188,45 @@ function dropResults(): CheckerResult[] {
     ),
   ];
 }
+
+describe('code-assigned question ids (M2 root-cause fix)', () => {
+  const bank = loadSeedBank();
+  const notes = buildNotes(loadDemoPack(), 'p10-at-the-restaurant');
+
+  function validDraft(id: string, text: string): Bank['questions'][number] {
+    return {
+      id, status: 'draft', type: 'clarify', difficulty: 1, studentId: 'maya',
+      text, ttsText: null,
+      noteIds: ['fact-buen-provecho'],
+      expectedPoints: [
+        { point: 'Say Buen provecho when food is served.', noteIds: ['fact-buen-provecho'] },
+      ],
+      misconception: null, check: null, review: null, audio: null,
+    };
+  }
+
+  it('a draft with a bad id gets a valid id instead of being rejected', () => {
+    const bad = validDraft('q01', 'What does Buen provecho mean when food is served?');
+    const before = checkBank({ ...bank, questions: [...bank.questions, bad] }, notes);
+    expect(questionCodeErrors('q01', before).length).toBeGreaterThan(0);
+
+    const [fixed] = assignQuestionIds([bad]);
+    expect(fixed.id).toMatch(/^q-[a-z0-9]+(-[a-z0-9]+)*$/);
+    const after = checkBank({ ...bank, questions: [...bank.questions, fixed] }, notes);
+    expect(questionCodeErrors(fixed.id, after)).toEqual([]);
+  });
+
+  it('slugs text, strips accents, and de-duplicates equal texts', () => {
+    expect(questionSlug('What is the menú del día?')).toBe('what-is-the-menu-del-dia');
+    const [a, b] = assignQuestionIds([
+      validDraft('maya-1', 'Same question text here?'),
+      validDraft('maya-2', 'Same question text here?'),
+    ]);
+    expect(a.id).toBe('q-same-question-text-here');
+    expect(b.id).toMatch(/^q-[a-z0-9]+(-[a-z0-9]+)*$/);
+    expect(new Set([a.id, b.id]).size).toBe(2);
+  });
+});
 
 describe('M2 checker test (§12 M2, mocked checker responses)', () => {
   const bank = loadSeedBank();
