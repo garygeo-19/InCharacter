@@ -14,3 +14,4 @@ test-results/
 # Local files
 .DS_Store
 *.log
+.dev.vars

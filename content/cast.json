@@ -1,0 +1,10 @@
+{
+  "classroom": "art/classroom.webp",
+  "masks": "art/classroom-masks.json",
+  "students": [
+    { "id": "maya", "name": "Maya", "type": "clarify", "description": "in her thirties, curly dark hair, mustard sweater", "voiceId": "<pick>", "portrait": "art/students/maya.webp" },
+    { "id": "leo", "name": "Leo", "type": "apply", "description": "in his sixties, gray beard, denim jacket", "voiceId": "<pick>", "portrait": "art/students/leo.webp" },
+    { "id": "priya", "name": "Priya", "type": "compare", "description": "in her forties, glasses, teal cardigan", "voiceId": "<pick>", "portrait": "art/students/priya.webp" },
+    { "id": "sam", "name": "Sam", "type": "misconception", "description": "in his twenties, short hair, red hoodie", "voiceId": "<pick>", "portrait": "art/students/sam.webp" }
+  ]
+}
