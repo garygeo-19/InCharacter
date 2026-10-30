@@ -1,0 +1,171 @@
+{
+  "packId": "spanish-food-shopping",
+  "partId": "p11-common-foods",
+  "labelsBy": "draft",
+  "classes": [
+    {
+      "id": "p11-strong",
+      "mode": "typed",
+      "lines": [
+        "Welcome! Today we are talking about food words in Spanish.",
+        "First, fish. El pez is a fish alive in the water, but el pescado is the same animal once it has been caught and put on a plate. Ask a waiter for pez and you have technically ordered an aquarium.",
+        "Four common meats on Spanish menus: pollo, chicken; cerdo, pork; cordero, lamb; and carne de res, beef, the usual term in Mexico and much of Latin America.",
+        "Careful with ternera: in Mexico it is veal, the meat of a young calf, but in Spain it is the usual word for beef, young beef. Meat from an older animal is sold as vaca or buey.",
+        "The Spanish pantry runs on aceite de oliva and sal: la paella lleva mucho aceite de oliva. Spain is the world’s largest olive oil producer. The two basic starches are pan, bread, and arroz, rice.",
+        "Verduras covers vegetables broadly, while legumbres, lentils, chickpeas and beans, get a word of their own.",
+        "And fruta means fruit.",
+        "For example, a menu might list pollo, cerdo and pescado with arroz and verduras.",
+        "Do not mix up pez and pescado when you order, that is the trap.",
+        "Quick check: what do legumbres mean?",
+        "So: pez swims but pescado is dinner, four meats, pantry staples, and verduras versus legumbres."
+      ],
+      "labels": {
+        "notes": {
+          "fact-pescado-vs-pez": "covered",
+          "fact-cuatro-carnes": "covered",
+          "fact-despensa-aceite-arroz": "covered",
+          "fi-ot-legumbres": "covered",
+          "fi-mcq-meat-types": "covered",
+          "pair-aceite": "covered",
+          "pair-arroz": "covered",
+          "pair-pollo": "covered",
+          "pair-pescado": "covered",
+          "pair-verduras": "covered",
+          "pair-fruta": "covered"
+        },
+        "moves": [
+          "example",
+          "pitfall",
+          "check",
+          "recap"
+        ]
+      }
+    },
+    {
+      "id": "p11-partial",
+      "mode": "typed",
+      "lines": [
+        "Today: food words.",
+        "There is pez and pescado, two fish words.",
+        "Pollo means chicken, and carne de res is beef.",
+        "Aceite de oliva is olive oil, and arroz is rice.",
+        "Verduras are vegetables.",
+        "That is it, I think."
+      ],
+      "labels": {
+        "notes": {
+          "fact-pescado-vs-pez": "partial",
+          "fact-cuatro-carnes": "partial",
+          "fact-despensa-aceite-arroz": "partial",
+          "fi-ot-legumbres": "missed",
+          "fi-mcq-meat-types": "partial",
+          "pair-aceite": "covered",
+          "pair-arroz": "covered",
+          "pair-pollo": "covered",
+          "pair-pescado": "missed",
+          "pair-verduras": "covered",
+          "pair-fruta": "missed"
+        },
+        "moves": []
+      }
+    },
+    {
+      "id": "p11-wrong",
+      "mode": "typed",
+      "lines": [
+        "Hola! Food Spanish today.",
+        "If you want fish at a restaurant, order pez, that is the fish you eat.",
+        "Legumbres just means all vegetables, the same as verduras.",
+        "In Mexico, ask for ternera when you want beef.",
+        "Pollo means chicken.",
+        "Aceite de oliva is olive oil."
+      ],
+      "labels": {
+        "notes": {
+          "fact-pescado-vs-pez": "wrong",
+          "fact-cuatro-carnes": "wrong",
+          "fact-despensa-aceite-arroz": "partial",
+          "fi-ot-legumbres": "wrong",
+          "fi-mcq-meat-types": "wrong",
+          "pair-aceite": "covered",
+          "pair-arroz": "missed",
+          "pair-pollo": "covered",
+          "pair-pescado": "missed",
+          "pair-verduras": "partial",
+          "pair-fruta": "missed"
+        },
+        "moves": [
+          "real-life"
+        ]
+      }
+    },
+    {
+      "id": "p11-minimal",
+      "mode": "typed",
+      "lines": [
+        "Food words today.",
+        "Pollo is chicken."
+      ],
+      "labels": {
+        "notes": {
+          "fact-pescado-vs-pez": "missed",
+          "fact-cuatro-carnes": "missed",
+          "fact-despensa-aceite-arroz": "missed",
+          "fi-ot-legumbres": "missed",
+          "fi-mcq-meat-types": "missed",
+          "pair-aceite": "missed",
+          "pair-arroz": "missed",
+          "pair-pollo": "covered",
+          "pair-pescado": "missed",
+          "pair-verduras": "missed",
+          "pair-fruta": "missed"
+        },
+        "moves": []
+      }
+    }
+  ],
+  "answers": [
+    {
+      "questionId": "q-legumbres-just-means-all-verduras-i-m-right",
+      "id": "full",
+      "lines": [
+        "No, legumbres are lentils, chickpeas and beans, a word of their own. Verduras covers vegetables broadly."
+      ],
+      "labels": {
+        "points": [
+          "hit",
+          "hit"
+        ],
+        "contradictions": 0
+      }
+    },
+    {
+      "questionId": "q-legumbres-just-means-all-verduras-i-m-right",
+      "id": "correction-only",
+      "lines": [
+        "No, legumbres are lentils, chickpeas and beans, not all vegetables."
+      ],
+      "labels": {
+        "points": [
+          "hit",
+          "none"
+        ],
+        "contradictions": 0
+      }
+    },
+    {
+      "questionId": "q-how-does-ternera-differ-in-mexico-and-spain",
+      "id": "full",
+      "lines": [
+        "In Mexico ternera is veal, the meat of a young calf. In Spain it is the usual word for beef, young beef."
+      ],
+      "labels": {
+        "points": [
+          "hit",
+          "hit"
+        ],
+        "contradictions": 0
+      }
+    }
+  ]
+}

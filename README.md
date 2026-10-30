@@ -112,6 +112,90 @@ Live spend M4: 5 images × $0.01 = $0.05, plus 2 SAM segmentations × $2.50/1,00
 - 30 Oct 2026 — Mask overlays render as positioned divs (accent outline + dim), not decoded mask polygons: SAM returned no usable masks, and boxes are all the highlight needs.
 - 30 Oct 2026 — `tests/art.test.ts` pins the milestone: cast completeness, five WebP files under 500 KB total, four valid fractional boxes in cast order left to right.
 
+## M5 — Evaluation, accessibility, layout, e2e (§12, owner-independent parts)
+
+Done 30 Oct 2026. Deploy, push and the license wait for the owner (§15 item 1); banks stay `checked`
+(human approval is M2/M6 business); voices are still unpicked so questions remain captions-only.
+
+### Grading evaluation (§13): `npm run eval`, live 30 Oct 2026
+
+12 classes (40 spec note verdicts + 88 draft), 11 answer samples (22 points), one model call per class
+and per sample, 23 calls in 167 s. Draft labels (`"labelsBy": "draft"`, p11/p12) are owner-unreviewed and
+reported separately; prompts were not tuned to any label.
+
+| Fixtures | Notes exact | Notes ±1 step | Points exact | Dropped | Time |
+|---|---|---|---|---|---|
+| Appendix C, p10 (4 classes, 5 answers) | 40/40 (100%) | 40/40 | 9/10 (90%) | 0 | 62 s |
+| Drafts, p11 (4 classes, 3 answers) | 38/44 (86%) | 42/44 | 6/6 (100%) | 0 | 53 s |
+| Drafts, p12 (4 classes, 3 answers) | 40/44 (91%) | 42/44 | 5/6 (83%) | 0 | 52 s |
+| **Spec total** | **40/40 (100%)** | 40/40 | **9/10 (90%)** | 0 | — |
+| **Draft total** | **78/88 (89%)** | 84/88 | **11/12 (92%)** | 0 | — |
+| Overall | 118/128 (92%) | 124/128 | 20/22 (91%) | 0 | 167 s |
+
+Against the §13 marks (≥ 85% exact on notes and on points, injection clean): the Appendix C set
+**passes both marks**, and the injection fixture's first line changes nothing (`d-injection` 10/10).
+Every point miss anywhere was a one-step boundary (hit↔partial); nothing was ever two steps off.
+
+Caveats, kept because they matter more than the headline: (1) the first live run batched each
+question's samples into one answers call and scored only 5/10 on points with `dropped: 6` — the model
+returned all-none with null quotes. Same-question batching is a situation production never creates
+(its three answers are always for three different questions), so `eval` now grades one sample per
+call and the batched number is superseded, not hidden. (2) Boundary judgments wobble run to run:
+`q-check-comes-automatically/partial` scored 1/2, then 2/2, then 1/2 across runs. (3) Two p12-wrong
+draft labels look wrong on their face — the teacher's lines contradict the `fact-cana-y-vino-tinto`
+("Cerveza is beer") and `fact-postre-flan-natillas` ("El postre is dessert") notes, so the grader's
+`wrong` is likelier right than the draft's `missed`/`partial`; owner review will settle them.
+The set stands at 12 of the 30 labeled classes §13 asks for; growing it further needs owner label
+review first.
+
+### Accessibility (§11.3)
+
+Checked against the code and computed (all text pairs ≥ 4.5:1, e.g. muted/paper 7.6, accent/paper 7.3,
+tile fine/accent 6.0, partial chip 5.7). Fixed: a visible `:focus-visible` outline (there was none —
+keyboard users were lost); timers announced exactly at 30 s and 10 s via a screen-reader-only live
+region instead of re-announcing every second; "Question N of 3" is now a heading; the settings sheet
+is `aria-modal`, closes on Escape, and returns focus to the gear button. Already fine: peek rows are
+real buttons (hold Space/Enter past 300 ms, tap mode supported), drawer summary and selects are
+native, all inputs labeled, `prefers-reduced-motion` respected, Type mode is a full voice alternative,
+captions shown for every question (no audio plays yet — voices unpicked — so there is nothing
+uncaptioned).
+
+### Layout (360×800, 390×844, 1280×800)
+
+Fixed two real overflow bugs found by reading the flex rules: the chat input (`width: 100%` inside a
+flex row overflowed at 360 px — now `flex: 1 1 auto; min-width: 0`) and the question bubble (added
+`min-width: 0`), plus a 44 px minimum on peek rows. The page stays a centered 480 px column on laptop,
+which the spec allows. `tests/e2e/audit.spec.ts` walks the whole mocked flow at all three sizes
+asserting zero horizontal overflow, ≥ 44 px targets, and a keyboard Space-hold peek — committed, but
+**not yet run**: no browser launches in this sandbox (see e2e).
+
+### End-to-end (§13)
+
+`tests/e2e/flow.spec.ts` (390×844, Type, mocked models, Home → debrief, score 63) is written and
+statically checked against the current UI, but **not yet run**: Chromium and WebKit were installed
+for Playwright and all three binaries (headless shell, full Chromium, system Chrome) abort at launch
+here (macOS sandbox denies Mach bootstrap / SIGABRT). Owner: run `npx playwright test` on an
+unsandboxed machine — no key needed, every `/api` call is mocked.
+
+Live spend M5: ≈ $0.60 over 62 grading calls (evaluations, probes and reruns at §9.9 rates; under
+the $3 step budget). Cumulative live spend: ≈ $1.20.
+
+**Owner, please do in the morning:** (1) `npx playwright test` (needs an unsandboxed browser);
+(2) review the 8 draft fixtures (`content/eval/…/p11*/p12*`, especially the two p12-wrong notes above)
+and flip `labelsBy` when approved; (3) pick voices, record audio, approve the banks; (4) deploy, rate
+limits on; (5) the license.
+
+### M5 decisions
+
+- 30 Oct 2026 — `npm run eval` grades one answer sample per call and reports spec vs draft splits;
+  batching same-question samples into one call collapsed the model to all-none (observed 5/10,
+  dropped 6) and is not a production situation, so the per-sample procedure supersedes it.
+- 30 Oct 2026 — No prompt or code tuning from the eval: all misses are one-step boundaries or
+  suspect draft labels, on samples too small to generalize from.
+- 30 Oct 2026 — `tests/e2e/audit.spec.ts` is committed unrunnable-here (sandbox kills browser
+  processes); the temporary Chromium-only config used to attempt the run was deleted, and
+  `test-results/` is gitignored.
+
 ## Decisions
 
 Choices made where the spec is silent, one line each with its date.

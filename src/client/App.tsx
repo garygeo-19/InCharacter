@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import comingSoon from '../../content/coming-soon.json';
 import { CastRow, ClassroomFigure } from './art';
 import { buildNotes, PackSchema, stripPrefix } from '../shared/notes';
@@ -49,6 +49,23 @@ function App() {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const settingsBtnRef = useRef<HTMLButtonElement | null>(null);
+  const sheetDoneRef = useRef<HTMLButtonElement | null>(null);
+
+  const closeSettings = () => {
+    setSettingsOpen(false);
+    settingsBtnRef.current?.focus();
+  };
+
+  useEffect(() => {
+    if (!settingsOpen) return;
+    sheetDoneRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeSettings();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [settingsOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     api.catalog().then((d) => setCatalog(d.packs)).catch((e: Error) => setCatalogError(e.message));
@@ -75,6 +92,7 @@ function App() {
         </button>
         <button
           type="button" className="icon-btn" aria-label="Settings"
+          ref={settingsBtnRef}
           onClick={() => setSettingsOpen(true)}
         >
           ⚙
@@ -125,8 +143,8 @@ function App() {
       )}
 
       {settingsOpen && (
-        <div className="sheet-backdrop" onClick={() => setSettingsOpen(false)}>
-          <div className="sheet" role="dialog" aria-label="Settings" onClick={(e) => e.stopPropagation()}>
+        <div className="sheet-backdrop" onClick={closeSettings}>
+          <div className="sheet" role="dialog" aria-modal="true" aria-label="Settings" onClick={(e) => e.stopPropagation()}>
             <h2>Settings</h2>
             <label className="field">
               Default mode
@@ -161,7 +179,7 @@ function App() {
             >
               Clear my history
             </button>
-            <button type="button" className="primary" onClick={() => setSettingsOpen(false)}>
+            <button type="button" className="primary" ref={sheetDoneRef} onClick={closeSettings}>
               Done
             </button>
           </div>

@@ -1,0 +1,167 @@
+{
+  "packId": "spanish-food-shopping",
+  "partId": "p12-drinks-sweets",
+  "labelsBy": "draft",
+  "classes": [
+    {
+      "id": "p12-strong",
+      "mode": "typed",
+      "lines": [
+        "Drinks and sweets today!",
+        "Juice is jugo through most of Latin America but zumo in Spain. Order zumo de naranja in Mexico City and you will be understood, and instantly marked as someone who learned their Spanish in Spain.",
+        "Cerveza is beer, but in a bar in Spain the order you hear constantly is una caña, a small draft beer. Wine comes tinto, red, or blanco, white. Red wine is normally called tinto, not rojo.",
+        "Vino just means wine, by the way.",
+        "El postre is dessert, and in Spain it often means custards and creams: flan, natillas, crema catalana, alongside fruit, ice cream and cakes. Dulce does double duty: the flavor sweet, and the noun for a sweet treat. After the postre comes un café, an espresso by default, and then the bill.",
+        "Note that refresco means soft drink, not dessert: el postre is dessert, while refresco, cerveza and vino are all drinks.",
+        "And cerveza is beer, distinct from vino, wine; jugo, juice; and agua, water.",
+        "For example, you would order una caña with friends, then el postre.",
+        "Do not call red wine rojo in Spain, ask for tinto.",
+        "Quick check: how do you order a small draft beer in Spain?",
+        "So: jugo versus zumo, caña and tinto, postre then café."
+      ],
+      "labels": {
+        "notes": {
+          "fact-zumo-vs-jugo": "covered",
+          "fact-cana-y-vino-tinto": "covered",
+          "fact-postre-flan-natillas": "covered",
+          "fi-ot-drink-not": "covered",
+          "fi-ot-cerveza-meaning": "covered",
+          "pair-refresco": "covered",
+          "pair-zumo": "covered",
+          "pair-cerveza": "covered",
+          "pair-vino": "covered",
+          "pair-postre": "covered",
+          "pair-dulce": "covered"
+        },
+        "moves": [
+          "example",
+          "pitfall",
+          "check",
+          "recap"
+        ]
+      }
+    },
+    {
+      "id": "p12-partial",
+      "mode": "typed",
+      "lines": [
+        "Drinks today.",
+        "Jugo means juice.",
+        "Cerveza is beer and vino is wine.",
+        "El postre is dessert and dulce is sweet.",
+        "That is all, I think."
+      ],
+      "labels": {
+        "notes": {
+          "fact-zumo-vs-jugo": "partial",
+          "fact-cana-y-vino-tinto": "partial",
+          "fact-postre-flan-natillas": "partial",
+          "fi-ot-drink-not": "partial",
+          "fi-ot-cerveza-meaning": "partial",
+          "pair-refresco": "missed",
+          "pair-zumo": "covered",
+          "pair-cerveza": "covered",
+          "pair-vino": "covered",
+          "pair-postre": "covered",
+          "pair-dulce": "covered"
+        },
+        "moves": []
+      }
+    },
+    {
+      "id": "p12-wrong",
+      "mode": "typed",
+      "lines": [
+        "Hey! Drinks and sweets.",
+        "Cerveza means wine and vino means beer, right?",
+        "El postre means soft drink.",
+        "Jugo means juice.",
+        "Dulce is sweet."
+      ],
+      "labels": {
+        "notes": {
+          "fact-zumo-vs-jugo": "partial",
+          "fact-cana-y-vino-tinto": "missed",
+          "fact-postre-flan-natillas": "partial",
+          "fi-ot-drink-not": "wrong",
+          "fi-ot-cerveza-meaning": "wrong",
+          "pair-refresco": "missed",
+          "pair-zumo": "covered",
+          "pair-cerveza": "wrong",
+          "pair-vino": "wrong",
+          "pair-postre": "wrong",
+          "pair-dulce": "covered"
+        },
+        "moves": []
+      }
+    },
+    {
+      "id": "p12-minimal",
+      "mode": "typed",
+      "lines": [
+        "Drinks and sweets today.",
+        "Vino is wine."
+      ],
+      "labels": {
+        "notes": {
+          "fact-zumo-vs-jugo": "missed",
+          "fact-cana-y-vino-tinto": "missed",
+          "fact-postre-flan-natillas": "missed",
+          "fi-ot-drink-not": "missed",
+          "fi-ot-cerveza-meaning": "missed",
+          "pair-refresco": "missed",
+          "pair-zumo": "missed",
+          "pair-cerveza": "missed",
+          "pair-vino": "covered",
+          "pair-postre": "missed",
+          "pair-dulce": "missed"
+        },
+        "moves": []
+      }
+    }
+  ],
+  "answers": [
+    {
+      "questionId": "q-cerveza-means-wine-and-vino-means-beer-tell-me-i",
+      "id": "full",
+      "lines": [
+        "No, cerveza is beer and vino is wine. They are distinct drinks, not to be mixed up."
+      ],
+      "labels": {
+        "points": [
+          "hit",
+          "hit"
+        ],
+        "contradictions": 0
+      }
+    },
+    {
+      "questionId": "q-cerveza-means-wine-and-vino-means-beer-tell-me-i",
+      "id": "wrong",
+      "lines": [
+        "Yes, you are right, cerveza is wine!"
+      ],
+      "labels": {
+        "points": [
+          "none",
+          "none"
+        ],
+        "contradictions": 1
+      }
+    },
+    {
+      "questionId": "q-how-does-jugo-differ-from-zumo-and-when-do-i-use",
+      "id": "full",
+      "lines": [
+        "Jugo is used through most of Latin America and zumo in Spain. Both words mean juice."
+      ],
+      "labels": {
+        "points": [
+          "hit",
+          "hit"
+        ],
+        "contradictions": 0
+      }
+    }
+  ]
+}

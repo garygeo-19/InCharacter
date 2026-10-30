@@ -241,6 +241,17 @@ export function Teach(props: {
   );
 }
 
+// Timers are announced at 30 s and 10 s (§11.3): the visual timer stays
+// quiet for screen readers, and this live region speaks only at crossings.
+function useTimerAnnouncement(left: number): string {
+  const [msg, setMsg] = useState('');
+  useEffect(() => {
+    if (left === 30) setMsg('30 seconds left.');
+    else if (left === 10) setMsg('10 seconds left.');
+  }, [left]);
+  return msg;
+}
+
 function Countdown({ fast, onDone }: { fast: boolean; onDone: () => void }) {
   const [count, setCount] = useState(3);
   useEffect(() => {
@@ -401,7 +412,7 @@ function ClassScreen(props: {
   const linesRef = useRef(props.lines);
   linesRef.current = props.lines;
   const left = props.totalSecs - elapsed;
-  const warned = left <= 30;
+  const announcement = useTimerAnnouncement(left);
   const voice = props.mode === 'voice';
   const [typedFallback, setTypedFallback] = useState(false);
   const [voiceActive, setVoiceActive] = useState(true);
@@ -425,9 +436,10 @@ function ClassScreen(props: {
 
   return (
     <>
-      <div className="timer" role="timer" aria-live={warned ? 'polite' : 'off'}>
+      <div className="timer" role="timer" aria-live="off">
         {mmss(left)}
       </div>
+      <span className="sr-only" aria-live="polite">{announcement}</span>
       <ClassroomFigure small alt="Your class listening" label="Students listening" />
       <OutlinePeek
         outline={props.outline} noteText={props.noteText} phase="class"
@@ -517,6 +529,7 @@ function QuestionScreen(props: {
   const linesRef = useRef(lines);
   linesRef.current = lines;
   const left = props.totalSecs - elapsed;
+  const announcement = useTimerAnnouncement(left);
   const useVoice = props.mode === 'voice';
   const [typedFallback, setTypedFallback] = useState(false);
   const [answerOpen, setAnswerOpen] = useState(true);
@@ -565,7 +578,7 @@ function QuestionScreen(props: {
 
   return (
     <>
-      <p className="fine">Question {props.index + 1} of 3.</p>
+      <h2 className="q-count">Question {props.index + 1} of 3.</h2>
       <ClassroomFigure
         small
         highlightId={q.studentId}
@@ -582,9 +595,10 @@ function QuestionScreen(props: {
       </div>
       {!props.asking && (
         <>
-          <div className="timer" role="timer" aria-live={left <= 30 ? 'polite' : 'off'}>
+          <div className="timer" role="timer" aria-live="off">
             {mmss(left)}
           </div>
+          <span className="sr-only" aria-live="polite">{announcement}</span>
           <details className="drawer">
             <summary>Outline (peek)</summary>
             <OutlinePeek
