@@ -239,7 +239,7 @@ function Home(props: {
   return (
     <>
       <header className="masthead">
-        <h1>Teach it to learn it.</h1>
+        <h1>Experience it to learn it.</h1>
       </header>
 
       {props.history.length > 0 && (

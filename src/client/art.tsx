@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import cast from '../../content/cast.json';
 
 // Classroom art (M4, REQUIREMENTS.md §9.8). Files live in public/art/;
@@ -61,85 +61,39 @@ export function PortraitImg({ id }: { id: string }) {
   );
 }
 
-type MaskBox = { x1: number; y1: number; x2: number; y2: number };
-type MasksFile = {
-  source: 'sam-3.1' | 'hand';
-  segments: { studentId: string; box: MaskBox }[];
-};
-
-// Fallback if /art/classroom-masks.json can't be fetched. It mirrors the
-// hand-set boxes (scripts/art-build.ts --hand); the fetched file wins when
-// present. Fractions of the picture, left to right: maya, leo, priya, sam.
-const FALLBACK_SEGMENTS: MasksFile['segments'] = [
-  { studentId: 'maya', box: { x1: 0.1, y1: 0.375, x2: 0.335, y2: 0.84 } },
-  { studentId: 'leo', box: { x1: 0.36, y1: 0.36, x2: 0.6, y2: 0.85 } },
-  { studentId: 'priya', box: { x1: 0.6, y1: 0.355, x2: 0.83, y2: 0.85 } },
-  { studentId: 'sam', box: { x1: 0.825, y1: 0.32, x2: 0.998, y2: 0.86 } },
-];
-
-function validBox(box: MaskBox): boolean {
-  return (
-    [box.x1, box.y1, box.x2, box.y2].every((v) => typeof v === 'number' && v >= 0 && v <= 1) &&
-    box.x1 < box.x2 &&
-    box.y1 < box.y2
-  );
-}
-
+// Name tags instead of box overlays: the hand-set boxes never lined up
+// with the people in the picture. The asker is a filled tag plus a
+// "<Name> is asking" line, so it never depends on box positions.
 export function ClassroomFigure(props: {
   small?: boolean;
   alt?: string;
   label?: string;
-  /** Show the per-student boxes; the highlighted one is outlined, the rest dimmed. */
+  /** The student currently asking: their name tag is highlighted. */
   highlightId?: string | null;
 }) {
-  const [segments, setSegments] = useState<MasksFile['segments']>(FALLBACK_SEGMENTS);
-  useEffect(() => {
-    let live = true;
-    fetch(`/${cast.masks as string}`)
-      .then((r) => {
-        if (!r.ok) throw new Error('no masks');
-        return r.json();
-      })
-      .then((json: MasksFile) => {
-        if (!live || !Array.isArray(json.segments)) return;
-        const good = json.segments.filter(
-          (s) => studentById(s.studentId) && s.box && validBox(s.box),
-        );
-        if (good.length === 4) setSegments(good);
-      })
-      .catch(() => {
-        // Keep the fallback boxes.
-      });
-    return () => {
-      live = false;
-    };
-  }, []);
-
-  const asking = props.highlightId ?? null;
+  const asker = props.highlightId ? studentById(props.highlightId) : null;
   return (
     <figure
-      className={`classroom-fig${props.small ? ' small' : ''}${asking ? ' has-asker' : ''}`}
+      className={`classroom-fig${props.small ? ' small' : ''}`}
       aria-label={props.label ?? 'Your class'}
     >
       <img src={CLASSROOM_SRC} alt={props.alt ?? CLASSROOM_ALT} loading="lazy" />
-      {asking &&
-        segments.map((s) => (
-          <div
-            key={s.studentId}
-            aria-hidden
-            className={`mask-box${s.studentId === asking ? ' is-asker' : ' is-dim'}`}
-            style={{
-              left: `${s.box.x1 * 100}%`,
-              top: `${s.box.y1 * 100}%`,
-              width: `${(s.box.x2 - s.box.x1) * 100}%`,
-              height: `${(s.box.y2 - s.box.y1) * 100}%`,
-            }}
-          >
-            {s.studentId === asking && (
-              <span className="mask-tag">{studentById(s.studentId)?.name}</span>
-            )}
-          </div>
-        ))}
+      {asker && (
+        <figcaption>
+          <p className="asker-line">{asker.name} is asking</p>
+          <ul className="name-tags" aria-label="Students">
+            {castStudents().map((s) => (
+              <li
+                key={s.id}
+                className={`name-tag${s.id === asker.id ? ' is-asking' : ''}`}
+                aria-current={s.id === asker.id ? 'true' : undefined}
+              >
+                {s.name}
+              </li>
+            ))}
+          </ul>
+        </figcaption>
+      )}
     </figure>
   );
 }

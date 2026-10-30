@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { splitTextToLines } from '../shared/lines';
 import { buildNotes, buildOutline, PackSchema, stripPrefix, type Note } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { scoreSession } from '../shared/scoring';
@@ -111,7 +112,14 @@ export function Teach(props: {
       </>
     );
   }
-  if (!notes || !outline || !bank) return <p>Preparing your class…</p>;
+  if (!notes || !outline || !bank) {
+    return (
+      <>
+        <p>Preparing your class…</p>
+        <WaitingDots status="Preparing your class. Loading the notes and questions." />
+      </>
+    );
+  }
 
   return (
     <>
@@ -127,7 +135,6 @@ export function Teach(props: {
           mode={props.settings.mode} packId={props.packId} partId={props.partId}
           outline={outline} noteText={(id) => notesById.get(id)?.text ?? ''}
           peekStyle={props.settings.peekStyle} onPeek={recordPeek}
-          lines={classLines} setLines={setClassLines}
           onEnd={(lines) => {
             if (lines.length === 0) setPhase({ name: 'empty' });
             else {
@@ -265,35 +272,40 @@ function Countdown({ fast, onDone }: { fast: boolean; onDone: () => void }) {
   return <h1 className="countdown" aria-live="assertive">{count > 0 ? count : 'Teach!'}</h1>;
 }
 
-function ChatBox(props: {
-  lines: Line[];
-  onSend: (text: string) => void;
+// One multi-line box for teaching and answers. The learner writes freely
+// (phone dictation lands here as one block); the sticky action submits, and
+// code splits the text into numbered lines for the evidence rules. The split
+// is never shown.
+function LongBox(props: {
+  label: string;
   placeholder: string;
-  sendLabel?: string;
+  value: string;
+  onChange: (value: string) => void;
 }) {
-  const [draft, setDraft] = useState('');
-  const send = () => {
-    const text = draft.trim();
-    if (!text) return;
-    props.onSend(text);
-    setDraft('');
-  };
   return (
-    <div className="chat">
-      <ul className="chat-lines" aria-live="polite">
-        {props.lines.map((l) => (
-          <li key={l.n} className="chat-line">{l.text}</li>
-        ))}
-      </ul>
-      <div className="chat-input">
-        <input
-          type="text" aria-label={props.placeholder} placeholder={props.placeholder}
-          value={draft} onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') send(); }}
-        />
-        <button type="button" className="primary" onClick={send}>{props.sendLabel ?? 'Send'}</button>
-      </div>
-    </div>
+    <textarea
+      className="teach-box"
+      aria-label={props.label}
+      placeholder={props.placeholder}
+      rows={6}
+      value={props.value}
+      onChange={(e) => props.onChange(e.target.value)}
+    />
+  );
+}
+
+// Motion feedback for model waits: three bouncing dots plus an accessible
+// status message. Under prefers-reduced-motion the dots sit still.
+function WaitingDots({ status }: { status: string }) {
+  return (
+    <p className="waiting" role="status">
+      <span className="sr-only">{status}</span>
+      <span className="dots" aria-hidden="true">
+        <span className="dot" />
+        <span className="dot" />
+        <span className="dot" />
+      </span>
+    </p>
   );
 }
 
@@ -404,13 +416,12 @@ function ClassScreen(props: {
   noteText: (id: string) => string;
   peekStyle: Settings['peekStyle'];
   onPeek: (peek: Peek) => void;
-  lines: Line[];
-  setLines: (lines: Line[]) => void;
   onEnd: (lines: Line[]) => void;
 }) {
   const [elapsed, setElapsed] = useState(0);
-  const linesRef = useRef(props.lines);
-  linesRef.current = props.lines;
+  const [draft, setDraft] = useState('');
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
   const left = props.totalSecs - elapsed;
   const announcement = useTimerAnnouncement(left);
   const voice = props.mode === 'voice';
@@ -427,7 +438,7 @@ function ClassScreen(props: {
   useEffect(() => {
     if (left <= 0) {
       if (useVoice) endVoice();
-      else props.onEnd(linesRef.current);
+      else props.onEnd(splitTextToLines(draftRef.current));
       return;
     }
     const t = setTimeout(() => setElapsed((e) => e + 1), 1000);
@@ -453,10 +464,10 @@ function ClassScreen(props: {
           onTypeInstead={() => setTypedFallback(true)}
         />
       ) : (
-        <ChatBox
-          lines={props.lines}
-          placeholder="Teach your class, one message per line"
-          onSend={(text) => props.setLines([...linesRef.current, { n: linesRef.current.length + 1, text, source: 'typed' }])}
+        <LongBox
+          label="Teach your class"
+          placeholder="Teach your class — write as much as you like"
+          value={draft} onChange={setDraft}
         />
       )}
       <div className="sticky-action">
@@ -465,7 +476,7 @@ function ClassScreen(props: {
           disabled={elapsed < props.endAfterSecs || (useVoice && !voiceActive)}
           onClick={() => {
             if (useVoice) endVoice();
-            else props.onEnd(linesRef.current);
+            else props.onEnd(splitTextToLines(draftRef.current));
           }}
         >
           End class
@@ -503,6 +514,7 @@ function Choosing(props: {
     <>
       <h1>Hands are going up…</h1>
       <p className="lede">Picking three questions and grading your class.</p>
+      <WaitingDots status="Choosing questions and grading your class. This can take a few seconds." />
     </>
   );
 }
@@ -525,9 +537,9 @@ function QuestionScreen(props: {
 }) {
   const q = props.bankById.get(props.picks[props.index].questionId);
   const [elapsed, setElapsed] = useState(0);
-  const [lines, setLines] = useState<Line[]>([]);
-  const linesRef = useRef(lines);
-  linesRef.current = lines;
+  const [draft, setDraft] = useState('');
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
   const left = props.totalSecs - elapsed;
   const announcement = useTimerAnnouncement(left);
   const useVoice = props.mode === 'voice';
@@ -543,7 +555,7 @@ function QuestionScreen(props: {
 
   useEffect(() => {
     setElapsed(0);
-    setLines([]);
+    setDraft('');
     setTypedFallback(false);
     setAnswerOpen(true);
     answeredRef.current = false;
@@ -553,7 +565,7 @@ function QuestionScreen(props: {
     if (!props.asking) {
       if (left <= 0) {
         if (answeringVoice) closeVoice();
-        else props.onAnswered(linesRef.current);
+        else props.onAnswered(splitTextToLines(draftRef.current));
         return;
       }
       const t = setTimeout(() => setElapsed((e) => e + 1), 1000);
@@ -623,12 +635,13 @@ function QuestionScreen(props: {
             </>
           ) : (
             <>
-              <ChatBox
-                lines={lines} placeholder="Type your answer" sendLabel="Send"
-                onSend={(text) => setLines((l) => [...l, { n: l.length + 1, text, source: 'typed' }])}
+              <LongBox
+                label="Type your answer"
+                placeholder="Type your answer — write as much as you like"
+                value={draft} onChange={setDraft}
               />
               <div className="sticky-action">
-                <button type="button" className="primary" onClick={() => props.onAnswered(linesRef.current)}>
+                <button type="button" className="primary" onClick={() => props.onAnswered(splitTextToLines(draftRef.current))}>
                   Done
                 </button>
               </div>
@@ -666,6 +679,8 @@ function Grading(props: {
   return (
     <>
       <h1>Grading your class…</h1>
+      <p className="lede">Checking every quote against your own words.</p>
+      <WaitingDots status="Grading your class. This can take a few seconds." />
       <CastRow />
     </>
   );
@@ -680,11 +695,7 @@ function NoScoreDebrief(props: {
   return (
     <>
       <h1>Your class</h1>
-      <ul className="chat-lines">
-        {props.classLines.map((l) => (
-          <li key={l.n} className="chat-line">{l.text}</li>
-        ))}
-      </ul>
+      <p className="chat-line">{props.classLines.map((l) => l.text).join(' ')}</p>
       <p className="lede">Grading didn&apos;t come back, so there&apos;s no score yet — your words and peeks are above.</p>
       <div className="sticky-action">
         <button type="button" className="primary" onClick={props.onRetry}>Grade again</button>
@@ -783,12 +794,11 @@ function Debrief(props: {
           return (
             <div className="grade-row" key={a.questionId}>
               <p><strong>{studentName(q?.studentId ?? '')}:</strong> {q?.text}</p>
-              <ul className="chat-lines">
-                {lines.length === 0 && <li className="chat-line empty-answer">(no answer — scored 0)</li>}
-                {lines.map((l) => (
-                  <li key={l.n} className="chat-line">{l.text}</li>
-                ))}
-              </ul>
+              {lines.length === 0 ? (
+                <p className="chat-line empty-answer">(no answer — scored 0)</p>
+              ) : (
+                <p className="chat-line">{lines.map((l) => l.text).join(' ')}</p>
+              )}
               {a.points.map((p) => (
                 <p key={p.index}>
                   <VerdictChip verdict={p.result === 'none' ? 'missed' : p.result === 'hit' ? 'hit' : 'partial-point'} />{' '}

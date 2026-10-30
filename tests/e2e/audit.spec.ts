@@ -115,7 +115,7 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
     await mockApi(page);
     await page.goto('/?fast=1');
 
-    await expect(page.getByRole('heading', { name: 'Teach it to learn it.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Experience it to learn it.' })).toBeVisible();
     await noOverflow(page, 'home');
     await tapTargets(page, 'home');
 
@@ -138,7 +138,7 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
     await tapTargets(page, 'briefing');
     await page.getByRole('button', { name: 'Start class' }).click();
 
-    const classBox = page.getByPlaceholder('Teach your class, one message per line');
+    const classBox = page.getByPlaceholder('Teach your class — write as much as you like');
     await expect(classBox).toBeVisible({ timeout: 10000 });
     await noOverflow(page, 'class');
     await tapTargets(page, 'class');
@@ -156,10 +156,7 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
     await page.keyboard.up('Space');
     await expect(peek).toHaveAttribute('aria-expanded', 'false');
 
-    await classBox.fill('The menu is el menú and the bill is la cuenta.');
-    await page.getByRole('button', { name: 'Send' }).click();
-    await classBox.fill('To order say quisiera and para mí el pollo.');
-    await page.getByRole('button', { name: 'Send' }).click();
+    await classBox.fill('The menu is el menú and the bill is la cuenta. To order say quisiera and para mí el pollo.');
     const endBtn = page.getByRole('button', { name: 'End class' });
     await expect(endBtn).toBeEnabled({ timeout: 10000 });
     await endBtn.click();
@@ -167,6 +164,11 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
     // Choosing interstitial is transient under mocked grading (see
     // flow.spec.ts): wait for the first question instead of requiring it.
     await expect(page.getByRole('heading', { name: 'Question 1 of 3.' })).toBeVisible({ timeout: 15000 });
+    // Name tags replace the old box outlines: no overlay boxes remain, and
+    // the asker reads in text with a filled tag.
+    await expect(page.getByText('Maya is asking')).toBeVisible();
+    await expect(page.locator('.name-tag.is-asking')).toHaveText('Maya');
+    expect(await page.locator('.mask-box').count()).toBe(0);
     for (const [i, answer] of [
       'La propina is the tip.',
       'Ask la cuenta por favor, they will not bring it.',
@@ -174,7 +176,7 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
     ].entries()) {
       await expect(page.getByRole('heading', { name: `Question ${i + 1} of 3.` })).toBeVisible({ timeout: 15000 });
       await noOverflow(page, `question${i + 1}`);
-      const answerBox = page.getByPlaceholder('Type your answer');
+      const answerBox = page.getByPlaceholder('Type your answer — write as much as you like');
       await expect(answerBox).toBeVisible({ timeout: 10000 });
       await answerBox.fill(answer);
       await page.getByRole('button', { name: 'Done' }).click();

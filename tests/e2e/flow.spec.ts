@@ -93,7 +93,7 @@ test('teach a class in Type mode, mocked grading', async ({ page }) => {
   }));
 
   await page.goto('/?fast=1');
-  await expect(page.getByRole('heading', { name: 'Teach it to learn it.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Experience it to learn it.' })).toBeVisible();
   await page.getByRole('button', { name: /Spanish: Food & Shopping/ }).click();
   await page.getByRole('button', { name: /Teach a class/ }).click();
   await expect(page.getByRole('heading', { name: 'Choose a class' })).toBeVisible();
@@ -101,12 +101,9 @@ test('teach a class in Type mode, mocked grading', async ({ page }) => {
   await expect(page.getByText("You're the Spanish teacher.")).toBeVisible();
   await page.getByRole('button', { name: 'Start class' }).click();
 
-  const classBox = page.getByPlaceholder('Teach your class, one message per line');
+  const classBox = page.getByPlaceholder('Teach your class — write as much as you like');
   await expect(classBox).toBeVisible({ timeout: 10000 });
-  await classBox.fill('The menu is el menú and the bill is la cuenta.');
-  await page.getByRole('button', { name: 'Send' }).click();
-  await classBox.fill('To order say quisiera and para mí el pollo.');
-  await page.getByRole('button', { name: 'Send' }).click();
+  await classBox.fill('The menu is el menú and the bill is la cuenta. To order say quisiera and para mí el pollo.');
   const endBtn = page.getByRole('button', { name: 'End class' });
   await expect(endBtn).toBeEnabled({ timeout: 10000 });
   await endBtn.click();
@@ -116,13 +113,17 @@ test('teach a class in Type mode, mocked grading', async ({ page }) => {
   // of requiring the interstitial. (The 0:06 timer in the report is also
   // correct: ?fast=1 shortens the 2:00 typed answer budget to 8 s.)
   await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
+  // Name tags replace the old box outlines: the asker reads in text with a
+  // filled tag, never depending on box positions.
+  await expect(page.getByText('Maya is asking')).toBeVisible();
+  await expect(page.locator('.name-tag.is-asking')).toHaveText('Maya');
   for (const [i, answer] of [
     'La propina is the tip.',
     'Ask la cuenta por favor, they will not bring it.',
     'Rabbit not seafood, saffron rice with chicken and beans.',
   ].entries()) {
     await expect(page.getByText(`Question ${i + 1} of 3.`)).toBeVisible({ timeout: 15000 });
-    const answerBox = page.getByPlaceholder('Type your answer');
+    const answerBox = page.getByPlaceholder('Type your answer — write as much as you like');
     await expect(answerBox).toBeVisible({ timeout: 10000 });
     await answerBox.fill(answer);
     await page.getByRole('button', { name: 'Done' }).click();
