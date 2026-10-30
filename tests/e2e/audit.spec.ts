@@ -164,7 +164,9 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
     await expect(endBtn).toBeEnabled({ timeout: 10000 });
     await endBtn.click();
 
-    await expect(page.getByText('Hands are going up…')).toBeVisible();
+    // Choosing interstitial is transient under mocked grading (see
+    // flow.spec.ts): wait for the first question instead of requiring it.
+    await expect(page.getByRole('heading', { name: 'Question 1 of 3.' })).toBeVisible({ timeout: 15000 });
     for (const [i, answer] of [
       'La propina is the tip.',
       'Ask la cuenta por favor, they will not bring it.',
@@ -178,7 +180,7 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
       await page.getByRole('button', { name: 'Done' }).click();
     }
 
-    await expect(page.getByText('Grading your class…')).toBeVisible();
+    // Grading screen is transient under mocked grades: wait for the score.
     await expect(page.getByRole('heading', { name: '63 / 100' })).toBeVisible({ timeout: 15000 });
     await noOverflow(page, 'debrief');
     await tapTargets(page, 'debrief');

@@ -77,6 +77,14 @@ body {
 
 .footer { margin-top: auto; font-size: 13px; color: var(--muted); }
 .footer p { margin: 0; }
+/* 44 px tap target without bigger text: padding grows the hit area,
+   the negative margin keeps the footer layout unchanged. */
+.footer a {
+  display: inline-block;
+  min-height: 44px;
+  padding: 14px 10px;
+  margin: -14px -10px;
+}
 
 h1 { font-size: 28px; line-height: 1.15; margin: 0 0 12px; }
 h2 { font-size: 19px; margin: 20px 0 8px; }
@@ -137,7 +145,11 @@ button:disabled { opacity: 0.45; cursor: default; }
 .topbar .brand {
   border: none;
   background: none;
-  padding: 10px 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 8px;
+  margin-left: -8px;
   font-family: system-ui, sans-serif;
   font-size: 13px;
   font-weight: 700;

@@ -111,7 +111,11 @@ test('teach a class in Type mode, mocked grading', async ({ page }) => {
   await expect(endBtn).toBeEnabled({ timeout: 10000 });
   await endBtn.click();
 
-  await expect(page.getByText('Hands are going up…')).toBeVisible();
+  // The choosing interstitial is transient: with mocked pick+grade it can
+  // resolve before this line runs, so wait for the first question instead
+  // of requiring the interstitial. (The 0:06 timer in the report is also
+  // correct: ?fast=1 shortens the 2:00 typed answer budget to 8 s.)
+  await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
   for (const [i, answer] of [
     'La propina is the tip.',
     'Ask la cuenta por favor, they will not bring it.',
@@ -124,7 +128,9 @@ test('teach a class in Type mode, mocked grading', async ({ page }) => {
     await page.getByRole('button', { name: 'Done' }).click();
   }
 
-  await expect(page.getByText('Grading your class…')).toBeVisible();
+  // Same transient-state race as choosing: with mocked grades the
+  // "Grading your class…" screen can resolve before its assertion runs,
+  // so wait for the score directly.
   await expect(page.getByRole('heading', { name: '63 / 100' })).toBeVisible({ timeout: 15000 });
   await expect(page.getByText('Covered', { exact: true }).first()).toBeVisible();
 
