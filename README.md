@@ -196,6 +196,18 @@ limits on; (5) the license.
   processes); the temporary Chromium-only config used to attempt the run was deleted, and
   `test-results/` is gitignored.
 
+## License
+
+In Character is licensed under the [Apache License 2.0](LICENSE). Copyright 2026 Recurxive LLC; see [NOTICE](NOTICE).
+
+"In Character" and "FlashFeed" are trademarks of Recurxive LLC. The Apache License does not grant permission to use
+them (section 6).
+
+The lessons come from FlashFeed's public knowledge packs, read at run time from the public catalog. FlashFeed's app,
+pack pipeline and catalog code are not part of this repository.
+
+Outside contributions aren't accepted during the hackathon.
+
 ## Decisions
 
 Choices made where the spec is silent, one line each with its date.
