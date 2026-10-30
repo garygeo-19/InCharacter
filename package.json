@@ -17,7 +17,8 @@
     "check:day1": "tsx scripts/day1-check1.ts",
     "bank:build": "tsx scripts/bank-build.ts",
     "bank:review": "tsx scripts/bank-review.ts",
-    "bank:approve": "tsx scripts/bank-approve.ts"
+    "bank:approve": "tsx scripts/bank-approve.ts",
+    "bank:audio": "tsx scripts/bank-audio.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",

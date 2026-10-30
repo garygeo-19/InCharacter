@@ -5,6 +5,7 @@ import { buildNotes, PackSchema, stripPrefix } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { api, type CatalogPack, type PartsResponse } from './api';
 import { Segments, languageName, mmss } from './format';
+import { checkMic, ensureAudioContext } from './voice';
 import {
   bestFor,
   clearHistory,
@@ -134,7 +135,7 @@ function App() {
                 onChange={(e) => updateSettings({ ...settings, mode: e.target.value as Settings['mode'] })}
               >
                 <option value="typed">Type (mic off)</option>
-                <option value="voice">Voice — arrives in M3, Type is used for now</option>
+                <option value="voice">Voice</option>
               </select>
             </label>
             <label className="field">
@@ -431,28 +432,77 @@ function Briefing(props: {
           ))}
         </ul>
       </section>
-      <section aria-label="Mode">
-        <h2>Mode</h2>
-        <div className="row" role="radiogroup" aria-label="Mode">
-          <button
-            type="button" aria-pressed
-            className="secondary"
-            onClick={() => props.updateSettings({ ...props.settings, mode: 'typed' })}
-          >
-            Type (mic off) ✓
-          </button>
-          <button type="button" className="secondary" disabled title="Voice arrives in M3">
-            Voice — in M3
-          </button>
-        </div>
-      </section>
+      <ModePicker
+        settings={props.settings} updateSettings={props.updateSettings}
+      />
       <p className="fine">{PRIVACY}</p>
       <div className="sticky-action">
-        <button type="button" className="primary" onClick={props.onStart} disabled={!notes}>
+        <button
+          type="button" className="primary"
+          disabled={!notes}
+          onClick={() => {
+            ensureAudioContext();
+            props.onStart();
+          }}
+        >
           Start class
         </button>
       </div>
     </>
+  );
+}
+
+// Mode choice with the §4.4 mic check: permission prompt, then a 2-second
+// level meter. Denial falls back to Type and says so.
+function ModePicker(props: {
+  settings: Settings;
+  updateSettings: (s: Settings) => void;
+}) {
+  const [mic, setMic] = useState<'idle' | 'checking' | 'denied'>('idle');
+  const [level, setLevel] = useState(0);
+
+  const chooseVoice = () => {
+    setMic('checking');
+    setLevel(0);
+    checkMic(setLevel)
+      .then(() => {
+        setMic('idle');
+        props.updateSettings({ ...props.settings, mode: 'voice' });
+      })
+      .catch(() => setMic('denied'));
+  };
+
+  return (
+    <section aria-label="Mode">
+      <h2>Mode</h2>
+      <div className="row" role="radiogroup" aria-label="Mode">
+        <button
+          type="button" aria-pressed={props.settings.mode === 'typed'}
+          className="secondary"
+          onClick={() => props.updateSettings({ ...props.settings, mode: 'typed' })}
+        >
+          Type (mic off){props.settings.mode === 'typed' ? ' ✓' : ''}
+        </button>
+        <button
+          type="button" aria-pressed={props.settings.mode === 'voice'}
+          className="secondary" disabled={mic === 'checking'}
+          onClick={chooseVoice}
+        >
+          Voice{props.settings.mode === 'voice' ? ' ✓' : ''}
+        </button>
+      </div>
+      {mic === 'checking' && (
+        <>
+          <p className="fine" role="status">Listening — speak to test your mic…</p>
+          <div className="meter" aria-hidden>
+            <div className="meter-fill" style={{ width: `${Math.round(level * 100)}%` }} />
+          </div>
+        </>
+      )}
+      {mic === 'denied' && (
+        <p className="error" role="status">Mic unavailable — using Type instead.</p>
+      )}
+    </section>
   );
 }
 

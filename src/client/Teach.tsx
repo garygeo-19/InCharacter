@@ -6,6 +6,7 @@ import { scoreSession } from '../shared/scoring';
 import type { Line, Peek } from '../shared/types';
 import { api, type BankDisplay, type LineIn } from './api';
 import { Segments, Stars, VerdictChip, mmss } from './format';
+import { captureToWav, startCapture, type VoiceCapture } from './voice';
 import {
   excludeIds,
   recordAttempt,
@@ -70,8 +71,8 @@ export function Teach(props: {
   const [answersGrade, setAnswersGrade] = useState<AnswersGrade | null>(null);
   const [gradeAttempts, setGradeAttempts] = useState(0);
 
-  const classSecs = props.fast ? 12 : SCORING_CONFIG.classSeconds.typed;
-  const answerSecs = props.fast ? 8 : SCORING_CONFIG.answerSeconds.typed;
+  const classSecs = props.fast ? 12 : SCORING_CONFIG.classSeconds[props.settings.mode];
+  const answerSecs = props.fast ? 8 : SCORING_CONFIG.answerSeconds[props.settings.mode];
   const endAfterSecs = props.fast ? 2 : 30;
 
   useEffect(() => {
@@ -123,6 +124,7 @@ export function Teach(props: {
       {phase.name === 'class' && (
         <ClassScreen
           totalSecs={classSecs} endAfterSecs={endAfterSecs}
+          mode={props.settings.mode} packId={props.packId} partId={props.partId}
           outline={outline} noteText={(id) => notesById.get(id)?.text ?? ''}
           peekStyle={props.settings.peekStyle} onPeek={recordPeek}
           lines={classLines} setLines={setClassLines}
@@ -167,6 +169,7 @@ export function Teach(props: {
         <QuestionScreen
           index={phase.index} asking={phase.asking}
           picks={picks} bankById={bankById}
+          mode={props.settings.mode} packId={props.packId} partId={props.partId}
           totalSecs={answerSecs}
           outline={outline} noteText={(id) => notesById.get(id)?.text ?? ''}
           peekStyle={props.settings.peekStyle} onPeek={recordPeek}
@@ -283,9 +286,109 @@ function ChatBox(props: {
   );
 }
 
+// Voice turn: records while `active`, transcribes once it flips false.
+// Each returned turn becomes a transcript line (§9.6). The WAV is kept
+// until the POST succeeds, so "Try again" re-sends the same audio; "Type
+// instead" hands back to the typed box (§10.1, §11.7).
+function VoiceLineTaker(props: {
+  packId: string;
+  partId: string;
+  active: boolean;
+  cue: string;
+  onDone: (lines: Line[]) => void;
+  onTypeInstead: () => void;
+}) {
+  const [level, setLevel] = useState(0);
+  const [status, setStatus] = useState<'recording' | 'transcribing' | 'error'>('recording');
+  const [error, setError] = useState('');
+  const captureRef = useRef<VoiceCapture | null>(null);
+  const wavRef = useRef<Uint8Array | null>(null);
+  const doneRef = useRef(false);
+
+  useEffect(() => {
+    let live = true;
+    startCapture((peak) => {
+      if (live) setLevel(peak);
+    })
+      .then((capture) => {
+        if (live) captureRef.current = capture;
+        else capture.stop();
+      })
+      .catch(() => {
+        if (!live) return;
+        setError('The mic is unavailable.');
+        setStatus('error');
+      });
+    return () => {
+      live = false;
+      captureRef.current?.stop();
+      captureRef.current = null;
+    };
+  }, []);
+
+  const post = (wav: Uint8Array) => {
+    setStatus('transcribing');
+    api.transcribe(wav, { packId: props.packId, partId: props.partId })
+      .then((d) => {
+        if (doneRef.current) return;
+        doneRef.current = true;
+        props.onDone(d.lines);
+      })
+      .catch((e: Error) => {
+        setError(e.message);
+        setStatus('error');
+      });
+  };
+
+  useEffect(() => {
+    if (!props.active && status === 'recording' && !doneRef.current) {
+      const capture = captureRef.current;
+      captureRef.current = null;
+      const wav = captureToWav(capture ? capture.stop() : new Int16Array(0));
+      wavRef.current = wav;
+      post(wav);
+    }
+  }, [props.active, status]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (status === 'transcribing') return <p role="status">Transcribing…</p>;
+  if (status === 'error') {
+    return (
+      <>
+        <p className="error">{error}</p>
+        <div className="row">
+          <button
+            type="button" className="primary"
+            disabled={!wavRef.current}
+            onClick={() => wavRef.current && post(wavRef.current)}
+          >
+            Try again
+          </button>
+          <button type="button" className="secondary" onClick={props.onTypeInstead}>
+            Type instead
+          </button>
+        </div>
+      </>
+    );
+  }
+  return (
+    <>
+      <p className="rec" role="status">
+        <span className="rec-dot" aria-hidden>●</span> Recording
+      </p>
+      <div className="meter" aria-hidden>
+        <div className="meter-fill" style={{ width: `${Math.round(level * 100)}%` }} />
+      </div>
+      <p className="lede">{props.cue}</p>
+    </>
+  );
+}
+
 function ClassScreen(props: {
   totalSecs: number;
   endAfterSecs: number;
+  mode: Settings['mode'];
+  packId: string;
+  partId: string;
   outline: ReturnType<typeof buildOutline>;
   noteText: (id: string) => string;
   peekStyle: Settings['peekStyle'];
@@ -299,15 +402,26 @@ function ClassScreen(props: {
   linesRef.current = props.lines;
   const left = props.totalSecs - elapsed;
   const warned = left <= 30;
+  const voice = props.mode === 'voice';
+  const [typedFallback, setTypedFallback] = useState(false);
+  const [voiceActive, setVoiceActive] = useState(true);
+  const endedRef = useRef(false);
+  const endVoice = () => {
+    if (endedRef.current) return;
+    endedRef.current = true;
+    setVoiceActive(false);
+  };
+  const useVoice = voice && !typedFallback;
 
   useEffect(() => {
     if (left <= 0) {
-      props.onEnd(linesRef.current);
+      if (useVoice) endVoice();
+      else props.onEnd(linesRef.current);
       return;
     }
     const t = setTimeout(() => setElapsed((e) => e + 1), 1000);
     return () => clearTimeout(t);
-  }, [left]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [left, useVoice]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -323,16 +437,28 @@ function ClassScreen(props: {
         outline={props.outline} noteText={props.noteText} phase="class"
         peekStyle={props.peekStyle} onPeek={props.onPeek}
       />
-      <ChatBox
-        lines={props.lines}
-        placeholder="Teach your class, one message per line"
-        onSend={(text) => props.setLines([...linesRef.current, { n: linesRef.current.length + 1, text, source: 'typed' }])}
-      />
+      {useVoice ? (
+        <VoiceLineTaker
+          packId={props.packId} partId={props.partId}
+          active={voiceActive} cue="Teach your class — speak now."
+          onDone={(lines) => props.onEnd(lines)}
+          onTypeInstead={() => setTypedFallback(true)}
+        />
+      ) : (
+        <ChatBox
+          lines={props.lines}
+          placeholder="Teach your class, one message per line"
+          onSend={(text) => props.setLines([...linesRef.current, { n: linesRef.current.length + 1, text, source: 'typed' }])}
+        />
+      )}
       <div className="sticky-action">
         <button
           type="button" className="primary"
-          disabled={elapsed < props.endAfterSecs}
-          onClick={() => props.onEnd(linesRef.current)}
+          disabled={elapsed < props.endAfterSecs || (useVoice && !voiceActive)}
+          onClick={() => {
+            if (useVoice) endVoice();
+            else props.onEnd(linesRef.current);
+          }}
         >
           End class
         </button>
@@ -378,6 +504,9 @@ function QuestionScreen(props: {
   asking: boolean;
   picks: { questionId: string }[];
   bankById: Map<string, BankDisplay>;
+  mode: Settings['mode'];
+  packId: string;
+  partId: string;
   totalSecs: number;
   outline: ReturnType<typeof buildOutline>;
   noteText: (id: string) => string;
@@ -392,25 +521,41 @@ function QuestionScreen(props: {
   const linesRef = useRef(lines);
   linesRef.current = lines;
   const left = props.totalSecs - elapsed;
+  const useVoice = props.mode === 'voice';
+  const [typedFallback, setTypedFallback] = useState(false);
+  const [answerOpen, setAnswerOpen] = useState(true);
+  const answeredRef = useRef(false);
+  const closeVoice = () => {
+    if (answeredRef.current) return;
+    answeredRef.current = true;
+    setAnswerOpen(false);
+  };
+  const answeringVoice = useVoice && !typedFallback;
 
   useEffect(() => {
     setElapsed(0);
     setLines([]);
+    setTypedFallback(false);
+    setAnswerOpen(true);
+    answeredRef.current = false;
   }, [props.index]);
 
   useEffect(() => {
     if (!props.asking) {
       if (left <= 0) {
-        props.onAnswered(linesRef.current);
+        if (answeringVoice) closeVoice();
+        else props.onAnswered(linesRef.current);
         return;
       }
       const t = setTimeout(() => setElapsed((e) => e + 1), 1000);
       return () => clearTimeout(t);
     }
     return undefined;
-  }, [left, props.asking]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [left, props.asking, answeringVoice]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // In Type mode with no recorded audio yet (M3), the caption is the question.
+  // No recorded student audio yet (M3 cut line): the caption is the
+  // question in both modes, and voice recording starts 2 s after it
+  // appears, with a "Your turn" cue (§4.6).
   useEffect(() => {
     if (props.asking) {
       const t = setTimeout(props.onAsked, 2500);
@@ -430,7 +575,7 @@ function QuestionScreen(props: {
         <div className="bubble">
           <p className="asker">{student}</p>
           <p>{q.text}</p>
-          <p className="fine">Student voices arrive in M3 — caption only for now.</p>
+          <p className="fine">Student voices are being recorded — caption for now.</p>
         </div>
       </div>
       {!props.asking && (
@@ -445,15 +590,34 @@ function QuestionScreen(props: {
               peekStyle={props.peekStyle} onPeek={props.onPeek}
             />
           </details>
-          <ChatBox
-            lines={lines} placeholder="Type your answer" sendLabel="Send"
-            onSend={(text) => setLines((l) => [...l, { n: l.length + 1, text, source: 'typed' }])}
-          />
-          <div className="sticky-action">
-            <button type="button" className="primary" onClick={() => props.onAnswered(linesRef.current)}>
-              Done
-            </button>
-          </div>
+          {answeringVoice ? (
+            <>
+              <p className="lede">Your turn — speak now.</p>
+              <VoiceLineTaker
+                packId={props.packId} partId={props.partId}
+                active={answerOpen} cue="Answer the question — speak now."
+                onDone={(voiceLines) => props.onAnswered(voiceLines)}
+                onTypeInstead={() => setTypedFallback(true)}
+              />
+              <div className="sticky-action">
+                <button type="button" className="primary" disabled={!answerOpen} onClick={closeVoice}>
+                  Done
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <ChatBox
+                lines={lines} placeholder="Type your answer" sendLabel="Send"
+                onSend={(text) => setLines((l) => [...l, { n: l.length + 1, text, source: 'typed' }])}
+              />
+              <div className="sticky-action">
+                <button type="button" className="primary" onClick={() => props.onAnswered(linesRef.current)}>
+                  Done
+                </button>
+              </div>
+            </>
+          )}
         </>
       )}
     </>

@@ -42,6 +42,14 @@ export type BankDisplay = {
 
 export type LineIn = { n: number; text: string };
 
+export type TranscribedLine = {
+  n: number;
+  text: string;
+  source: 'typed' | 'voice';
+  startMs?: number;
+  endMs?: number;
+};
+
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const body = (await res.json().catch(() => ({}))) as { error?: string };
@@ -78,6 +86,14 @@ export const api = {
         dropped: number;
       }>,
     ),
+  transcribe: (wav: Uint8Array, meta: { packId: string; partId: string }) => {
+    const form = new FormData();
+    form.append('audio', new Blob([wav as Uint8Array<ArrayBuffer>], { type: 'audio/wav' }), 'audio.wav');
+    form.append('meta', JSON.stringify(meta));
+    return fetch('/api/transcribe', { method: 'POST', body: form }).then(
+      json<{ lines: TranscribedLine[]; audioDurationMs: number }>,
+    );
+  },
   gradeAnswers: (body: {
     packId: string;
     partId: string;

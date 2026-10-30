@@ -5,9 +5,11 @@ import { parseUsableStatuses } from '../shared/bank';
 import { applyAnswersEvidence, applyClassEvidence } from '../shared/evidence';
 import { fetchCatalog, fetchPack, liveEntries } from '../shared/notes';
 import { fallbackPick, validatePicks, type UsableQuestion } from '../shared/picker';
+import { TRANSCRIBE_MAX_AUDIO_BYTES, turnsToLines, wavProblem } from '../shared/voice';
 import { classContent, partStatuses } from './content';
 import { requireModelApiKey } from './env';
 import { chatStructured, createMetaClient } from './meta';
+import { transcribeWav } from './transcribe';
 import {
   GRADE_ANSWERS_SYSTEM,
   GRADE_CLASS_SYSTEM,
@@ -45,14 +47,16 @@ function totalChars(lines: { text: string }[]): number {
   return lines.reduce((s, l) => s + l.text.length, 0);
 }
 
-// Per-IP rate limit (§10.4): 36 class-op calls an hour ≈ 12 classes (pick +
-// class grade + answers grade each). Decision 30 Oct 2026.
+// Per-IP rate limits (§10.4): 36 class-op calls an hour ≈ 12 classes (pick +
+// class grade + answers grade each), and 60 transcriptions an hour on the
+// transcribe route. Decision 30 Oct 2026.
 const HITS = new Map<string, number[]>();
-function rateLimited(ip: string, limit = 36): boolean {
+const TRANSCRIBE_HITS = new Map<string, number[]>();
+function rateLimited(ip: string, limit = 36, store = HITS): boolean {
   const now = Date.now();
-  const kept = (HITS.get(ip) ?? []).filter((t) => now - t < 3_600_000);
+  const kept = (store.get(ip) ?? []).filter((t) => now - t < 3_600_000);
   kept.push(now);
-  HITS.set(ip, kept);
+  store.set(ip, kept);
   return kept.length > limit;
 }
 
@@ -153,6 +157,64 @@ export function createApp(env: Record<string, string>) {
       });
     } catch (err) {
       return c.json({ error: (err as Error).message }, 502);
+    }
+  });
+
+  // Voice in, file mode (§9.6, §10.2): the browser posts its WAV plus
+  // `meta` { packId, partId }; the server forwards it to the Voice API with
+  // the part's anchors as keywords. Returns one transcript line per turn.
+  const TranscribeMeta = z.object({ packId: z.string(), partId: z.string() });
+  app.post('/api/transcribe', async (c) => {
+    const ip = c.req.header('x-forwarded-for') ?? 'local';
+    if (rateLimited(ip, 60, TRANSCRIBE_HITS)) {
+      return c.json({ error: 'Too many transcriptions this hour.' }, 429);
+    }
+    let form: Record<string, string | File>;
+    try {
+      form = (await c.req.parseBody()) as Record<string, string | File>;
+    } catch {
+      return c.json({ error: 'Expected multipart audio.' }, 400);
+    }
+    const audio = form['audio'];
+    const metaRaw = form['meta'];
+    let metaJson: unknown = metaRaw;
+    if (typeof metaRaw === 'string') {
+      try {
+        metaJson = JSON.parse(metaRaw);
+      } catch {
+        return c.json({ error: 'Expected multipart audio and meta.' }, 400);
+      }
+    }
+    const meta = TranscribeMeta.safeParse(metaJson);
+    if (!(audio instanceof File) || !meta.success) {
+      return c.json({ error: 'Expected multipart audio and meta.' }, 400);
+    }
+    const wav = new Uint8Array(await audio.arrayBuffer());
+    if (wav.length > TRANSCRIBE_MAX_AUDIO_BYTES) {
+      return c.json({ error: 'Audio is too large (at most 10 MB).' }, 400);
+    }
+    const problem = wavProblem(wav);
+    if (problem) return c.json({ error: problem }, 400);
+    try {
+      const entry = await catalogEntry(meta.data.packId);
+      const pack = await fetchPack(base, entry);
+      const { notes } = await classContent(base, entry, meta.data.partId, statuses);
+      const anchors = notes.flatMap((n) => n.anchors);
+      checkBudget();
+      const result = await withTimeout(
+        transcribeWav({
+          apiKey: requireModelApiKey(env),
+          wav,
+          packLanguage: pack.language,
+          anchors,
+        }),
+        120_000,
+        'transcribe',
+      );
+      return c.json({ lines: turnsToLines(result.turns), audioDurationMs: result.audioDurationMs });
+    } catch (err) {
+      const status = (err as { status?: number }).status ?? 502;
+      return c.json({ error: (err as Error).message }, status as 502);
     }
   });
 
