@@ -223,9 +223,10 @@ test('pinned level bar stays on screen; answers auto-record when the question en
 
 test('transcribe failure reads plainly; Try again re-sends the kept audio', async ({ page }) => {
   await fakeMic(page);
-  // Call 1 (class) succeeds, call 2 (answer 1) fails, call 3+ succeed.
+  // Call 1 (class) succeeds; call 2 (answer 1) and its automatic retry
+  // (call 3) fail, so the error shows; call 4+ (Try again) succeed.
   await mockApi(page, (call) =>
-    call === 2
+    call === 2 || call === 3
       ? { status: 502, json: { error: 'Transcription failed with status 500: model overloaded' } }
       : { status: 200, json: VOICE_LINES },
   );
