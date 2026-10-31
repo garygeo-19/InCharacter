@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 // Local secrets live in .dev.vars (Wrangler convention, gitignored) or the
-// process environment. Values are never logged.
+// process environment. Values are never logged. Node-only: the Worker entry
+// passes its env bindings straight to createApp and never imports this file.
 export function loadEnv(): Record<string, string> {
   const env: Record<string, string> = {};
   try {
@@ -19,8 +20,4 @@ export function loadEnv(): Record<string, string> {
   return { ...env, ...process.env } as Record<string, string>;
 }
 
-export function requireModelApiKey(env: Record<string, string>): string {
-  const key = env.MODEL_API_KEY;
-  if (!key) throw new Error('MODEL_API_KEY is not set (expected in .dev.vars)');
-  return key;
-}
+export { requireModelApiKey } from './env-shared';

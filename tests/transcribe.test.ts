@@ -39,22 +39,43 @@ const RECORDED = JSON.parse(
 
 type SeenRequest = { url: string; requestPart: Record<string, unknown>; audioBytes: number };
 
+// The route forwards audio as a streamed multipart body (never a FormData
+// instance), so the stub splits the raw bytes on the boundary instead.
+function splitUpload(bytes: Uint8Array, boundary: string): { requestPart: Record<string, unknown>; audioBytes: number } {
+  const latin = Buffer.from(bytes).toString('latin1');
+  const parts = latin.split(`--${boundary}`);
+  let requestPart: Record<string, unknown> = {};
+  let audioBytes = -1;
+  for (const part of parts) {
+    const headEnd = part.indexOf('\r\n\r\n');
+    if (headEnd < 0) continue;
+    const head = part.slice(0, headEnd);
+    let content = part.slice(headEnd + 4);
+    if (content.endsWith('\r\n')) content = content.slice(0, -2);
+    if (head.includes('name="request"')) {
+      requestPart = JSON.parse(content) as Record<string, unknown>;
+    } else if (head.includes('name="audio"')) {
+      audioBytes = Buffer.byteLength(content, 'latin1');
+    }
+  }
+  return { requestPart, audioBytes };
+}
+
 function stubNetwork(seen: SeenRequest[], metaStatus = 200) {
-  vi.stubGlobal('fetch', async (url: unknown, init?: { body?: unknown }) => {
+  vi.stubGlobal('fetch', async (url: unknown, init?: { body?: unknown; headers?: unknown }) => {
     const u = String(url);
     if (u.endsWith('/packs/catalog.json')) return { ok: true, json: async () => CATALOG_JSON };
     if (u.endsWith('.json')) return { ok: true, json: async () => PACK_JSON };
     if (u.includes('/asr/transcribe')) {
-      const form = init?.body as FormData;
-      const requestRaw = form.get('request');
-      const audioRaw = form.get('audio');
-      seen.push({
-        url: u,
-        requestPart: JSON.parse(
-          typeof requestRaw === 'string' ? requestRaw : await (requestRaw as Blob).text(),
-        ) as Record<string, unknown>,
-        audioBytes: audioRaw instanceof Blob ? (await audioRaw.arrayBuffer()).byteLength : -1,
-      });
+      const rawHeaders = init?.headers as Record<string, string> | Headers | undefined;
+      const contentType =
+        rawHeaders instanceof Headers
+          ? (rawHeaders.get('content-type') ?? '')
+          : (rawHeaders?.['content-type'] ?? rawHeaders?.['Content-Type'] ?? '');
+      const boundary = /boundary=([^;]+)/.exec(contentType)?.[1] ?? '';
+      const bytes = new Uint8Array(await new Response(init?.body as BodyInit).arrayBuffer());
+      const { requestPart, audioBytes } = splitUpload(bytes, boundary);
+      seen.push({ url: u, requestPart, audioBytes });
       if (metaStatus !== 200) {
         return {
           ok: false,
@@ -110,7 +131,8 @@ describe('POST /api/transcribe (Meta mocked)', () => {
     const keywords = seen[0].requestPart['keywords'] as string[];
     expect(keywords).toContain('buen provecho');
     expect(keywords.length).toBeLessThanOrEqual(50);
-    expect(seen[0].audioBytes).toBeGreaterThan(44);
+    // The streamed upload forwards every audio byte exactly (no re-encode).
+    expect(seen[0].audioBytes).toBe(encodeWav(new Int16Array(2400).fill(100)).length);
   });
 
   it('rejects missing meta, non-WAV audio, oversize audio and Meta failures', async () => {

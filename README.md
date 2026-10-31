@@ -25,6 +25,46 @@ npm run check:day1 # Day-1 check 1 (needs MODEL_API_KEY in .dev.vars)
 
 Stack (§10.3): TypeScript, React + Vite, Hono (Node in dev, Workers-ready), Zod, OpenAI SDK against Meta's base URL, Vitest, Playwright (config scaffolded; the mobile test lands in M1). Layout follows §10.5. CI (`.github/workflows/ci.yml`) runs typecheck, unit tests and build on push/PR.
 
+## Deploy
+
+In Character deploys as one Cloudflare Worker named `incharacter` (Free plan), built from this repo by
+Cloudflare's GitHub integration (Workers Builds). Nobody deploys from a laptop: the owner connects the repo
+once in the dashboard, and pushes rebuild and redeploy it. Keys never go in the repo, and deployment is never
+done by the coding agent.
+
+Dashboard setup for the owner (one time):
+
+1. Cloudflare dashboard → Workers & Pages → Create → Import a repository → select this repo.
+2. Build settings: Build command `npm ci && npm run build`, Deploy command `npx wrangler deploy`.
+   (`wrangler.jsonc`: Worker name `incharacter`, entry `src/server/worker.ts`, static assets from `dist/`
+   with SPA fallback, `workers_dev` true.)
+3. Settings → Variables and Secrets: keep the non-secret vars from `wrangler.jsonc`
+   (`CATALOG_BASE`, `APP_ORIGIN`, `DAILY_CALL_CAP`, `USABLE_STATUSES`), and add `MODEL_API_KEY` as an
+   **encrypted secret** — never as a plain variable, never in the repo.
+4. Deploy. The first deploy assigns `https://incharacter.<subdomain>.workers.dev`. Copy that URL into the
+   `APP_ORIGIN` variable (it ships as a `https://incharacter.<your-subdomain>.workers.dev` placeholder) so
+   CORS allows the app; the new value applies to new requests without a redeploy.
+5. Optional: attach the real domain under Worker → Settings → Domains.
+
+Local checks that need no login: `npm run typecheck`, `npm test`, `npm run build`, and
+`npx wrangler deploy --dry-run --outdir /tmp/wr-dry`. The dry run reports the bundle size (31 Oct 2026:
+worker 584,129 B ≈ 570 KiB, ≈ 106 KiB gzip — comfortably under the 1 MiB Free-plan script limit; static
+assets upload separately).
+
+Worker notes:
+
+- The Worker serves the same Hono app as the dev server (`src/server/worker.ts` builds it from the env
+  bindings). `/api/transcribe` walks the upload as a stream — size from Content-Length plus a byte-counting
+  pass, WAV header from the first 44 bytes only — so a multi-MB WAV stays within the 10 ms CPU budget.
+  Catalog/pack/bank parsing is cached in module scope per isolate.
+- Rate limits (36 class-ops/hour/IP, 60 transcriptions/hour/IP) and the daily model-call cap live in
+  module-scope memory. On Node the process is the unit; on Workers each isolate keeps its own counters, so
+  a burst spread across many isolates can exceed the nominal totals. Best effort: the daily cap still bounds
+  spend per isolate.
+- Workers have no filesystem, so the approved banks are bundled into the Worker (`src/server/worker.ts`
+  imports them and calls `setBankFiles`). When a new part is banked, add its JSON import and map entry there
+  before redeploying; Node dev keeps reading `content/banks/` from disk.
+
 ## M0 — Setup and day-1 checks (§12)
 
 | Check | Result |
@@ -241,3 +281,4 @@ Choices made where the spec is silent, one line each with its date.
 - 31 Oct 2026 — Kept the reviewer's uncommitted transcribe logging in `src/server/app.ts` / `src/server/transcribe.ts` (message and status only, never the key; `SAVE_FAILED_WAV` debug save stays env-gated) and committed it with the voice fixes.
 - 31 Oct 2026 — Done/End stops the timer at once (`src/shared/timed-turn.ts`: first finish wins, first deliver wins; voice shows "Answer sent…" / "Class sent…" with waiting dots while transcribing; a transcription failure's "Type it instead" starts a fresh turn keeping the remaining time). Flaky e2e assertions now wait for stable end states with explicit timeouts instead of asserting transient screens.
 - 31 Oct 2026 — Countdown always reaches the class (`src/shared/countdown.ts` + `src/client/Teach.tsx`): the 3-2-1 state machine starts the class exactly once (extra ticks are no-ops), and an absolute watchdog past the last tick starts it even if a tick is ever dropped or delayed — the WebKit freeze on "1" (voice.spec.ts:178, timers.spec.ts:201). A mic start that fails or hangs past `VOICE_START_TIMEOUT_MS` (8 s) falls back to Type on its own with "Mic unavailable — using Type instead.", on the class and on answers; a capture that opens late is stopped at once.
+- 31 Oct 2026 — Workers deploy (Free plan): `wrangler.jsonc` names the Worker `incharacter` with `compatibility_date` 2026-10-30 (the newest the wrangler-bundled workerd accepts; 2026-10-31 fails local `wrangler dev`), no `nodejs_compat` (the bundle has no `node:` imports — the disk bank read reaches the fs builtin at run time only, and only on Node). `/api/transcribe` parses the incoming multipart as a stream (zero-copy audio views, byte-counted cap, WAV check on the first 44 bytes) and re-emits the same views to Meta with an exact Content-Length; Content-Length past cap + 64 KB slack rejects up front. Rate limits and the daily cap are per-isolate on Workers (best effort). `SAVE_FAILED_WAV` survives as a `createApp` option wired only by the Node entry.

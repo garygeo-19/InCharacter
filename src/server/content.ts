@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { z } from 'zod';
 import {
   isReady,
@@ -25,17 +23,57 @@ const BankFileSchema = z.object({
   questions: z.array(z.any()),
 });
 
-export function loadBank(packId: string, partId: string): Bank | null {
+// Bank files have two sources. On Node they are read from content/banks/ on
+// disk; on Cloudflare Workers there is no filesystem, so the Worker entry
+// registers its bundled JSON imports with setBankFiles() before serving.
+// The disk read reaches the fs builtin at run time (no static node: import),
+// so this module bundles cleanly for Workers. Parsed banks are cached in
+// module scope, so a request never re-reads or re-parses them.
+let bankFiles: Record<string, unknown> | null = null;
+const bankCache = new Map<string, Bank | null>();
+
+export function setBankFiles(map: Record<string, unknown>): void {
+  bankFiles = map;
+  bankCache.clear();
+}
+
+function readBankDisk(packId: string, partId: string): unknown {
   try {
-    const raw = JSON.parse(
-      readFileSync(join(process.cwd(), 'content', 'banks', packId, `${partId}.json`), 'utf8'),
+    const proc = (
+      globalThis as {
+        process?: { getBuiltinModule?: (id: string) => unknown; cwd?: () => string };
+      }
+    ).process;
+    const getBuiltin = proc?.getBuiltinModule;
+    if (typeof getBuiltin !== 'function') return null;
+    const fs = getBuiltin.call(proc, 'node:fs') as {
+      readFileSync?: (path: string, encoding: string) => string;
+    };
+    const cwd = typeof proc?.cwd === 'function' ? proc.cwd() : '.';
+    if (typeof fs?.readFileSync !== 'function') return null;
+    return JSON.parse(
+      fs.readFileSync(`${cwd}/content/banks/${packId}/${partId}.json`, 'utf8'),
     ) as unknown;
-    const parsed = BankFileSchema.parse(raw);
-    if (parsed.packId !== packId || parsed.partId !== partId) return null;
-    return parsed as Bank;
   } catch {
     return null;
   }
+}
+
+export function loadBank(packId: string, partId: string): Bank | null {
+  const key = `${packId}/${partId}`;
+  if (bankCache.has(key)) return bankCache.get(key) ?? null;
+  let bank: Bank | null = null;
+  try {
+    const raw: unknown = bankFiles ? (bankFiles[key] ?? null) : readBankDisk(packId, partId);
+    if (raw) {
+      const parsed = BankFileSchema.parse(raw);
+      if (parsed.packId === packId && parsed.partId === partId) bank = parsed as Bank;
+    }
+  } catch {
+    bank = null;
+  }
+  bankCache.set(key, bank);
+  return bank;
 }
 
 export type PartStatus = {

@@ -1,4 +1,4 @@
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { z } from 'zod';
 import { parseUsableStatuses } from '../shared/bank';
@@ -7,9 +7,15 @@ import { fetchCatalog, fetchPack, liveEntries } from '../shared/notes';
 import { fallbackPick, validatePicks, type UsableQuestion } from '../shared/picker';
 import { TRANSCRIBE_MAX_AUDIO_BYTES, turnsToLines, wavProblem } from '../shared/voice';
 import { classContent, partStatuses } from './content';
-import { requireModelApiKey } from './env';
+import { requireModelApiKey } from './env-shared';
 import { chatStructured, createMetaClient } from './meta';
-import { transcribeWav } from './transcribe';
+import { transcribeStream } from './transcribe';
+import {
+  extractBoundary,
+  parseTranscribeUpload,
+  TRANSCRIBE_UPLOAD_SLACK_BYTES,
+  type ParsedUpload,
+} from './transcribe-stream';
 import {
   GRADE_ANSWERS_SYSTEM,
   GRADE_CLASS_SYSTEM,
@@ -49,7 +55,9 @@ function totalChars(lines: { text: string }[]): number {
 
 // Per-IP rate limits (§10.4): 36 class-op calls an hour ≈ 12 classes (pick +
 // class grade + answers grade each), and 60 transcriptions an hour on the
-// transcribe route. Decision 30 Oct 2026.
+// transcribe route. Decision 30 Oct 2026. These counters live in module
+// scope: on Node the process is the unit; on Workers each isolate keeps its
+// own (best effort — see README "Deploy").
 const HITS = new Map<string, number[]>();
 const TRANSCRIBE_HITS = new Map<string, number[]>();
 function rateLimited(ip: string, limit = 36, store = HITS): boolean {
@@ -60,7 +68,12 @@ function rateLimited(ip: string, limit = 36, store = HITS): boolean {
   return kept.length > limit;
 }
 
-// Daily model-call cap (§10.4). In-memory; the process is the unit.
+function clientIp(c: Context): string {
+  return c.req.header('cf-connecting-ip') ?? c.req.header('x-forwarded-for') ?? 'local';
+}
+
+// Daily model-call cap (§10.4). In-memory; the process is the unit on Node,
+// one isolate's share on Workers (see README "Deploy").
 let callDay = '';
 let callCount = 0;
 
@@ -72,7 +85,10 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
-export function createApp(env: Record<string, string>) {
+export function createApp(
+  env: Record<string, string>,
+  opts?: { saveFailedWav?: (wav: Uint8Array) => void },
+) {
   const app = new Hono();
   const origin = env.APP_ORIGIN ?? 'http://localhost:5173';
   app.use('/api/*', cors({ origin: [origin, 'http://localhost:5173'] }));
@@ -163,39 +179,50 @@ export function createApp(env: Record<string, string>) {
   // Voice in, file mode (§9.6, §10.2): the browser posts its WAV plus
   // `meta` { packId, partId }; the server forwards it to the Voice API with
   // the part's anchors as keywords. Returns one transcript line per turn.
+  // The upload is walked as a stream (never buffered and re-encoded), so a
+  // multi-MB WAV stays within the Workers Free-plan CPU budget.
   const TranscribeMeta = z.object({ packId: z.string(), partId: z.string() });
   app.post('/api/transcribe', async (c) => {
-    const ip = c.req.header('x-forwarded-for') ?? 'local';
+    const ip = clientIp(c);
     if (rateLimited(ip, 60, TRANSCRIBE_HITS)) {
       return c.json({ error: 'Too many transcriptions this hour.' }, 429);
     }
-    let form: Record<string, string | File>;
+    // Fast path: the whole body is the audio plus a few hundred bytes of
+    // form overhead, so past cap + slack the audio itself is over the cap.
+    const contentLength = Number(c.req.header('content-length') ?? '');
+    if (
+      Number.isFinite(contentLength) &&
+      contentLength > TRANSCRIBE_MAX_AUDIO_BYTES + TRANSCRIBE_UPLOAD_SLACK_BYTES
+    ) {
+      return c.json({ error: 'Audio is too large (at most 10 MB).' }, 400);
+    }
+    let upload: ParsedUpload;
     try {
-      form = (await c.req.parseBody()) as Record<string, string | File>;
+      upload = await parseTranscribeUpload(
+        c.req.raw.body,
+        extractBoundary(c.req.header('content-type')) ?? '',
+      );
     } catch {
       return c.json({ error: 'Expected multipart audio.' }, 400);
     }
-    const audio = form['audio'];
-    const metaRaw = form['meta'];
-    let metaJson: unknown = metaRaw;
-    if (typeof metaRaw === 'string') {
+    let metaJson: unknown = upload.metaRaw;
+    if (typeof upload.metaRaw === 'string') {
       try {
-        metaJson = JSON.parse(metaRaw);
+        metaJson = JSON.parse(upload.metaRaw);
       } catch {
         return c.json({ error: 'Expected multipart audio and meta.' }, 400);
       }
     }
     const meta = TranscribeMeta.safeParse(metaJson);
-    if (!(audio instanceof File) || !meta.success) {
+    if (!upload.audioFound || !meta.success) {
       return c.json({ error: 'Expected multipart audio and meta.' }, 400);
     }
-    const wav = new Uint8Array(await audio.arrayBuffer());
-    if (wav.length > TRANSCRIBE_MAX_AUDIO_BYTES) {
+    if (upload.tooLarge || upload.audioBytes > TRANSCRIBE_MAX_AUDIO_BYTES) {
       return c.json({ error: 'Audio is too large (at most 10 MB).' }, 400);
     }
-    const problem = wavProblem(wav);
+    const problem = wavProblem(upload.head);
     if (problem) {
-      console.error('[transcribe] bad wav:', problem, `wav=${wav.length}B`);
+      console.error('[transcribe] bad wav:', problem, `wav=${upload.audioBytes}B`);
       return c.json({ error: problem }, 400);
     }
     try {
@@ -205,9 +232,10 @@ export function createApp(env: Record<string, string>) {
       const anchors = notes.flatMap((n) => n.anchors);
       checkBudget();
       const result = await withTimeout(
-        transcribeWav({
+        transcribeStream({
           apiKey: requireModelApiKey(env),
-          wav,
+          audio: upload.audioChunks,
+          audioBytes: upload.audioBytes,
           packLanguage: pack.language,
           anchors,
         }),
@@ -217,18 +245,27 @@ export function createApp(env: Record<string, string>) {
       return c.json({ lines: turnsToLines(result.turns), audioDurationMs: result.audioDurationMs });
     } catch (err) {
       // Message and status only, never the key or headers.
-      if (process.env.SAVE_FAILED_WAV) {
-        const { writeFileSync } = await import('node:fs');
-        writeFileSync(process.env.SAVE_FAILED_WAV, wav);
+      if (opts?.saveFailedWav && !upload.tooLarge) {
+        try {
+          const flat = new Uint8Array(upload.audioBytes);
+          let o = 0;
+          for (const chunk of upload.audioChunks) {
+            flat.set(chunk, o);
+            o += chunk.length;
+          }
+          opts.saveFailedWav(flat);
+        } catch {
+          // Debug save must never break the error response.
+        }
       }
-      console.error('[transcribe] failed:', (err as { status?: number }).status ?? '-', (err as Error).message, `wav=${wav.length}B`);
+      console.error('[transcribe] failed:', (err as { status?: number }).status ?? '-', (err as Error).message, `wav=${upload.audioBytes}B`);
       const status = (err as { status?: number }).status ?? 502;
       return c.json({ error: (err as Error).message }, status as 502);
     }
   });
 
   app.post('/api/pick', async (c) => {
-    const ip = c.req.header('x-forwarded-for') ?? 'local';
+    const ip = clientIp(c);
     if (rateLimited(ip)) return c.json({ error: 'Too many classes this hour.' }, 429);
     const parsed = PickBody.safeParse(await c.req.json());
     if (!parsed.success) return c.json({ error: 'Bad request.' }, 400);
@@ -281,7 +318,7 @@ export function createApp(env: Record<string, string>) {
   });
 
   app.post('/api/grade/class', async (c) => {
-    const ip = c.req.header('x-forwarded-for') ?? 'local';
+    const ip = clientIp(c);
     if (rateLimited(ip)) return c.json({ error: 'Too many classes this hour.' }, 429);
     const parsed = GradeClassBody.safeParse(await c.req.json());
     if (!parsed.success) return c.json({ error: 'Bad request.' }, 400);
@@ -336,7 +373,7 @@ export function createApp(env: Record<string, string>) {
   });
 
   app.post('/api/grade/answers', async (c) => {
-    const ip = c.req.header('x-forwarded-for') ?? 'local';
+    const ip = clientIp(c);
     if (rateLimited(ip)) return c.json({ error: 'Too many classes this hour.' }, 429);
     const parsed = GradeAnswersBody.safeParse(await c.req.json());
     if (!parsed.success) return c.json({ error: 'Bad request.' }, 400);

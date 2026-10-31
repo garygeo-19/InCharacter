@@ -1,0 +1,24 @@
+// Cloudflare Workers config for In Character (see README "Deploy").
+// Secrets are never stored here: the owner sets MODEL_API_KEY as an
+// encrypted secret in the dashboard (Workers Builds project settings).
+{
+  "name": "incharacter",
+  "compatibility_date": "2026-10-30",
+  "main": "src/server/worker.ts",
+  "workers_dev": true,
+  // Static assets from the Vite build. Non-asset paths that are not /api/*
+  // fall back to index.html (SPA). Run `npm run build` before deploying.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+  // Non-secret vars. APP_ORIGIN must be the deployed workers.dev URL: after
+  // the first deploy, replace the placeholder subdomain below with the real
+  // one (dashboard: Worker > Settings > Variables) so CORS allows the app.
+  "vars": {
+    "CATALOG_BASE": "https://flashfeed-packs-serving.vercel.app",
+    "APP_ORIGIN": "https://incharacter.<your-subdomain>.workers.dev",
+    "DAILY_CALL_CAP": "3000",
+    "USABLE_STATUSES": "approved,checked"
+  }
+}
