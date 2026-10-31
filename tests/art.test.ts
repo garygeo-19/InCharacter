@@ -21,7 +21,7 @@ function isWebP(path: string): boolean {
 }
 
 describe('classroom art', () => {
-  it('cast.json names the four students with portraits and no picked voices', () => {
+  it('cast.json names the four students with portraits and four distinct ElevenLabs voices', () => {
     expect(cast.classroom).toBe('art/classroom.webp');
     expect(cast.masks).toBe('art/classroom-masks.json');
     expect(cast.students.map((s) => s.id)).toEqual(['maya', 'leo', 'priya', 'sam']);
@@ -29,7 +29,7 @@ describe('classroom art', () => {
       expect(s.name.length).toBeGreaterThan(0);
       expect(s.description.length).toBeGreaterThan(0);
       expect(s.portrait).toBe(`art/students/${s.id}.webp`);
-      expect(s.voiceId).toBe('<pick>');
+      expect(s.voiceId).toMatch(/^[A-Za-z0-9]{20}$/);
     }
   });
 
