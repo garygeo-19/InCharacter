@@ -5,6 +5,7 @@ import { parseUsableStatuses } from '../shared/bank';
 import { applyAnswersEvidence, applyClassEvidence } from '../shared/evidence';
 import { fetchCatalog, fetchPack, liveEntries } from '../shared/notes';
 import { fallbackPick, validatePicks, type UsableQuestion } from '../shared/picker';
+import { questionAudioUrl } from '../shared/question-audio';
 import { TRANSCRIBE_MAX_AUDIO_BYTES, turnsToLines, wavProblem } from '../shared/voice';
 import { classContent, partStatuses } from './content';
 import { requireModelApiKey } from './env-shared';
@@ -54,8 +55,10 @@ function totalChars(lines: { text: string }[]): number {
 }
 
 // Per-IP rate limits (§10.4): 36 class-op calls an hour ≈ 12 classes (pick +
-// class grade + answers grade each), and 60 transcriptions an hour on the
-// transcribe route. Decision 30 Oct 2026. These counters live in module
+// class grade + answers grade each), and 240 transcriptions an hour on the
+// transcribe route (chunked upload, owner fix 31 Oct 2026: a 3:00 class
+// plus 3 answers POSTs ~18 chunks). Decision 30 Oct 2026, raised 31 Oct
+// 2026. These counters live in module
 // scope: on Node the process is the unit; on Workers each isolate keeps its
 // own (best effort — see README "Deploy").
 const HITS = new Map<string, number[]>();
@@ -169,6 +172,9 @@ export function createApp(
           id: q.id, text: q.text, type: q.type, difficulty: q.difficulty,
           studentId: q.studentId, noteIds: q.noteIds,
           expectedPoints: q.expectedPoints, misconception: q.misconception,
+          // The mp3 URL only; the client never sees voiceId (§9.7).
+          // The recorded textHash is trusted; only the file path is checked.
+          audioUrl: questionAudioUrl(c.req.param('packId'), c.req.param('partId'), q.id, q.audio),
         })),
       });
     } catch (err) {
@@ -184,7 +190,7 @@ export function createApp(
   const TranscribeMeta = z.object({ packId: z.string(), partId: z.string() });
   app.post('/api/transcribe', async (c) => {
     const ip = clientIp(c);
-    if (rateLimited(ip, 60, TRANSCRIBE_HITS)) {
+    if (rateLimited(ip, 240, TRANSCRIBE_HITS)) {
       return c.json({ error: 'Too many transcriptions this hour.' }, 429);
     }
     // Fast path: the whole body is the audio plus a few hundred bytes of

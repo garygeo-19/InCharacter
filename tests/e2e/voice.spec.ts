@@ -8,8 +8,9 @@ import { expect, test, type Page } from '@playwright/test';
 // check; timers run short via ?fast=1.
 //
 // Covers owner feedback 31 Oct 2026: the pinned level bar, answers that
-// record only after the "Start answer" tap, and readable transcribe errors
-// whose "Try again" re-sends the kept audio.
+// auto-record when the question audio ends (caption fallback 2 s after it
+// appears), and readable transcribe errors whose "Try again" re-sends the
+// kept audio.
 
 const DEMO = JSON.parse(readFileSync('tests/fixtures/demo-part.json', 'utf8')) as {
   packId: string; packVersion: string; language: string;
@@ -112,6 +113,7 @@ async function mockApi(page: Page, onTranscribe: (call: number) => { status: num
         id: q.id, text: q.text, type: q.type, difficulty: q.difficulty,
         studentId: q.studentId, noteIds: q.noteIds,
         expectedPoints: q.expectedPoints, misconception: q.misconception,
+        audioUrl: `/audio/spanish-food-shopping/p10-at-the-restaurant/${q.id}.mp3`,
       })),
     },
   }));
@@ -175,7 +177,7 @@ async function endClass(page: Page) {
   await endBtn.click();
 }
 
-test('pinned level bar stays on screen; answers record only after Start answer', async ({ page }) => {
+test('pinned level bar stays on screen; answers auto-record when the question ends', async ({ page }) => {
   await fakeMic(page);
   await mockApi(page, () => ({ status: 200, json: VOICE_LINES }));
   await driveToClass(page);
@@ -202,20 +204,16 @@ test('pinned level bar stays on screen; answers record only after Start answer',
   await endClass(page);
   await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
 
-  // No auto-record: Start answer is shown, no bar, full timer.
-  await expect(page.getByRole('button', { name: 'Start answer' })).toBeVisible({ timeout: 10000 });
-  await expect(page.locator('.levelbar-pinned')).toHaveCount(0);
-  // Full answer budget before the Start tap: the timer has not started, so
-  // this text is the stable pre-start state, not a mid-count value.
-  await expect(page.locator('.timer')).toHaveText('0:08', { timeout: 10000 });
-
-  // The tap starts recording and the timer.
-  await page.getByRole('button', { name: 'Start answer' }).click();
+  // Auto-record: no Start button; the answer records on its own once the
+  // question audio ends (or 2 s after the caption on fallback), with the
+  // full timer and a "Your turn" cue.
+  await expect(page.getByRole('button', { name: 'Start answer' })).toHaveCount(0);
   await expect(page.locator('.levelbar-pinned')).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText('Your turn — speak now.')).toBeVisible({ timeout: 10000 });
   await expect(page.getByRole('button', { name: 'Done' })).toBeEnabled({ timeout: 10000 });
   await page.waitForFunction(
     () => document.querySelector('.timer')?.textContent !== '0:08',
-    { timeout: 8000 },
+    { timeout: 15000 },
   );
   await page.getByRole('button', { name: 'Done' }).click();
 
@@ -236,7 +234,7 @@ test('transcribe failure reads plainly; Try again re-sends the kept audio', asyn
   await endClass(page);
   await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
 
-  await page.getByRole('button', { name: 'Start answer' }).click();
+  // The answer auto-records; Done ends it.
   await expect(page.locator('.levelbar-pinned')).toBeVisible({ timeout: 15000 });
   await page.getByRole('button', { name: 'Done' }).click();
 
@@ -270,7 +268,7 @@ test('transcribe failure offers Type it instead', async ({ page }) => {
   await endClass(page);
   await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
 
-  await page.getByRole('button', { name: 'Start answer' }).click();
+  // The answer auto-records; Done ends it.
   await expect(page.locator('.levelbar-pinned')).toBeVisible({ timeout: 15000 });
   await page.getByRole('button', { name: 'Done' }).click();
   await expect(page.locator('.error')).toBeVisible({ timeout: 15000 });
@@ -292,7 +290,7 @@ test('reduced motion shows a still bar with a numeric level', async ({ page }) =
 
   await endClass(page);
   await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
-  await page.getByRole('button', { name: 'Start answer' }).click();
+  // The answer auto-records once the question audio ends or falls back.
   // Steady red fill plus a numeric level snapped twice a second. The number
   // arrives with the first level callback, so wait for that stable state.
   await expect(page.locator('.levelbar-fill.still')).toBeVisible({ timeout: 15000 });

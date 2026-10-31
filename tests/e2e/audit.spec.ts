@@ -52,6 +52,7 @@ async function mockApi(page: Page) {
         id: q.id, text: q.text, type: q.type, difficulty: q.difficulty,
         studentId: q.studentId, noteIds: q.noteIds,
         expectedPoints: q.expectedPoints, misconception: q.misconception,
+        audioUrl: `/audio/spanish-food-shopping/p10-at-the-restaurant/${q.id}.mp3`,
       })),
     },
   }));

@@ -97,6 +97,7 @@ async function mockApi(page: Page, delayMs: (call: number) => number) {
         id: q.id, text: q.text, type: q.type, difficulty: q.difficulty,
         studentId: q.studentId, noteIds: q.noteIds,
         expectedPoints: q.expectedPoints, misconception: q.misconception,
+        audioUrl: `/audio/spanish-food-shopping/p10-at-the-restaurant/${q.id}.mp3`,
       })),
     },
   }));
@@ -175,15 +176,16 @@ test('Done stops the answer timer and shows Answer sent while transcribing', asy
   await endBtn.click();
   await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
 
-  await expect(page.getByRole('button', { name: 'Start answer' })).toBeVisible({ timeout: 10000 });
-  await page.getByRole('button', { name: 'Start answer' }).click();
+  // The answer auto-records when the question audio ends or falls back.
   await expect(page.locator('.levelbar-pinned')).toBeVisible({ timeout: 15000 });
   const done = page.getByRole('button', { name: 'Done' });
   await expect(done).toBeEnabled({ timeout: 10000 });
   // Let the 8 s answer timer tick so a frozen display proves the fix.
+  // (The auto-recorded answer starts once the question audio ends or the
+  // caption falls back, so allow past that before the first tick.)
   await page.waitForFunction(
     () => document.querySelector('.timer')?.textContent !== '0:08',
-    { timeout: 8000 },
+    { timeout: 20000 },
   );
   await done.click();
 

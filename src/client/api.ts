@@ -38,6 +38,8 @@ export type BankDisplay = {
   noteIds: string[];
   expectedPoints: { point: string; noteIds: string[] }[];
   misconception: string | null;
+  /** Pre-recorded student voice (§4.6, §9.7); null plays the caption only. */
+  audioUrl: string | null;
 };
 
 export type LineIn = { n: number; text: string };

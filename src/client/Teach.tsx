@@ -7,17 +7,29 @@ import {
   type CountdownState,
 } from '../shared/countdown';
 import { friendlyErrorMessage } from '../shared/errors';
+import { joinChunkLines } from '../shared/chunks';
 import { splitTextToLines } from '../shared/lines';
+import {
+  QUESTION_CAPTION_FALLBACK_MS,
+  questionAudioAfter,
+  questionAudioMode,
+} from '../shared/question-audio';
 import { TimedTurn } from '../shared/timed-turn';
 import { VOICE_START_TIMEOUT_MS } from '../shared/voice';
 import { buildNotes, buildOutline, PackSchema, stripPrefix, type Note } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { formatPoints, headlineFor, scoreSession } from '../shared/scoring';
 import type { Line, Peek } from '../shared/types';
-import { api, type BankDisplay, type LineIn } from './api';
+import { api, type BankDisplay, type LineIn, type TranscribedLine } from './api';
 import { Segments, VerdictChip, mmss } from './format';
 import { LevelBar, useReducedMotion } from './levelbar';
-import { captureToWav, startCapture, type VoiceCapture } from './voice';
+import {
+  captureToWav,
+  playSharedQuestion,
+  replaySharedQuestion,
+  sharedQuestionAudio,
+  startChunkedCapture,
+} from './voice';
 import {
   excludeIds,
   recordAttempt,
@@ -199,7 +211,8 @@ export function Teach(props: {
         <QuestionScreen
           index={phase.index} asking={phase.asking}
           picks={picks} bankById={bankById}
-          mode={props.settings.mode} packId={props.packId} partId={props.partId}
+          mode={props.settings.mode} soundOn={props.settings.sound}
+          packId={props.packId} partId={props.partId}
           totalSecs={answerSecs}
           outline={outline} noteText={(id) => notesById.get(id)?.text ?? ''}
           peekStyle={props.settings.peekStyle} onPeek={recordPeek}
@@ -355,13 +368,23 @@ function WaitingDots({ status }: { status: string }) {
   );
 }
 
-// Voice turn: records from mount (answers mount it only after the "Start
-// answer" tap), transcribes once `active` flips false. Each returned turn
-// becomes a transcript line (§9.6). The WAV is kept until the POST
-// succeeds, so "Try again" re-sends the same audio without re-recording;
-// "Type it instead" hands back to the typed box (§10.1, §11.7). A mic
-// start that fails or hangs falls back to the typed box on its own
+// Voice turn: records from mount, transcribes once `active` flips false.
+// While the learner talks, every ~20 s of PCM is cut (at the quietest
+// 80 ms frame) into a chunk and POSTed to /api/transcribe in the
+// background; when the turn ends the remainder is sent, and the chunk
+// lines are joined in chunk order (owner fix 31 Oct 2026 — a 117 s
+// recording transcribes in ~8 s instead of ~50 s). Chunk WAVs are kept
+// until every chunk succeeds, a failed chunk is retried once, and "Try
+// again" re-sends only the failed chunks without re-recording; "Type it
+// instead" hands back to the typed box (§10.1, §11.7). A mic start that
+// fails or hangs falls back to the typed box on its own
 // (onMicUnavailable), so a bad mic never holds the turn on silence.
+type ChunkEntry = {
+  wav: Uint8Array;
+  lines: TranscribedLine[] | null;
+  promise: Promise<void> | null;
+};
+
 function VoiceLineTaker(props: {
   packId: string;
   partId: string;
@@ -374,11 +397,69 @@ function VoiceLineTaker(props: {
   const [level, setLevel] = useState(0);
   const [status, setStatus] = useState<'recording' | 'transcribing' | 'error'>('recording');
   const [error, setError] = useState('');
-  const captureRef = useRef<VoiceCapture | null>(null);
-  const wavRef = useRef<Uint8Array | null>(null);
+  const captureRef = useRef<{ stop: () => Int16Array | null } | null>(null);
+  const entriesRef = useRef<ChunkEntry[]>([]);
   const doneRef = useRef(false);
   const unavailableRef = useRef(props.onMicUnavailable);
   unavailableRef.current = props.onMicUnavailable;
+  const meta = useMemo(
+    () => ({ packId: props.packId, partId: props.partId }),
+    [props.packId, props.partId],
+  );
+
+  // One POST with a single retry; success stores the chunk's lines.
+  const postEntry = (entry: ChunkEntry): Promise<void> => {
+    const attempt = () =>
+      api.transcribe(entry.wav, meta).then((d) => {
+        entry.lines = d.lines;
+      });
+    const promise = attempt().catch(() => attempt());
+    entry.promise = promise.catch(() => {
+      // Failure surfaces as lines === null at join time; the chunk WAV is
+      // kept so "Try again" can re-send it.
+    });
+    return entry.promise;
+  };
+
+  // Join finished chunks in order; failures (null lines) become the
+  // current error handling (§11.7).
+  const finishChunks = (): Promise<void> => {
+    const entries = entriesRef.current;
+    return Promise.all(entries.map((e) => e.promise ?? Promise.resolve()))
+      .then(() => {
+        if (doneRef.current) return;
+        const failed = entries.some((e) => e.lines === null);
+        if (failed) {
+          throw new Error('Transcription failed.');
+        }
+        doneRef.current = true;
+        props.onDone(joinChunkLines(entries.map((e) => e.lines ?? [])));
+      })
+      .catch((e: Error) => {
+        if (doneRef.current) return;
+        setError(e.message);
+        setStatus('error');
+      });
+  };
+
+  const stopAndSend = () => {
+    const capture = captureRef.current;
+    captureRef.current = null;
+    const tail = capture ? capture.stop() : new Int16Array(0);
+    if (tail && tail.length > 0) {
+      const entry: ChunkEntry = { wav: captureToWav(tail), lines: null, promise: null };
+      entriesRef.current.push(entry);
+      postEntry(entry);
+    } else if (entriesRef.current.length === 0) {
+      // Nothing captured at all: send the empty WAV so the turn resolves
+      // to no lines (the "We didn't catch anything" path), as before.
+      const entry: ChunkEntry = { wav: captureToWav(new Int16Array(0)), lines: null, promise: null };
+      entriesRef.current.push(entry);
+      postEntry(entry);
+    }
+    setStatus('transcribing');
+    void finishChunks();
+  };
 
   useEffect(() => {
     let live = true;
@@ -391,9 +472,17 @@ function VoiceLineTaker(props: {
       unavailableRef.current();
     };
     const slow = setTimeout(failMic, VOICE_START_TIMEOUT_MS);
-    startCapture((peak) => {
-      if (live) setLevel(peak);
-    })
+    startChunkedCapture(
+      (peak) => {
+        if (live) setLevel(peak);
+      },
+      (pcm) => {
+        if (!live) return;
+        const entry: ChunkEntry = { wav: captureToWav(pcm), lines: null, promise: null };
+        entriesRef.current.push(entry);
+        postEntry(entry);
+      },
+    )
       .then((capture) => {
         // A capture that opens after the fallback is stopped at once so the
         // mic is released.
@@ -416,29 +505,19 @@ function VoiceLineTaker(props: {
       captureRef.current?.stop();
       captureRef.current = null;
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const post = (wav: Uint8Array) => {
+  const retryFailed = () => {
     setStatus('transcribing');
-    api.transcribe(wav, { packId: props.packId, partId: props.partId })
-      .then((d) => {
-        if (doneRef.current) return;
-        doneRef.current = true;
-        props.onDone(d.lines);
-      })
-      .catch((e: Error) => {
-        setError(e.message);
-        setStatus('error');
-      });
+    for (const entry of entriesRef.current) {
+      if (entry.lines === null) postEntry(entry);
+    }
+    void finishChunks();
   };
 
   useEffect(() => {
     if (!props.active && status === 'recording' && !doneRef.current) {
-      const capture = captureRef.current;
-      captureRef.current = null;
-      const wav = captureToWav(capture ? capture.stop() : new Int16Array(0));
-      wavRef.current = wav;
-      post(wav);
+      stopAndSend();
     }
   }, [props.active, status]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -450,8 +529,7 @@ function VoiceLineTaker(props: {
         <div className="row">
           <button
             type="button" className="primary"
-            disabled={!wavRef.current}
-            onClick={() => wavRef.current && post(wavRef.current)}
+            onClick={retryFailed}
           >
             Try again
           </button>
@@ -631,12 +709,30 @@ function Choosing(props: {
   );
 }
 
+// The shared question audio element, mounted in the question view so the
+// mp3 URL is in the DOM (and the iOS-unlocked element of voice.ts is the
+// one that plays). Unmounting pauses it.
+function QuestionAudioSlot({ src }: { src: string }) {
+  const slotRef = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const el = sharedQuestionAudio();
+    el.setAttribute('src', src);
+    slotRef.current?.appendChild(el);
+    return () => {
+      el.pause();
+      el.remove();
+    };
+  }, [src]);
+  return <span ref={slotRef} className="question-audio" />;
+}
+
 function QuestionScreen(props: {
   index: number;
   asking: boolean;
   picks: { questionId: string }[];
   bankById: Map<string, BankDisplay>;
   mode: Settings['mode'];
+  soundOn: boolean;
   packId: string;
   partId: string;
   totalSecs: number;
@@ -658,9 +754,11 @@ function QuestionScreen(props: {
   const [typedFallback, setTypedFallback] = useState(false);
   const [micNotice, setMicNotice] = useState(false);
   const [answerOpen, setAnswerOpen] = useState(true);
-  // Voice answers never auto-record: recording (and the timer) starts on
-  // the "Start answer" tap, which mounts the VoiceLineTaker below.
-  const [started, setStarted] = useState(false);
+  // Voice answers auto-record: recording (and the timer) starts when the
+  // question audio ends (§4.6), which flips asking to false and mounts the
+  // VoiceLineTaker below. With no audio, a failed load, or a play()
+  // rejection, the caption fallback starts 2 s after it appears.
+  const [audioFailed, setAudioFailed] = useState(false);
   // One answer is submitted exactly once: Done stops the timer at once and
   // a timeout firing mid-transcription does nothing a second time.
   const turnRef = useRef<TimedTurn | null>(null);
@@ -693,40 +791,67 @@ function QuestionScreen(props: {
     if (notice) setMicNotice(true);
   };
 
+  const audioUrl = q?.audioUrl ?? null;
+  const audioWanted = questionAudioMode({ audioUrl, soundOn: props.soundOn });
+  const audioMode = questionAudioAfter({
+    mode: audioWanted,
+    event: audioFailed ? 'error' : 'replayed',
+  });
+
   useEffect(() => {
     setElapsed(0);
     setDraft('');
     setTypedFallback(false);
     setMicNotice(false);
     setAnswerOpen(true);
-    setStarted(false);
+    setAudioFailed(false);
     turnRef.current = new TimedTurn();
     setSubmitted(false);
   }, [props.index]);
 
+  // The answer timer runs once the answer has started (asking flipped):
+  // voice recording starts then too, so the timer and the mic agree.
   useEffect(() => {
-    if (!props.asking && (!answeringVoice || started)) {
-      if (!turnRef.current!.timerRunning) return undefined;
-      if (left <= 0) {
-        finishAnswer('timeout');
-        return undefined;
-      }
-      const t = setTimeout(() => setElapsed((e) => e + 1), 1000);
-      return () => clearTimeout(t);
+    if (props.asking) return undefined;
+    if (!turnRef.current!.timerRunning) return undefined;
+    if (left <= 0) {
+      finishAnswer('timeout');
+      return undefined;
     }
-    return undefined;
-  }, [left, props.asking, answeringVoice, started, submitted]); // eslint-disable-line react-hooks/exhaustive-deps
+    const t = setTimeout(() => setElapsed((e) => e + 1), 1000);
+    return () => clearTimeout(t);
+  }, [left, props.asking, submitted]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // No recorded student audio yet (M3 cut line): the caption is the
-  // question in both modes, shown for ~2.5 s before the learner can answer.
-  // In voice mode the "Start answer" button then starts recording (§4.6).
+  // Asking (§4.6): the question plays its audio with the caption shown.
+  // Voice answers start when the audio ends, with a "Your turn" cue. With
+  // no audio, a failed load, or a play() rejection, the caption fallback
+  // starts 2 s after it appears. Type mode plays the audio too (see the
+  // effect below), and the answer box is usable at once.
   useEffect(() => {
-    if (props.asking) {
-      const t = setTimeout(props.onAsked, 2500);
-      return () => clearTimeout(t);
+    if (!props.asking || !q) return undefined;
+    if (!useVoice) {
+      props.onAsked();
+      return undefined;
     }
-    return undefined;
-  }, [props.asking, props.index]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (audioMode === 'audio' && audioUrl) {
+      return playSharedQuestion(audioUrl, {
+        onEnded: () => props.onAsked(),
+        onError: () => setAudioFailed(true),
+      });
+    }
+    const t = setTimeout(props.onAsked, QUESTION_CAPTION_FALLBACK_MS);
+    return () => clearTimeout(t);
+  }, [props.asking, props.index, useVoice, audioMode, audioUrl, q]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Type mode: the question audio plays alongside the already-usable
+  // answer box. Replay restarts it; the answer timer is untouched.
+  useEffect(() => {
+    if (useVoice || audioMode !== 'audio' || !audioUrl) return undefined;
+    return playSharedQuestion(audioUrl, {
+      onEnded: () => {},
+      onError: () => setAudioFailed(true),
+    });
+  }, [props.index, useVoice, audioMode, audioUrl]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!q) return <p>Loading question…</p>;
   const student = studentName(q.studentId);
@@ -745,7 +870,18 @@ function QuestionScreen(props: {
         <div className="bubble">
           <p className="asker">{student}</p>
           <p>{q.text}</p>
-          <p className="fine">Student voices are being recorded — caption for now.</p>
+          {audioWanted === 'audio' && audioUrl && (
+            <>
+              <QuestionAudioSlot src={audioUrl} />
+              <button
+                type="button" className="secondary"
+                aria-label={`Replay ${student}'s question`}
+                onClick={() => replaySharedQuestion(() => setAudioFailed(true))}
+              >
+                Replay
+              </button>
+            </>
+          )}
         </div>
       </div>
       {!props.asking && (
@@ -762,41 +898,30 @@ function QuestionScreen(props: {
             />
           </details>
           {answeringVoice ? (
-            started ? (
-              <>
-                <p className="lede">Your turn — speak now.</p>
-                {micNotice && (
-                  <p className="error" role="status">Mic unavailable — using Type instead.</p>
-                )}
-                <VoiceLineTaker
-                  packId={props.packId} partId={props.partId}
-                  active={answerOpen} cue="Answer the question — speak now."
-                  onDone={deliverAnswerLines}
-                  onTypeInstead={() => fallBackToTyping(false)}
-                  onMicUnavailable={() => fallBackToTyping(true)}
-                />
-                {submitted && (
-                  <>
-                    <p role="status">Answer sent…</p>
-                    <WaitingDots status="Answer sent. Transcribing your answer." />
-                  </>
-                )}
-                <div className="sticky-action">
-                  <button type="button" className="primary" disabled={!answerOpen || submitted} onClick={() => finishAnswer('done')}>
-                    Done
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="lede">Tap Start answer when you&apos;re ready — recording and the timer start then.</p>
-                <div className="sticky-action">
-                  <button type="button" className="primary" onClick={() => setStarted(true)}>
-                    Start answer
-                  </button>
-                </div>
-              </>
-            )
+            <>
+              <p className="lede">Your turn — speak now.</p>
+              {micNotice && (
+                <p className="error" role="status">Mic unavailable — using Type instead.</p>
+              )}
+              <VoiceLineTaker
+                packId={props.packId} partId={props.partId}
+                active={answerOpen} cue="Answer the question — speak now."
+                onDone={deliverAnswerLines}
+                onTypeInstead={() => fallBackToTyping(false)}
+                onMicUnavailable={() => fallBackToTyping(true)}
+              />
+              {submitted && (
+                <>
+                  <p role="status">Answer sent…</p>
+                  <WaitingDots status="Answer sent. Transcribing your answer." />
+                </>
+              )}
+              <div className="sticky-action">
+                <button type="button" className="primary" disabled={!answerOpen || submitted} onClick={() => finishAnswer('done')}>
+                  Done
+                </button>
+              </div>
+            </>
           ) : (
             <>
               <LongBox

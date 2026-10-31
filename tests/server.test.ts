@@ -70,7 +70,15 @@ describe('server content routes (stubbed catalog)', () => {
 
     const bank = await app.request('/api/bank/spanish-food-shopping/p10-at-the-restaurant');
     expect(bank.status).toBe(200);
-    expect(((await bank.json()) as { questions: unknown[] }).questions).toHaveLength(12);
+    const questions = ((await bank.json()) as { questions: { id: string; audioUrl: string | null }[] }).questions;
+    expect(questions).toHaveLength(12);
+    // Recorded questions carry their mp3 URL; the client never sees voiceId.
+    const withAudio = questions.filter((q) => q.audioUrl);
+    expect(withAudio.length).toBeGreaterThan(0);
+    for (const q of withAudio) {
+      expect(q.audioUrl).toBe(`/audio/spanish-food-shopping/p10-at-the-restaurant/${q.id}.mp3`);
+    }
+    expect(JSON.stringify(questions)).not.toContain('voiceId');
   });
 
   it('rejects bad bodies and missing keys without calling the model', async () => {

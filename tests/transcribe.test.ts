@@ -178,13 +178,13 @@ describe('POST /api/transcribe (Meta mocked)', () => {
     expect(noKey).toHaveLength(0);
   });
 
-  it('rate-limits transcriptions at 60 an hour per IP (§10.4)', async () => {
+  it('rate-limits transcriptions at 240 an hour per IP (§10.4, chunked upload)', async () => {
     const seen: SeenRequest[] = [];
     stubNetwork(seen);
     const app = createApp({ MODEL_API_KEY: 'test-key' });
     const ip = 'transcribe-limit-probe';
     let status = 0;
-    for (let i = 0; i < 61; i++) {
+    for (let i = 0; i < 241; i++) {
       const res = await app.request('/api/transcribe', {
         method: 'POST',
         headers: { 'x-forwarded-for': ip },
@@ -194,6 +194,6 @@ describe('POST /api/transcribe (Meta mocked)', () => {
       await res.arrayBuffer().catch(() => undefined);
     }
     expect(status).toBe(429);
-    expect(seen.length).toBeLessThanOrEqual(60);
+    expect(seen.length).toBeLessThanOrEqual(240);
   });
 });

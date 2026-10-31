@@ -2,6 +2,7 @@
 // downsampled to 24 kHz 16-bit PCM. The key never reaches the browser; the
 // WAV is posted to /api/transcribe, which forwards it server-side.
 
+import { PcmChunker } from '../shared/chunks';
 import { encodeWav, VOICE_SAMPLE_RATE } from '../shared/voice';
 
 // Runs in the worklet thread: nearest-neighbour downsampling from the
@@ -49,7 +50,10 @@ export type VoiceCapture = {
   stop: () => Int16Array;
 };
 
-export async function startCapture(onLevel: (peak: number) => void): Promise<VoiceCapture> {
+export async function startCapture(
+  onLevel: (peak: number) => void,
+  onSamples?: (samples: Int16Array) => void,
+): Promise<VoiceCapture> {
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { echoCancellation: true, noiseSuppression: true },
   });
@@ -78,6 +82,11 @@ export async function startCapture(onLevel: (peak: number) => void): Promise<Voi
     const copy = Int16Array.from(chunk);
     chunks.push(copy);
     total += copy.length;
+    try {
+      onSamples?.(copy);
+    } catch {
+      // A chunking hiccup must never break capture; the full PCM is kept.
+    }
     const now = performance.now();
     if (now - lastLevelAt > 100) {
       lastLevelAt = now;
@@ -122,4 +131,102 @@ export async function checkMic(onLevel: (peak: number) => void): Promise<void> {
 /** Wrap captured PCM as a WAV, ready to POST to /api/transcribe. */
 export function captureToWav(pcm: Int16Array): Uint8Array {
   return encodeWav(pcm, VOICE_SAMPLE_RATE);
+}
+
+/**
+ * Chunked capture (owner fix 31 Oct 2026): like startCapture, but every
+ * ~20 s of PCM (cut at the quietest 80 ms frame in the last 3 s) is
+ * delivered to onChunk while recording continues. stop() tears down the
+ * mic and returns the tail PCM (null when nothing is left); chunks
+ * already delivered are not repeated.
+ */
+export async function startChunkedCapture(
+  onLevel: (peak: number) => void,
+  onChunk: (pcm: Int16Array) => void,
+): Promise<{ stop: () => Int16Array | null }> {
+  const chunker = new PcmChunker(VOICE_SAMPLE_RATE);
+  const capture = await startCapture(onLevel, (samples) => {
+    for (const cut of chunker.push(samples)) onChunk(cut);
+  });
+  return {
+    stop: () => {
+      // Discards the full assembly (the delivered heads plus the tail);
+      // the tail is what the caller still needs.
+      capture.stop();
+      return chunker.flush();
+    },
+  };
+}
+
+// --- Student question playback (REQUIREMENTS.md §4.6) ----------------------
+// One shared HTMLAudioElement plays every question. Start class unlocks it
+// inside its tap handler (§4.4) by playing a short silent sound, so later
+// play() calls outside a gesture work in iOS Safari; the question view
+// mounts this same element (QuestionAudioSlot in Teach.tsx).
+
+let questionAudioEl: HTMLAudioElement | null = null;
+let silentUrl: string | null = null;
+
+export function sharedQuestionAudio(): HTMLAudioElement {
+  if (!questionAudioEl) questionAudioEl = new Audio();
+  questionAudioEl.preload = 'auto';
+  return questionAudioEl;
+}
+
+/** Call inside the Start-class tap handler (§4.4), next to ensureAudioContext. */
+export function unlockAudioPlayback(): void {
+  try {
+    const el = sharedQuestionAudio();
+    if (!silentUrl) {
+      const wav = encodeWav(new Int16Array(800), 8000);
+      silentUrl = URL.createObjectURL(new Blob([wav as Uint8Array<ArrayBuffer>], { type: 'audio/wav' }));
+    }
+    el.src = silentUrl;
+    void el.play().catch(() => {
+      // Locked or headless: questions fall back to the caption.
+    });
+  } catch {
+    // No audio in this environment.
+  }
+}
+
+export type QuestionPlayHandlers = {
+  onEnded: () => void;
+  onError: () => void;
+};
+
+/**
+ * Play a question mp3 on the shared element. Returns a cleanup that
+ * removes the listeners and pauses. A play() rejection reports onError
+ * (caption fallback); it never throws.
+ */
+export function playSharedQuestion(url: string, handlers: QuestionPlayHandlers): () => void {
+  const el = sharedQuestionAudio();
+  const onEnded = () => handlers.onEnded();
+  const onError = () => handlers.onError();
+  el.addEventListener('ended', onEnded);
+  el.addEventListener('error', onError);
+  try {
+    if (el.getAttribute('src') !== url) el.setAttribute('src', url);
+    el.currentTime = 0;
+    void el.play().catch(onError);
+  } catch {
+    onError();
+  }
+  return () => {
+    el.removeEventListener('ended', onEnded);
+    el.removeEventListener('error', onError);
+    el.pause();
+  };
+}
+
+/** Replay the current question: restart the sound, nothing else. */
+export function replaySharedQuestion(onError: () => void): void {
+  try {
+    const el = sharedQuestionAudio();
+    el.currentTime = 0;
+    void el.play().catch(onError);
+  } catch {
+    onError();
+  }
 }

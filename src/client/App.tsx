@@ -7,7 +7,7 @@ import { buildNotes, PackSchema, stripPrefix } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { api, type CatalogPack, type PartsResponse } from './api';
 import { Segments, languageName, mmss } from './format';
-import { checkMic, ensureAudioContext } from './voice';
+import { checkMic, ensureAudioContext, unlockAudioPlayback } from './voice';
 import {
   bestFor,
   clearHistory,
@@ -495,7 +495,11 @@ function Briefing(props: {
           type="button" className="primary"
           disabled={!notes}
           onClick={() => {
+            // Same tap unlocks capture and question playback on iOS (§4.4):
+            // the AudioContext for the mic, a silent sound on the shared
+            // question element for the student voices (§4.6).
             ensureAudioContext();
+            unlockAudioPlayback();
             props.onStart();
           }}
         >

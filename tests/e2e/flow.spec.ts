@@ -56,6 +56,7 @@ async function mockAll(page: Page) {
         id: q.id, text: q.text, type: q.type, difficulty: q.difficulty,
         studentId: q.studentId, noteIds: q.noteIds,
         expectedPoints: q.expectedPoints, misconception: q.misconception,
+        audioUrl: `/audio/spanish-food-shopping/p10-at-the-restaurant/${q.id}.mp3`,
       })),
     },
   }));
@@ -132,6 +133,40 @@ async function driveToDebrief(page: Page) {
     await page.getByRole('button', { name: 'Done' }).click();
   }
 }
+
+test('question plays recorded audio with caption and Replay', async ({ page }) => {
+  await mockAll(page);
+  await page.goto('/?fast=1');
+  await expect(page.getByRole('heading', { name: 'Experience it to learn it.' })).toBeVisible();
+  await page.getByRole('button', { name: /Spanish: Food & Shopping/ }).click();
+  await page.getByRole('button', { name: /Teach a class/ }).click();
+  await expect(page.getByRole('heading', { name: 'Choose a class' })).toBeVisible();
+  await page.getByRole('button', { name: /At the Restaurant/ }).click();
+  await expect(page.getByText("You're the Spanish teacher.")).toBeVisible();
+  await page.getByRole('button', { name: 'Start class' }).click();
+
+  const classBox = page.getByPlaceholder('Teach your class — write as much as you like');
+  await expect(classBox).toBeVisible({ timeout: 10000 });
+  await classBox.fill('The menu is el menú and the bill is la cuenta.');
+  const endBtn = page.getByRole('button', { name: 'End class' });
+  await expect(endBtn).toBeEnabled({ timeout: 10000 });
+  await endBtn.click();
+
+  await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
+  // The question view carries the mp3 on an audio element with a Replay
+  // button; the caption is shown, and the M3 cut-line placeholder is gone.
+  const audio = page.locator('.question audio');
+  await expect(audio).toHaveAttribute('src', /q-propina-meaning\.mp3/, { timeout: 10000 });
+  await expect(page.getByRole('button', { name: /Replay/ })).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText('Student voices are being recorded')).toHaveCount(0);
+  // Type mode: the answer box is usable at once, while the audio plays.
+  const answerBox = page.getByPlaceholder('Type your answer — write as much as you like');
+  await expect(answerBox).toBeVisible({ timeout: 10000 });
+  // Replay restarts the sound and leaves the question in place.
+  await page.getByRole('button', { name: /Replay/ }).click();
+  await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 10000 });
+  await expect(answerBox).toBeVisible({ timeout: 10000 });
+});
 
 test('teach a class in Type mode, mocked grading', async ({ page }) => {
   await mockAll(page);
