@@ -34,9 +34,24 @@ export function languageBiasFor(packLanguage: string): string[] {
   return name ? ['English', name] : ['English'];
 }
 
-/** Part anchors (§6.3) become the transcription keywords, at most 50. */
+/** The API rejects the whole request if any keyword is longer than this (400, seen 30 Oct 2026). */
+export const VOICE_MAX_KEYWORD_LENGTH = 30;
+
+/**
+ * Part anchors (§6.3) become the transcription keywords: trimmed, de-duplicated, at most 30 characters each
+ * (longer anchors are dropped, since a cut-off phrase would bias recognition toward words nobody says), at most 50.
+ */
 export function keywordsFor(anchors: string[]): string[] {
-  return anchors.slice(0, VOICE_MAX_KEYWORDS);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of anchors) {
+    const k = raw.trim();
+    if (!k || k.length > VOICE_MAX_KEYWORD_LENGTH || seen.has(k.toLowerCase())) continue;
+    seen.add(k.toLowerCase());
+    out.push(k);
+    if (out.length === VOICE_MAX_KEYWORDS) break;
+  }
+  return out;
 }
 
 /** The `request` part of POST /v1/asr/transcribe in file mode (§9.6). */

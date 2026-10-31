@@ -110,3 +110,17 @@ describe('turnsToLines (recorded day-1 response)', () => {
     expect(lines[1]).toMatchObject({ startMs: 100, endMs: 200 });
   });
 });
+
+describe('keywordsFor limits (Meta rejects keywords over 30 characters)', () => {
+  it('drops anchors longer than 30 characters, trims and de-duplicates', async () => {
+    const { keywordsFor, VOICE_MAX_KEYWORD_LENGTH } = await import('./voice');
+    const long = 'a phrase that is definitely longer than thirty characters';
+    const out = keywordsFor([' la cuenta ', long, 'La cuenta', 'el menú']);
+    expect(out).toEqual(['la cuenta', 'el menú']);
+    expect(out.every((k) => k.length <= VOICE_MAX_KEYWORD_LENGTH)).toBe(true);
+  });
+  it('keeps at most 50', async () => {
+    const { keywordsFor } = await import('./voice');
+    expect(keywordsFor(Array.from({ length: 80 }, (_, i) => `word${i}`))).toHaveLength(50);
+  });
+});
