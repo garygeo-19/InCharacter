@@ -99,7 +99,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-refresco-mean-in-english.mp3",
+        "textHash": "7f647809bb1fd2aedcc110b2d3e836ec403368fad4dd1e3290e903ea5681bf26",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-does-vino-mean-in-english",
@@ -148,7 +153,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-vino-mean-in-english.mp3",
+        "textHash": "30612ee07c5f4a52f9f72030e679e09753282d13414571ba3a6c2273cdd521ec",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-does-cerveza-mean-in-english",
@@ -197,7 +207,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-cerveza-mean-in-english.mp3",
+        "textHash": "6945382f1fca682e51a6b3cefc4c737df169a8810a116d05574bb4fb128fea37",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-does-dulce-mean-in-english",
@@ -246,7 +261,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-dulce-mean-in-english.mp3",
+        "textHash": "afcdf559e8a86154e2799991e3cb1a0f80b272191b97bbf0139576f64c8c8828",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-does-el-postre-mean-in-english",
@@ -295,7 +315,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-el-postre-mean-in-english.mp3",
+        "textHash": "096681dc5c68961537ad9944b3c1c584ca1cc823b896067496fb84486912b273",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-does-jugo-mean-in-english",
@@ -344,7 +369,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-jugo-mean-in-english.mp3",
+        "textHash": "02426d38b55f508841cd92fcb2505dbb9ecbc2b476a4c525c0b3db2f53e2b39f",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-comes-after-postre-in-spain",
@@ -399,7 +429,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-comes-after-postre-in-spain.mp3",
+        "textHash": "78cde041e06e116ba1ad41a8302681b488cfa35db275908ae3e56855fc2319a7",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-in-a-bar-in-spain-how-do-i-order-a-small-draft-b",
@@ -454,7 +489,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-in-a-bar-in-spain-how-do-i-order-a-small-draft-b.mp3",
+        "textHash": "496d3ed894f7e963e865f94aa3eccc9406c6067a9c9572c8a25b8eb07018412d",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-in-spain-what-do-i-ask-for-if-i-want-red-wine",
@@ -509,7 +549,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-in-spain-what-do-i-ask-for-if-i-want-red-wine.mp3",
+        "textHash": "6783444f1b82c336e16380bc194af02af7537d1eb75dd1bf55322a1696ea6289",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-i-m-in-mexico-city-and-want-juice-what-word-shou",
@@ -731,7 +776,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-my-friend-wants-something-sweet-in-spain-what-po.mp3",
+        "textHash": "90ebec37b9cbbf8d37606b4f5899d9241b3d89bbc62f1aaac37abd6b03f5e839",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-if-my-friend-wants-a-soft-drink-in-madrid-what-w",
@@ -1064,7 +1114,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-how-does-jugo-differ-from-zumo-and-when-do-i-use.mp3",
+        "textHash": "0a0039f93469c14a6aab16501580227e3d75e8f30149e72cb7db3e6fc6d592db",
+        "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-how-do-cerveza-and-vino-differ-when-i-order-in-s",
@@ -1348,7 +1403,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-cerveza-means-wine-and-vino-means-beer-tell-me-i.mp3",
+        "textHash": "803bc5246656c9c0c9552bf7c30632ac6898c882aa927ce033f557d275f14889",
+        "voiceId": "4e32WqNVWRquDa1OcRYZ",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-el-postre-means-soft-drink-tell-me-i-m-right",
@@ -1407,7 +1467,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-el-postre-means-soft-drink-tell-me-i-m-right.mp3",
+        "textHash": "dff496c5baa00008fa3efbfad0623055e03c32b25ed57f32ec9fc0d7254cb68a",
+        "voiceId": "4e32WqNVWRquDa1OcRYZ",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-dulce-only-means-sweet-flavor-never-a-treat-tell",

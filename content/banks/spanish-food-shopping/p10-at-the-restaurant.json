@@ -1,1 +1,432 @@
-{"audio":null,"builtAt":"2026-10-27","check":null,"lessonId":"l4-food","notes":[{"hash":"8a2bde3db5b8760298c24f9655e6e926024c5364e01fb1142f9c2c659ed4e25a","id":"fact-buen-provecho"},{"hash":"2835f6410f1307ff12306687f741c82f1a3e981b20e66da5228d85984e8ae1a7","id":"ih-paella-valenciana"},{"hash":"7a8801769af160af25bb10446fcc7aa916945bfb1a89b686deeb077842a7fec5","id":"fact-carta-not-menu"},{"hash":"94220d6c566d8e261e0d079cb883d87bacc040ff95f36fbece7c568914499993","id":"fi-mcq-ordering-phrase"},{"hash":"eed37b6fb25624b80732c3bdf0443af91fb4cb130c896f81c3f8526b353cb99c","id":"fi-ot-ask-bill"},{"hash":"0d09be54522e999508a68fc083977bd827c59cfcbacce79307cb37ef16ef355b","id":"pair-la-cuenta"},{"hash":"ec6c2a0646ea60f803ad0dc1e07f75b901a4730ba9157ced96547cd9efc3af17","id":"pair-el-camarero"},{"hash":"e66501f1787e8e508d72574e1fbc063b777dbc5fb17277a80cfbc618d2f6e0db","id":"pair-la-carta"},{"hash":"a195b328e30dd3c56f82a4ce1d11d783099a6202871956e235856047052c3778","id":"pair-la-propina"},{"hash":"ebef12bf9a9ca4f61c8c48e2c8f3aa87dde7a2fe7bc2580bca2063b01f7978ee","id":"pair-quisiera"}],"packId":"spanish-food-shopping","packVersion":"1.0.9","partId":"p10-at-the-restaurant","questions":[{"difficulty":1,"expectedPoints":[{"noteIds":["pair-la-propina"],"point":"La propina is the tip."}],"id":"q-propina-meaning","misconception":null,"noteIds":["pair-la-propina"],"status":"checked","studentId":"maya","text":"Sorry, I missed one of the words. What's la propina?","ttsText":null,"type":"clarify"},{"difficulty":1,"expectedPoints":[{"noteIds":["pair-el-camarero"],"point":"El mesero."}],"id":"q-waiter-word","misconception":null,"noteIds":["pair-el-camarero"],"status":"checked","studentId":"maya","text":"How do I say 'the waiter' in Spanish?","ttsText":null,"type":"clarify"},{"difficulty":1,"expectedPoints":[{"noteIds":["fact-buen-provecho"],"point":"It means 'enjoy your meal'."}],"id":"q-buen-provecho-meaning","misconception":null,"noteIds":["fact-buen-provecho"],"status":"checked","studentId":"maya","text":"What does buen provecho actually mean?","ttsText":null,"type":"clarify"},{"difficulty":2,"expectedPoints":[{"noteIds":["fact-carta-not-menu"],"point":"Probably the menú del día, a fixed-price set meal."},{"noteIds":["fact-carta-not-menu"],"point":"To see the list of dishes, ask for la carta."}],"id":"q-menu-in-madrid","misconception":null,"noteIds":["fact-carta-not-menu"],"status":"checked","studentId":"leo","text":"If I'm in Madrid and ask the waiter for el menú, what am I likely to get?","ttsText":null,"type":"apply"},{"difficulty":2,"expectedPoints":[{"noteIds":["fact-buen-provecho"],"point":"Say buen provecho, 'enjoy your meal'."},{"noteIds":["fact-buen-provecho"],"point":"It's common courtesy, even to people you're just walking past."}],"id":"q-walking-past-diners","misconception":null,"noteIds":["fact-buen-provecho"],"status":"checked","studentId":"leo","text":"We're walking past a table where people are eating. Is there anything we should say?","ttsText":null,"type":"apply"},{"difficulty":2,"expectedPoints":[{"noteIds":["fi-mcq-ordering-phrase","fact-carta-not-menu"],"point":"'Para mí, el pollo' ('for me, the chicken'), the natural way as the waiter goes around; quisiera… also works."}],"id":"q-order-chicken","misconception":null,"noteIds":["fi-mcq-ordering-phrase","fact-carta-not-menu"],"status":"checked","studentId":"leo","text":"The waiter's going around our table and I want the chicken. What do I say?","ttsText":null,"type":"apply"},{"difficulty":2,"expectedPoints":[{"noteIds":["fi-ot-ask-bill","pair-la-cuenta"],"point":"Ask for it: 'la cuenta, por favor.'"},{"noteIds":["fi-ot-ask-bill"],"point":"In Spain the server won't bring it automatically."}],"id":"q-getting-the-check","misconception":null,"noteIds":["fi-ot-ask-bill","pair-la-cuenta"],"status":"checked","studentId":"leo","text":"We've finished eating in Madrid. How do we get the check?","ttsText":null,"type":"apply"},{"difficulty":3,"expectedPoints":[{"noteIds":["pair-quisiera","fact-carta-not-menu"],"point":"Quisiera means 'I would like', a way to order from the menu."},{"noteIds":["fact-carta-not-menu","fi-mcq-ordering-phrase"],"point":"'Para mí, el pollo' ('for me, the chicken') is the casual, natural way as the waiter goes around the table."}],"id":"q-quisiera-vs-para-mi","misconception":null,"noteIds":["pair-quisiera","fact-carta-not-menu","fi-mcq-ordering-phrase"],"status":"checked","studentId":"priya","text":"What's the difference between saying 'quisiera' and 'para mí, el pollo'?","ttsText":null,"type":"compare"},{"difficulty":3,"expectedPoints":[{"noteIds":["fact-carta-not-menu"],"point":"In Spain, el menú usually means the menú del día, a fixed-price set meal."},{"noteIds":["fact-carta-not-menu","pair-la-carta"],"point":"So la carta is how you get the list of dishes there."}],"id":"q-why-say-la-carta","misconception":null,"noteIds":["fact-carta-not-menu","pair-la-carta"],"status":"checked","studentId":"priya","text":"If el menú and la carta both mean the menu, why would anyone bother saying la carta?","ttsText":null,"type":"compare"},{"difficulty":3,"expectedPoints":[{"noteIds":["fi-ot-ask-bill"],"point":"No: in Spain servers don't bring the check automatically."},{"noteIds":["fi-ot-ask-bill","pair-la-cuenta"],"point":"You ask for it with 'la cuenta, por favor.'"}],"id":"q-check-comes-automatically","misconception":"In Spain the server brings the check without being asked.","noteIds":["fi-ot-ask-bill","pair-la-cuenta"],"status":"checked","studentId":"sam","text":"In Spain the waiter just brings the check when you're done, right? I'll wait for it.","ttsText":null,"type":"misconception"},{"difficulty":3,"expectedPoints":[{"noteIds":["ih-paella-valenciana"],"point":"No: the traditional paella valenciana has rabbit, not seafood."},{"noteIds":["ih-paella-valenciana"],"point":"It's saffron rice with rabbit, chicken and beans, a classic dish of Valencia."}],"id":"q-paella-seafood","misconception":"Traditional paella is a seafood dish.","noteIds":["ih-paella-valenciana"],"status":"checked","studentId":"sam","text":"Paella's a seafood dish, isn't it? That's what I'll order to try the real thing.","ttsText":null,"type":"misconception"},{"difficulty":3,"expectedPoints":[{"noteIds":["fact-buen-provecho"],"point":"No: it's common courtesy to say it when walking past people who are eating, too."}],"id":"q-buen-provecho-strangers","misconception":"Buen provecho is only for the people you're eating with.","noteIds":["fact-buen-provecho"],"status":"checked","studentId":"sam","text":"I'd only say buen provecho to people at my own table. Saying it to strangers would be weird, right?","ttsText":null,"type":"misconception"}],"schemaVersion":1}
+{
+  "audio": null,
+  "builtAt": "2026-10-27",
+  "check": null,
+  "lessonId": "l4-food",
+  "notes": [
+    {
+      "hash": "8a2bde3db5b8760298c24f9655e6e926024c5364e01fb1142f9c2c659ed4e25a",
+      "id": "fact-buen-provecho"
+    },
+    {
+      "hash": "2835f6410f1307ff12306687f741c82f1a3e981b20e66da5228d85984e8ae1a7",
+      "id": "ih-paella-valenciana"
+    },
+    {
+      "hash": "7a8801769af160af25bb10446fcc7aa916945bfb1a89b686deeb077842a7fec5",
+      "id": "fact-carta-not-menu"
+    },
+    {
+      "hash": "94220d6c566d8e261e0d079cb883d87bacc040ff95f36fbece7c568914499993",
+      "id": "fi-mcq-ordering-phrase"
+    },
+    {
+      "hash": "eed37b6fb25624b80732c3bdf0443af91fb4cb130c896f81c3f8526b353cb99c",
+      "id": "fi-ot-ask-bill"
+    },
+    {
+      "hash": "0d09be54522e999508a68fc083977bd827c59cfcbacce79307cb37ef16ef355b",
+      "id": "pair-la-cuenta"
+    },
+    {
+      "hash": "ec6c2a0646ea60f803ad0dc1e07f75b901a4730ba9157ced96547cd9efc3af17",
+      "id": "pair-el-camarero"
+    },
+    {
+      "hash": "e66501f1787e8e508d72574e1fbc063b777dbc5fb17277a80cfbc618d2f6e0db",
+      "id": "pair-la-carta"
+    },
+    {
+      "hash": "a195b328e30dd3c56f82a4ce1d11d783099a6202871956e235856047052c3778",
+      "id": "pair-la-propina"
+    },
+    {
+      "hash": "ebef12bf9a9ca4f61c8c48e2c8f3aa87dde7a2fe7bc2580bca2063b01f7978ee",
+      "id": "pair-quisiera"
+    }
+  ],
+  "packId": "spanish-food-shopping",
+  "packVersion": "1.0.9",
+  "partId": "p10-at-the-restaurant",
+  "questions": [
+    {
+      "difficulty": 1,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-la-propina"
+          ],
+          "point": "La propina is the tip."
+        }
+      ],
+      "id": "q-propina-meaning",
+      "misconception": null,
+      "noteIds": [
+        "pair-la-propina"
+      ],
+      "status": "checked",
+      "studentId": "maya",
+      "text": "Sorry, I missed one of the words. What's la propina?",
+      "ttsText": null,
+      "type": "clarify",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-propina-meaning.mp3",
+        "textHash": "db0a158954f26f1261318531bb524c085c28b930682b77efe606eadd7a065030",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 1,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-el-camarero"
+          ],
+          "point": "El mesero."
+        }
+      ],
+      "id": "q-waiter-word",
+      "misconception": null,
+      "noteIds": [
+        "pair-el-camarero"
+      ],
+      "status": "checked",
+      "studentId": "maya",
+      "text": "How do I say 'the waiter' in Spanish?",
+      "ttsText": null,
+      "type": "clarify",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-waiter-word.mp3",
+        "textHash": "cb4d6c0966a82b890a34c1bba3c57a561a6008b0ce31cda897bdbc05ff1646cd",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 1,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-buen-provecho"
+          ],
+          "point": "It means 'enjoy your meal'."
+        }
+      ],
+      "id": "q-buen-provecho-meaning",
+      "misconception": null,
+      "noteIds": [
+        "fact-buen-provecho"
+      ],
+      "status": "checked",
+      "studentId": "maya",
+      "text": "What does buen provecho actually mean?",
+      "ttsText": null,
+      "type": "clarify",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-buen-provecho-meaning.mp3",
+        "textHash": "bc5eb1f04df8ec8b54968335d1215d06dc242e122df58a60540653d0860dc8fc",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 2,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-carta-not-menu"
+          ],
+          "point": "Probably the menú del día, a fixed-price set meal."
+        },
+        {
+          "noteIds": [
+            "fact-carta-not-menu"
+          ],
+          "point": "To see the list of dishes, ask for la carta."
+        }
+      ],
+      "id": "q-menu-in-madrid",
+      "misconception": null,
+      "noteIds": [
+        "fact-carta-not-menu"
+      ],
+      "status": "checked",
+      "studentId": "leo",
+      "text": "If I'm in Madrid and ask the waiter for el menú, what am I likely to get?",
+      "ttsText": null,
+      "type": "apply",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-menu-in-madrid.mp3",
+        "textHash": "54d8f8253d02cf4363023f4acc07d9c65cc2909b618acb47565a54d2dedc7d79",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 2,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-buen-provecho"
+          ],
+          "point": "Say buen provecho, 'enjoy your meal'."
+        },
+        {
+          "noteIds": [
+            "fact-buen-provecho"
+          ],
+          "point": "It's common courtesy, even to people you're just walking past."
+        }
+      ],
+      "id": "q-walking-past-diners",
+      "misconception": null,
+      "noteIds": [
+        "fact-buen-provecho"
+      ],
+      "status": "checked",
+      "studentId": "leo",
+      "text": "We're walking past a table where people are eating. Is there anything we should say?",
+      "ttsText": null,
+      "type": "apply",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-walking-past-diners.mp3",
+        "textHash": "bd52631a0fc633bc08d39b8ec8c0ce60aa74998d10a28216760a04f4cc043f7c",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 2,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-mcq-ordering-phrase",
+            "fact-carta-not-menu"
+          ],
+          "point": "'Para mí, el pollo' ('for me, the chicken'), the natural way as the waiter goes around; quisiera… also works."
+        }
+      ],
+      "id": "q-order-chicken",
+      "misconception": null,
+      "noteIds": [
+        "fi-mcq-ordering-phrase",
+        "fact-carta-not-menu"
+      ],
+      "status": "checked",
+      "studentId": "leo",
+      "text": "The waiter's going around our table and I want the chicken. What do I say?",
+      "ttsText": null,
+      "type": "apply",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-order-chicken.mp3",
+        "textHash": "4f070fdea51cc9760de174aaea3620a94b5d2795394fe0915510e7263a34481a",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 2,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-ot-ask-bill",
+            "pair-la-cuenta"
+          ],
+          "point": "Ask for it: 'la cuenta, por favor.'"
+        },
+        {
+          "noteIds": [
+            "fi-ot-ask-bill"
+          ],
+          "point": "In Spain the server won't bring it automatically."
+        }
+      ],
+      "id": "q-getting-the-check",
+      "misconception": null,
+      "noteIds": [
+        "fi-ot-ask-bill",
+        "pair-la-cuenta"
+      ],
+      "status": "checked",
+      "studentId": "leo",
+      "text": "We've finished eating in Madrid. How do we get the check?",
+      "ttsText": null,
+      "type": "apply",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-getting-the-check.mp3",
+        "textHash": "9847548c0b558d3665b368f0f9d07b3c8b03be6a9baab227db99d7832d8d0e8a",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 3,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-quisiera",
+            "fact-carta-not-menu"
+          ],
+          "point": "Quisiera means 'I would like', a way to order from the menu."
+        },
+        {
+          "noteIds": [
+            "fact-carta-not-menu",
+            "fi-mcq-ordering-phrase"
+          ],
+          "point": "'Para mí, el pollo' ('for me, the chicken') is the casual, natural way as the waiter goes around the table."
+        }
+      ],
+      "id": "q-quisiera-vs-para-mi",
+      "misconception": null,
+      "noteIds": [
+        "pair-quisiera",
+        "fact-carta-not-menu",
+        "fi-mcq-ordering-phrase"
+      ],
+      "status": "checked",
+      "studentId": "priya",
+      "text": "What's the difference between saying 'quisiera' and 'para mí, el pollo'?",
+      "ttsText": null,
+      "type": "compare",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-quisiera-vs-para-mi.mp3",
+        "textHash": "f7fdaed183c8018982c46004b05fbe7086d55cce0f7da7ee67ef46b068f2641b",
+        "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 3,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-carta-not-menu"
+          ],
+          "point": "In Spain, el menú usually means the menú del día, a fixed-price set meal."
+        },
+        {
+          "noteIds": [
+            "fact-carta-not-menu",
+            "pair-la-carta"
+          ],
+          "point": "So la carta is how you get the list of dishes there."
+        }
+      ],
+      "id": "q-why-say-la-carta",
+      "misconception": null,
+      "noteIds": [
+        "fact-carta-not-menu",
+        "pair-la-carta"
+      ],
+      "status": "checked",
+      "studentId": "priya",
+      "text": "If el menú and la carta both mean the menu, why would anyone bother saying la carta?",
+      "ttsText": null,
+      "type": "compare",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-why-say-la-carta.mp3",
+        "textHash": "7c240f116028d1e7f6c5303d3aaaee4d5d395a89e0edf4e3f50fbf7d6a35b138",
+        "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 3,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fi-ot-ask-bill"
+          ],
+          "point": "No: in Spain servers don't bring the check automatically."
+        },
+        {
+          "noteIds": [
+            "fi-ot-ask-bill",
+            "pair-la-cuenta"
+          ],
+          "point": "You ask for it with 'la cuenta, por favor.'"
+        }
+      ],
+      "id": "q-check-comes-automatically",
+      "misconception": "In Spain the server brings the check without being asked.",
+      "noteIds": [
+        "fi-ot-ask-bill",
+        "pair-la-cuenta"
+      ],
+      "status": "checked",
+      "studentId": "sam",
+      "text": "In Spain the waiter just brings the check when you're done, right? I'll wait for it.",
+      "ttsText": null,
+      "type": "misconception",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-check-comes-automatically.mp3",
+        "textHash": "10ce5875b0228d6aca4f5f68604b5ba95676f8cdd95f8083011fe6a8a5542dd0",
+        "voiceId": "4e32WqNVWRquDa1OcRYZ",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 3,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "ih-paella-valenciana"
+          ],
+          "point": "No: the traditional paella valenciana has rabbit, not seafood."
+        },
+        {
+          "noteIds": [
+            "ih-paella-valenciana"
+          ],
+          "point": "It's saffron rice with rabbit, chicken and beans, a classic dish of Valencia."
+        }
+      ],
+      "id": "q-paella-seafood",
+      "misconception": "Traditional paella is a seafood dish.",
+      "noteIds": [
+        "ih-paella-valenciana"
+      ],
+      "status": "checked",
+      "studentId": "sam",
+      "text": "Paella's a seafood dish, isn't it? That's what I'll order to try the real thing.",
+      "ttsText": null,
+      "type": "misconception",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-paella-seafood.mp3",
+        "textHash": "eeaf74a280210c549049109a881553dbdbab283c81c52ae6f60ca8d81f571be6",
+        "voiceId": "4e32WqNVWRquDa1OcRYZ",
+        "model": "eleven_multilingual_v2"
+      }
+    },
+    {
+      "difficulty": 3,
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-buen-provecho"
+          ],
+          "point": "No: it's common courtesy to say it when walking past people who are eating, too."
+        }
+      ],
+      "id": "q-buen-provecho-strangers",
+      "misconception": "Buen provecho is only for the people you're eating with.",
+      "noteIds": [
+        "fact-buen-provecho"
+      ],
+      "status": "checked",
+      "studentId": "sam",
+      "text": "I'd only say buen provecho to people at my own table. Saying it to strangers would be weird, right?",
+      "ttsText": null,
+      "type": "misconception",
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-buen-provecho-strangers.mp3",
+        "textHash": "35695b383c5b8b3caa89be0b41153e5bba7627d0e072110a2e4a31205d229309",
+        "voiceId": "4e32WqNVWRquDa1OcRYZ",
+        "model": "eleven_multilingual_v2"
+      }
+    }
+  ],
+  "schemaVersion": 1
+}

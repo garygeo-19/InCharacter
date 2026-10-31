@@ -107,7 +107,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-can-you-clarify-when-i-should-say-pez-versus-pes.mp3",
+        "textHash": "951396277661ad474dde2e98d9b0aa5de6e2ccb3f260325652b9428427847507",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-does-pollo-mean-in-english",
@@ -164,7 +169,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-pollo-mean-in-english.mp3",
+        "textHash": "2375db97d7fdcea859830dcdbab93427719f611baaa86ded42ab9e65f90c1612",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-does-fruta-mean-i-keep-mixing-it-up",
@@ -213,7 +223,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-fruta-mean-i-keep-mixing-it-up.mp3",
+        "textHash": "2b2601267574fe85c2faa523c4de27745ce5b80e3e14a19fa181a6e7df4e1ba0",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-can-you-clarify-what-verduras-covers",
@@ -269,7 +284,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-can-you-clarify-what-verduras-covers.mp3",
+        "textHash": "0bcb0a8c470fe2fe45f5126dbd3fe68bacb854e7755d1f1aa037914628a10d69",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-does-arroz-mean-in-english",
@@ -325,7 +345,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-arroz-mean-in-english.mp3",
+        "textHash": "81cfa202af1981f1006e12614fe2c9a342a9ec70412369f4e045525de583798b",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-what-does-aceite-de-oliva-mean",
@@ -381,7 +406,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-aceite-de-oliva-mean.mp3",
+        "textHash": "017368f1641592449e1bdb6119299bd8d9181e26c0843eea48260f7fc84c0097",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-can-you-clarify-what-legumbres-means",
@@ -496,7 +526,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-carne-de-res-mean.mp3",
+        "textHash": "dc8be62da8d8bd2d5e15bc9960f5911a360d50751ce5710b81ed4770640e0c99",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-at-a-restaurant-i-want-chicken-which-menu-word-d",
@@ -610,7 +645,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-if-i-want-fish-to-eat-should-i-order-pez-or-pesc.mp3",
+        "textHash": "1baca19b478e8731263952728b1848473a8620ab7bf947cba9fb4c44e219c634",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-for-breakfast-i-want-starches-do-i-ask-for-pan-a",
@@ -943,7 +983,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-if-i-want-fruit-after-dinner-do-i-ask-for-fruta.mp3",
+        "textHash": "d6e7913ca109f120c2a8cc1cfb98177b77170f71162d4595c13c02aab16e6a62",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-in-spain-i-want-young-beef-do-i-order-ternera",
@@ -998,7 +1043,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-in-spain-i-want-young-beef-do-i-order-ternera.mp3",
+        "textHash": "900e4d39746920708536c9c4989dc994048ad92f977710e277cd1a59e70e1ce3",
+        "voiceId": "7EzWGsX10sAS4c9m9cPf",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-how-do-pez-and-pescado-differ-for-fish",
@@ -1055,7 +1105,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-how-do-pez-and-pescado-differ-for-fish.mp3",
+        "textHash": "1d4066e961cbbcba24caaa8264455dd5ade6efae67f223681e5c9b057d80c5fd",
+        "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-how-do-verduras-and-legumbres-differ",
@@ -1171,7 +1226,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-how-does-ternera-differ-in-mexico-and-spain.mp3",
+        "textHash": "de8e5e7c42e7f89315077a3b15f33e3d78cb508e24656ccb87f6ad067222288a",
+        "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-how-are-pan-and-arroz-alike-in-the-spanish-pantr",
@@ -1459,7 +1519,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/spanish-food-shopping/p11-common-foods/q-legumbres-just-means-all-verduras-i-m-right.mp3",
+        "textHash": "97c4a7157238969bdfccd940dec75d1e2981fb89ebde59416febcc748ae5cf52",
+        "voiceId": "4e32WqNVWRquDa1OcRYZ",
+        "model": "eleven_multilingual_v2"
+      }
     },
     {
       "id": "q-aceite-de-oliva-is-rarely-used-tell-me-i-m-right",
