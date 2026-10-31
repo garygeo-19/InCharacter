@@ -5,13 +5,15 @@
  * Run: npm run bank:audio -- content/banks/<packId>/<partId>.json [--force]
  *
  * - Speech comes from ElevenLabs, recorded ahead of time; nothing is
- *   generated while someone uses the app. Model eleven_multilingual_v2
- *   (eleven_v3 when a line sounds flat — set it per question by editing
- *   MODEL below is not supported; re-record with ttsText instead).
+ *   generated while someone uses the app. Model eleven_v4, which reads
+ *   IPA between forward slashes: Spanish terms listed in
+ *   content/pronunciations/<packId>.json are spoken as /ipa/ so the
+ *   English voice says them in Spanish.
  * - MP3 files go to public/audio/{packId}/{partId}/{questionId}.mp3, and
  *   each question records { file, textHash, voiceId, model }. The caption
- *   always shows `text`; `ttsText` (when set) is a respelling for the voice
- *   only. textHash is sha256 of the spoken text (ttsText ?? text).
+ *   always shows `text`; the voice gets `ttsText` when set, else `text` with
+ *   the pronunciations applied. textHash is sha256 of that spoken text, so
+ *   a pronunciation change re-records the lines it touches.
  * - Up-to-date lines are skipped unless --force is passed.
  * - ELEVENLABS_API_KEY lives only in the local .env/.dev.vars the script
  *   reads. It is never printed or logged.
@@ -21,8 +23,9 @@ import { join } from 'node:path';
 import { parseUsableStatuses, usableQuestions, type Bank } from '../src/shared/bank';
 import { sha256Hex } from '../src/shared/sha256';
 import { loadEnv } from '../src/server/env';
+import { applyPronunciations, type Lexicon } from '../src/shared/pronounce';
 
-const MODEL = 'eleven_multilingual_v2';
+const MODEL = 'eleven_v4';
 
 type BankAudio = { file: string; textHash: string; voiceId: string; model: string };
 
@@ -51,6 +54,10 @@ async function main() {
 
   const bank = JSON.parse(readFileSync(file, 'utf8')) as Bank;
   const cast = JSON.parse(readFileSync(join(process.cwd(), 'content', 'cast.json'), 'utf8')) as Cast;
+  const lexiconFile = join(process.cwd(), 'content', 'pronunciations', `${bank.packId}.json`);
+  const lexicon: Lexicon = existsSync(lexiconFile)
+    ? (JSON.parse(readFileSync(lexiconFile, 'utf8')) as { terms: Lexicon }).terms
+    : {};
   const voices = new Map(cast.students.map((s) => [s.id, s.voiceId]));
   const missing = cast.students.filter((s) => !s.voiceId || s.voiceId === '<pick>');
   if (missing.length > 0) {
@@ -69,7 +76,7 @@ async function main() {
   for (const q of usable) {
     const full = byId.get(q.id);
     if (!full) continue;
-    const spoken = full.ttsText ?? full.text;
+    const spoken = full.ttsText ?? applyPronunciations(full.text, lexicon);
     const textHash = sha256Hex(spoken);
     const outFile = join('public', 'audio', bank.packId, bank.partId, `${full.id}.mp3`);
     const current = full.audio as BankAudio | null;

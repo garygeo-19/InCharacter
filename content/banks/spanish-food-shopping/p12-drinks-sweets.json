@@ -101,9 +101,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-refresco-mean-in-english.mp3",
-        "textHash": "7f647809bb1fd2aedcc110b2d3e836ec403368fad4dd1e3290e903ea5681bf26",
+        "textHash": "521078eafd64db08193e41aeeea8c97dc57b59f214c19a6cc795d347a8971da1",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -155,9 +155,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-vino-mean-in-english.mp3",
-        "textHash": "30612ee07c5f4a52f9f72030e679e09753282d13414571ba3a6c2273cdd521ec",
+        "textHash": "3af01572b06187d97bbf34edb56e577cef3fbe5725942155985e646a065c571a",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -209,9 +209,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-cerveza-mean-in-english.mp3",
-        "textHash": "6945382f1fca682e51a6b3cefc4c737df169a8810a116d05574bb4fb128fea37",
+        "textHash": "7a0d360b9122de7c9613c552eb505a72e7520ac01ac1c56a56c24b8a901c0c14",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -263,9 +263,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-dulce-mean-in-english.mp3",
-        "textHash": "afcdf559e8a86154e2799991e3cb1a0f80b272191b97bbf0139576f64c8c8828",
+        "textHash": "490ce74f8e417abe57d9f91fce9c3c9fb9001d3a223f99ee6078dd6775441359",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -317,9 +317,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-el-postre-mean-in-english.mp3",
-        "textHash": "096681dc5c68961537ad9944b3c1c584ca1cc823b896067496fb84486912b273",
+        "textHash": "e6ab21738e4efe5c93166e2f96a687220df458fe6f7c33cfc8709227783ceed1",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -371,9 +371,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-jugo-mean-in-english.mp3",
-        "textHash": "02426d38b55f508841cd92fcb2505dbb9ecbc2b476a4c525c0b3db2f53e2b39f",
+        "textHash": "7b5fb0cd67cb3a5d9bff9f32e8dd2ef573dfefda608426d08727d960aeb031c0",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -431,9 +431,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-comes-after-postre-in-spain.mp3",
-        "textHash": "78cde041e06e116ba1ad41a8302681b488cfa35db275908ae3e56855fc2319a7",
+        "textHash": "3e1ef0371b6e8cfac0295bf05f00c21cc5c2afebbd7ab18ed9fe8ae2031cd34e",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -493,7 +493,7 @@
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-in-a-bar-in-spain-how-do-i-order-a-small-draft-b.mp3",
         "textHash": "496d3ed894f7e963e865f94aa3eccc9406c6067a9c9572c8a25b8eb07018412d",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -553,7 +553,7 @@
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-in-spain-what-do-i-ask-for-if-i-want-red-wine.mp3",
         "textHash": "6783444f1b82c336e16380bc194af02af7537d1eb75dd1bf55322a1696ea6289",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -778,9 +778,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-my-friend-wants-something-sweet-in-spain-what-po.mp3",
-        "textHash": "90ebec37b9cbbf8d37606b4f5899d9241b3d89bbc62f1aaac37abd6b03f5e839",
+        "textHash": "436bb06c076540cd673cab1883dfb33b5d5d0490cdae516629ad69b5668ab919",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -1116,9 +1116,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-how-does-jugo-differ-from-zumo-and-when-do-i-use.mp3",
-        "textHash": "0a0039f93469c14a6aab16501580227e3d75e8f30149e72cb7db3e6fc6d592db",
+        "textHash": "81e42677154e827c3d19c1e09df93fdeb0e0d515eebee524448d7f505454141f",
         "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -1405,9 +1405,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-cerveza-means-wine-and-vino-means-beer-tell-me-i.mp3",
-        "textHash": "803bc5246656c9c0c9552bf7c30632ac6898c882aa927ce033f557d275f14889",
+        "textHash": "bde4abc914d69b922ee1b7c0c47aaea729c52f5de64b29fc4a74840194137fa0",
         "voiceId": "4e32WqNVWRquDa1OcRYZ",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -1469,9 +1469,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-el-postre-means-soft-drink-tell-me-i-m-right.mp3",
-        "textHash": "dff496c5baa00008fa3efbfad0623055e03c32b25ed57f32ec9fc0d7254cb68a",
+        "textHash": "0663213f2dd678c41ad3b32cb9815d33fb8d36ed02cbfafeeded83a085f76bd8",
         "voiceId": "4e32WqNVWRquDa1OcRYZ",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {

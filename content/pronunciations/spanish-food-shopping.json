@@ -1,0 +1,30 @@
+{
+  "_about": "IPA for Spanish terms inside English questions, Latin American (Mexico) pronunciation. bank:audio writes each match as /ipa/ for Eleven v4, so the voice says the Spanish word in Spanish. Captions are unchanged. Longest match wins; matching ignores case and stops at word edges.",
+  "terms": {
+    "la propina": "la pɾoˈpina",
+    "buen provecho": "bwem pɾoˈβetʃo",
+    "el menú": "el meˈnu",
+    "la carta": "la ˈkaɾta",
+    "quisiera": "kiˈsjeɾa",
+    "para mí": "ˈpaɾa ˈmi",
+    "el pollo": "el ˈpoʝo",
+    "pollo": "ˈpoʝo",
+    "pez": "pes",
+    "pescado": "pesˈkaðo",
+    "fruta": "ˈfɾuta",
+    "verduras": "beɾˈðuɾas",
+    "arroz": "aˈros",
+    "aceite de oliva": "aˈsejte ðe oˈliβa",
+    "carne de res": "ˈkaɾne ðe ˈres",
+    "ternera": "teɾˈneɾa",
+    "legumbres": "leˈɣumbɾes",
+    "refresco": "reˈfɾesko",
+    "vino": "ˈbino",
+    "cerveza": "seɾˈβesa",
+    "dulce": "ˈdulse",
+    "el postre": "el ˈpostɾe",
+    "postre": "ˈpostɾe",
+    "jugo": "ˈxuɣo",
+    "zumo": "ˈsumo"
+  }
+}

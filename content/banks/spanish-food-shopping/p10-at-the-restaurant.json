@@ -71,9 +71,9 @@
       "type": "clarify",
       "audio": {
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-propina-meaning.mp3",
-        "textHash": "db0a158954f26f1261318531bb524c085c28b930682b77efe606eadd7a065030",
+        "textHash": "3fa76fa127588d6e0b1f36ae395c2afe904ad690473a4eec3c3034c307c05c83",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -100,7 +100,7 @@
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-waiter-word.mp3",
         "textHash": "cb4d6c0966a82b890a34c1bba3c57a561a6008b0ce31cda897bdbc05ff1646cd",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -125,9 +125,9 @@
       "type": "clarify",
       "audio": {
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-buen-provecho-meaning.mp3",
-        "textHash": "bc5eb1f04df8ec8b54968335d1215d06dc242e122df58a60540653d0860dc8fc",
+        "textHash": "ecd56663559306db555c85187a896995c88fb9ff6ceb8677918201ce15d4982e",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -158,9 +158,9 @@
       "type": "apply",
       "audio": {
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-menu-in-madrid.mp3",
-        "textHash": "54d8f8253d02cf4363023f4acc07d9c65cc2909b618acb47565a54d2dedc7d79",
+        "textHash": "673ad95be59bb130eb6952ac895e52a697cb4579194d0d165a0629d5dfbb4ed7",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -193,7 +193,7 @@
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-walking-past-diners.mp3",
         "textHash": "bd52631a0fc633bc08d39b8ec8c0ce60aa74998d10a28216760a04f4cc043f7c",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -222,7 +222,7 @@
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-order-chicken.mp3",
         "textHash": "4f070fdea51cc9760de174aaea3620a94b5d2795394fe0915510e7263a34481a",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -257,7 +257,7 @@
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-getting-the-check.mp3",
         "textHash": "9847548c0b558d3665b368f0f9d07b3c8b03be6a9baab227db99d7832d8d0e8a",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -292,9 +292,9 @@
       "type": "compare",
       "audio": {
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-quisiera-vs-para-mi.mp3",
-        "textHash": "f7fdaed183c8018982c46004b05fbe7086d55cce0f7da7ee67ef46b068f2641b",
+        "textHash": "61cbcb783aeea56412dd3d4cbf82280eeacf4fc14661144e9b9b00e0c0993c7e",
         "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -327,9 +327,9 @@
       "type": "compare",
       "audio": {
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-why-say-la-carta.mp3",
-        "textHash": "7c240f116028d1e7f6c5303d3aaaee4d5d395a89e0edf4e3f50fbf7d6a35b138",
+        "textHash": "3a82939b8e49bf54d6c822a68d0fe80c4205ef9c01122473305cec8c89ece4f3",
         "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -364,7 +364,7 @@
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-check-comes-automatically.mp3",
         "textHash": "10ce5875b0228d6aca4f5f68604b5ba95676f8cdd95f8083011fe6a8a5542dd0",
         "voiceId": "4e32WqNVWRquDa1OcRYZ",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -397,7 +397,7 @@
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-paella-seafood.mp3",
         "textHash": "eeaf74a280210c549049109a881553dbdbab283c81c52ae6f60ca8d81f571be6",
         "voiceId": "4e32WqNVWRquDa1OcRYZ",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -422,9 +422,9 @@
       "type": "misconception",
       "audio": {
         "file": "public/audio/spanish-food-shopping/p10-at-the-restaurant/q-buen-provecho-strangers.mp3",
-        "textHash": "35695b383c5b8b3caa89be0b41153e5bba7627d0e072110a2e4a31205d229309",
+        "textHash": "5698b96c2090d3e05d167ca736c922ee39a8214241c4b7c6ddbfc4a0c41567b9",
         "voiceId": "4e32WqNVWRquDa1OcRYZ",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     }
   ],

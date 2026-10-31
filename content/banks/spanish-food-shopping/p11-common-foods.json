@@ -109,9 +109,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-can-you-clarify-when-i-should-say-pez-versus-pes.mp3",
-        "textHash": "951396277661ad474dde2e98d9b0aa5de6e2ccb3f260325652b9428427847507",
+        "textHash": "7dbf9d95fd8b5796e413e01539233a62d073aa52ec2111f4bbd3915a7a87bf47",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -171,9 +171,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-pollo-mean-in-english.mp3",
-        "textHash": "2375db97d7fdcea859830dcdbab93427719f611baaa86ded42ab9e65f90c1612",
+        "textHash": "7c89781a65ebdd0824a8789aacb7aee72ce1725038f12dedbcadc268a5908bdc",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -225,9 +225,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-fruta-mean-i-keep-mixing-it-up.mp3",
-        "textHash": "2b2601267574fe85c2faa523c4de27745ce5b80e3e14a19fa181a6e7df4e1ba0",
+        "textHash": "85bdd5df948274e054220b4d3116a2b55435e86184b4966e83b75cdf3e8eec4c",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -286,9 +286,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-can-you-clarify-what-verduras-covers.mp3",
-        "textHash": "0bcb0a8c470fe2fe45f5126dbd3fe68bacb854e7755d1f1aa037914628a10d69",
+        "textHash": "db38987aef3ebab859585da33654e9f5a0b877503685a107821d7ee02028f2a0",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -347,9 +347,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-arroz-mean-in-english.mp3",
-        "textHash": "81cfa202af1981f1006e12614fe2c9a342a9ec70412369f4e045525de583798b",
+        "textHash": "9bbe0a0943c8ccfcc5691e006d34eb19ca223b09220edc5823e756432d842afc",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -408,9 +408,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-aceite-de-oliva-mean.mp3",
-        "textHash": "017368f1641592449e1bdb6119299bd8d9181e26c0843eea48260f7fc84c0097",
+        "textHash": "573492d489ae1685e2659c5073239b9bb453a0539df7cae7e9a2dab97e2ff851",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -528,9 +528,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-carne-de-res-mean.mp3",
-        "textHash": "dc8be62da8d8bd2d5e15bc9960f5911a360d50751ce5710b81ed4770640e0c99",
+        "textHash": "bb8893f5c80c5ae0cf4a513b15683f1bbfe7ed615043f28a8129f046304f0a9c",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -647,9 +647,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-if-i-want-fish-to-eat-should-i-order-pez-or-pesc.mp3",
-        "textHash": "1baca19b478e8731263952728b1848473a8620ab7bf947cba9fb4c44e219c634",
+        "textHash": "79199b4868ea85fae278fa19591fe3e6294dae66b0191434b2675faba88cc0a2",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -985,9 +985,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-if-i-want-fruit-after-dinner-do-i-ask-for-fruta.mp3",
-        "textHash": "d6e7913ca109f120c2a8cc1cfb98177b77170f71162d4595c13c02aab16e6a62",
+        "textHash": "6d1ffca1a3a53f1e4a73d32914e35206d6cc46989989cf578c73acc2ceea7f3b",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -1045,9 +1045,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-in-spain-i-want-young-beef-do-i-order-ternera.mp3",
-        "textHash": "900e4d39746920708536c9c4989dc994048ad92f977710e277cd1a59e70e1ce3",
+        "textHash": "f46941f531202c6e256e3f1c1505f5971d74808a755c2768a46e312070b4accc",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -1107,9 +1107,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-how-do-pez-and-pescado-differ-for-fish.mp3",
-        "textHash": "1d4066e961cbbcba24caaa8264455dd5ade6efae67f223681e5c9b057d80c5fd",
+        "textHash": "514824db3ae03d7a6f91a0f67c3bc02737bc557d0db3352011f6449607f1aa99",
         "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -1228,9 +1228,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-how-does-ternera-differ-in-mexico-and-spain.mp3",
-        "textHash": "de8e5e7c42e7f89315077a3b15f33e3d78cb508e24656ccb87f6ad067222288a",
+        "textHash": "1ae36d229181c6c22c3adc7a2343d2f4fd71dee5857bb6699df81aeb5bbffdc3",
         "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
@@ -1521,9 +1521,9 @@
       "review": null,
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-legumbres-just-means-all-verduras-i-m-right.mp3",
-        "textHash": "97c4a7157238969bdfccd940dec75d1e2981fb89ebde59416febcc748ae5cf52",
+        "textHash": "5a18c98688002e687e4af3be20d94afe74bd69eeae256a18fc09937705de8e04",
         "voiceId": "4e32WqNVWRquDa1OcRYZ",
-        "model": "eleven_multilingual_v2"
+        "model": "eleven_v4"
       }
     },
     {
