@@ -196,6 +196,13 @@ limits on; (5) the license.
   processes); the temporary Chromium-only config used to attempt the run was deleted, and
   `test-results/` is gitignored.
 
+## Known issues
+
+- **Browser test hang (30 Oct 2026):** in Playwright's WebKit, with the test's fake microphone (an oscillator stream),
+  the page's JavaScript occasionally freezes as class recording starts, so `voice.spec.ts:178` or `timers.spec.ts:201`
+  fails about 1 run in 10 (`--repeat-each 30` reproduces it). The frozen page can't answer `page.evaluate`, so no
+  in-page timer runs, including the countdown watchdog. Not seen on a real iPhone. Revisit if it appears on a device.
+
 ## License
 
 In Character is licensed under the [Apache License 2.0](LICENSE). Copyright 2026 Recurxive LLC; see [NOTICE](NOTICE).
