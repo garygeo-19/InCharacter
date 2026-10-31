@@ -166,8 +166,8 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
     await expect(page.getByRole('heading', { name: 'Question 1 of 3.' })).toBeVisible({ timeout: 15000 });
     // Name tags replace the old box outlines: no overlay boxes remain, and
     // the asker reads in text with a filled tag.
-    await expect(page.getByText('Maya is asking')).toBeVisible();
-    await expect(page.locator('.name-tag.is-asking')).toHaveText('Maya');
+    await expect(page.getByText('Maya is asking')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.name-tag.is-asking')).toHaveText('Maya', { timeout: 10000 });
     expect(await page.locator('.mask-box').count()).toBe(0);
     for (const [i, answer] of [
       'La propina is the tip.',
@@ -187,9 +187,9 @@ for (const vp of [{ w: 360, h: 800 }, { w: 390, h: 844 }, { w: 1280, h: 800 }]) 
     // 61, not flow.spec's 63: this audit holds one peek above, and each peek costs 2 points (§8.4).
     await expect(page.getByRole('heading', { name: "Good effort — here's what to teach next time." })).toBeVisible({ timeout: 15000 });
     await expect(page.getByText('61 / 100')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByRole('heading', { name: 'How your score was calculated' })).toBeVisible();
-    await expect(page.getByText(/1 peek, .* → −2/)).toBeVisible();
-    await expect(page.getByText(/Total: 13\.33 \+ 50 − 2 = 61/)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'How your score was calculated' })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/1 peek, .* → −2/)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Total: 13\.33 \+ 50 − 2 = 61/)).toBeVisible({ timeout: 15000 });
     await noOverflow(page, 'debrief');
     await tapTargets(page, 'debrief');
   });

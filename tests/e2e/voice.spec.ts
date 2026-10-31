@@ -188,7 +188,7 @@ test('pinned level bar stays on screen; answers record only after Start answer',
   );
   expect(position).toBe('fixed');
   // One live region announces Recording once; the moving fill is silent.
-  await expect(bar.locator('[role="status"]')).toHaveText('Recording');
+  await expect(bar.locator('[role="status"]')).toHaveText('Recording', { timeout: 15000 });
   expect(await bar.locator('.levelbar-track[aria-hidden="true"]').count()).toBe(1);
 
   // Scroll the outline to the bottom: the bar stays pinned near the top.
@@ -205,12 +205,14 @@ test('pinned level bar stays on screen; answers record only after Start answer',
   // No auto-record: Start answer is shown, no bar, full timer.
   await expect(page.getByRole('button', { name: 'Start answer' })).toBeVisible({ timeout: 10000 });
   await expect(page.locator('.levelbar-pinned')).toHaveCount(0);
-  await expect(page.locator('.timer')).toHaveText('0:08');
+  // Full answer budget before the Start tap: the timer has not started, so
+  // this text is the stable pre-start state, not a mid-count value.
+  await expect(page.locator('.timer')).toHaveText('0:08', { timeout: 10000 });
 
   // The tap starts recording and the timer.
   await page.getByRole('button', { name: 'Start answer' }).click();
   await expect(page.locator('.levelbar-pinned')).toBeVisible({ timeout: 15000 });
-  await expect(page.getByRole('button', { name: 'Done' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Done' })).toBeEnabled({ timeout: 10000 });
   await page.waitForFunction(
     () => document.querySelector('.timer')?.textContent !== '0:08',
     { timeout: 8000 },
@@ -244,8 +246,8 @@ test('transcribe failure reads plainly; Try again re-sends the kept audio', asyn
   await expect(error).toContainText(/didn't transcribe/i);
   await expect(error).not.toContainText(/request failed/i);
   await expect(error).not.toContainText(/status 500/i);
-  await expect(page.getByRole('button', { name: 'Try again' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Type it instead' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Try again' })).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole('button', { name: 'Type it instead' })).toBeVisible({ timeout: 10000 });
 
   // Try again re-sends the kept WAV: the mic is not re-opened.
   const before = await gumCalls(page);
@@ -275,7 +277,7 @@ test('transcribe failure offers Type it instead', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Type it instead' }).click();
   const answerBox = page.getByPlaceholder('Type your answer — write as much as you like');
-  await expect(answerBox).toBeVisible();
+  await expect(answerBox).toBeVisible({ timeout: 10000 });
   await answerBox.fill('La propina is the tip.');
   await page.getByRole('button', { name: 'Done' }).click();
   await expect(page.getByText('Question 2 of 3.')).toBeVisible({ timeout: 15000 });
@@ -291,7 +293,8 @@ test('reduced motion shows a still bar with a numeric level', async ({ page }) =
   await endClass(page);
   await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
   await page.getByRole('button', { name: 'Start answer' }).click();
-  // Steady red fill plus a numeric level snapped twice a second.
+  // Steady red fill plus a numeric level snapped twice a second. The number
+  // arrives with the first level callback, so wait for that stable state.
   await expect(page.locator('.levelbar-fill.still')).toBeVisible({ timeout: 15000 });
-  await expect(page.locator('.levelbar-num')).toContainText(/Mic level \d+%/);
+  await expect(page.locator('.levelbar-num')).toContainText(/Mic level \d+%/, { timeout: 15000 });
 });

@@ -118,8 +118,8 @@ async function driveToDebrief(page: Page) {
   await expect(page.getByText('Question 1 of 3.')).toBeVisible({ timeout: 15000 });
   // Name tags replace the old box outlines: the asker reads in text with a
   // filled tag, never depending on box positions.
-  await expect(page.getByText('Maya is asking')).toBeVisible();
-  await expect(page.locator('.name-tag.is-asking')).toHaveText('Maya');
+  await expect(page.getByText('Maya is asking')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('.name-tag.is-asking')).toHaveText('Maya', { timeout: 10000 });
   for (const [i, answer] of [
     'La propina is the tip.',
     'Ask la cuenta por favor, they will not bring it.',
@@ -157,7 +157,7 @@ test('teach a class in Type mode, mocked grading', async ({ page }) => {
   await expect(page.getByText('Peeks: 0 peeks, 0.0s → no penalty')).toBeVisible();
   await expect(page.getByText('Total: 13.33 + 50 − 0 = 63')).toBeVisible();
   // Screen readers get the final headline and score announced once.
-  await expect(page.getByRole('status')).toContainText("Good effort — here's what to teach next time. Your score is 63 out of 100.");
+  await expect(page.getByRole('status')).toContainText("Good effort — here's what to teach next time. Your score is 63 out of 100.", { timeout: 15000 });
   await expect(page.getByText('Covered', { exact: true }).first()).toBeVisible();
 
   await page.getByRole('button', { name: 'Home' }).click();

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { friendlyErrorMessage } from '../shared/errors';
 import { splitTextToLines } from '../shared/lines';
+import { TimedTurn } from '../shared/timed-turn';
 import { buildNotes, buildOutline, PackSchema, stripPrefix, type Note } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { formatPoints, headlineFor, scoreSession } from '../shared/scoring';
@@ -443,23 +444,41 @@ function ClassScreen(props: {
   const voice = props.mode === 'voice';
   const [typedFallback, setTypedFallback] = useState(false);
   const [voiceActive, setVoiceActive] = useState(true);
-  const endedRef = useRef(false);
-  const endVoice = () => {
-    if (endedRef.current) return;
-    endedRef.current = true;
-    setVoiceActive(false);
-  };
+  // One class is submitted exactly once: Done/End stops the timer at once
+  // and a timeout firing mid-transcription does nothing a second time.
+  const turnRef = useRef<TimedTurn | null>(null);
+  if (!turnRef.current) turnRef.current = new TimedTurn();
+  const [stopped, setStopped] = useState(false);
   const useVoice = voice && !typedFallback;
+  const useVoiceRef = useRef(useVoice);
+  useVoiceRef.current = useVoice;
+
+  const finishClass = (reason: 'done' | 'timeout'): boolean => {
+    const turn = turnRef.current!;
+    if (!turn.finish(reason)) return false;
+    setStopped(true);
+    if (useVoiceRef.current) {
+      setVoiceActive(false);
+    } else if (turn.deliver()) {
+      props.onEnd(splitTextToLines(draftRef.current));
+    }
+    return true;
+  };
+  const deliverClassLines = (lines: Line[]) => {
+    if (turnRef.current!.deliver()) props.onEnd(lines);
+  };
 
   useEffect(() => {
+    if (!turnRef.current!.timerRunning) return;
     if (left <= 0) {
-      if (useVoice) endVoice();
-      else props.onEnd(splitTextToLines(draftRef.current));
+      finishClass('timeout');
       return;
     }
     const t = setTimeout(() => setElapsed((e) => e + 1), 1000);
     return () => clearTimeout(t);
-  }, [left, useVoice]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [left, useVoice, stopped]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const sending = stopped && useVoice;
 
   return (
     <>
@@ -473,12 +492,26 @@ function ClassScreen(props: {
         peekStyle={props.peekStyle} onPeek={props.onPeek}
       />
       {useVoice ? (
-        <VoiceLineTaker
-          packId={props.packId} partId={props.partId}
-          active={voiceActive} cue="Teach your class — speak now."
-          onDone={(lines) => props.onEnd(lines)}
-          onTypeInstead={() => setTypedFallback(true)}
-        />
+        <>
+          <VoiceLineTaker
+            packId={props.packId} partId={props.partId}
+            active={voiceActive} cue="Teach your class — speak now."
+            onDone={deliverClassLines}
+            onTypeInstead={() => {
+              // Transcription failed: let the learner type instead with a
+              // fresh turn, keeping the remaining time.
+              turnRef.current = new TimedTurn();
+              setStopped(false);
+              setTypedFallback(true);
+            }}
+          />
+          {sending && (
+            <>
+              <p role="status">Class sent…</p>
+              <WaitingDots status="Class sent. Transcribing your class." />
+            </>
+          )}
+        </>
       ) : (
         <LongBox
           label="Teach your class"
@@ -489,10 +522,16 @@ function ClassScreen(props: {
       <div className="sticky-action">
         <button
           type="button" className="primary"
-          disabled={elapsed < props.endAfterSecs || (useVoice && !voiceActive)}
+          disabled={elapsed < props.endAfterSecs || stopped}
           onClick={() => {
-            if (useVoice) endVoice();
-            else props.onEnd(splitTextToLines(draftRef.current));
+            if (useVoice) finishClass('done');
+            else {
+              // Typed fallback after a transcription error delivers even
+              // though the timer already stopped for the voice turn.
+              const turn = turnRef.current!;
+              if (turn.isStopped) deliverClassLines(splitTextToLines(draftRef.current));
+              else finishClass('done');
+            }
           }}
         >
           End class
@@ -564,13 +603,29 @@ function QuestionScreen(props: {
   // Voice answers never auto-record: recording (and the timer) starts on
   // the "Start answer" tap, which mounts the VoiceLineTaker below.
   const [started, setStarted] = useState(false);
-  const answeredRef = useRef(false);
-  const closeVoice = () => {
-    if (answeredRef.current) return;
-    answeredRef.current = true;
-    setAnswerOpen(false);
-  };
+  // One answer is submitted exactly once: Done stops the timer at once and
+  // a timeout firing mid-transcription does nothing a second time.
+  const turnRef = useRef<TimedTurn | null>(null);
+  if (!turnRef.current) turnRef.current = new TimedTurn();
+  const [submitted, setSubmitted] = useState(false);
   const answeringVoice = useVoice && !typedFallback;
+  const answeringVoiceRef = useRef(answeringVoice);
+  answeringVoiceRef.current = answeringVoice;
+
+  const finishAnswer = (reason: 'done' | 'timeout'): boolean => {
+    const turn = turnRef.current!;
+    if (!turn.finish(reason)) return false;
+    setSubmitted(true);
+    if (answeringVoiceRef.current) {
+      setAnswerOpen(false);
+    } else if (turn.deliver()) {
+      props.onAnswered(splitTextToLines(draftRef.current));
+    }
+    return true;
+  };
+  const deliverAnswerLines = (lines: Line[]) => {
+    if (turnRef.current!.deliver()) props.onAnswered(lines);
+  };
 
   useEffect(() => {
     setElapsed(0);
@@ -578,21 +633,22 @@ function QuestionScreen(props: {
     setTypedFallback(false);
     setAnswerOpen(true);
     setStarted(false);
-    answeredRef.current = false;
+    turnRef.current = new TimedTurn();
+    setSubmitted(false);
   }, [props.index]);
 
   useEffect(() => {
     if (!props.asking && (!answeringVoice || started)) {
+      if (!turnRef.current!.timerRunning) return undefined;
       if (left <= 0) {
-        if (answeringVoice) closeVoice();
-        else props.onAnswered(splitTextToLines(draftRef.current));
-        return;
+        finishAnswer('timeout');
+        return undefined;
       }
       const t = setTimeout(() => setElapsed((e) => e + 1), 1000);
       return () => clearTimeout(t);
     }
     return undefined;
-  }, [left, props.asking, answeringVoice, started]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [left, props.asking, answeringVoice, started, submitted]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // No recorded student audio yet (M3 cut line): the caption is the
   // question in both modes, shown for ~2.5 s before the learner can answer.
@@ -645,11 +701,23 @@ function QuestionScreen(props: {
                 <VoiceLineTaker
                   packId={props.packId} partId={props.partId}
                   active={answerOpen} cue="Answer the question — speak now."
-                  onDone={(voiceLines) => props.onAnswered(voiceLines)}
-                  onTypeInstead={() => setTypedFallback(true)}
+                  onDone={deliverAnswerLines}
+                  onTypeInstead={() => {
+                    // Transcription failed: let the learner type instead
+                    // with a fresh turn, keeping the remaining time.
+                    turnRef.current = new TimedTurn();
+                    setSubmitted(false);
+                    setTypedFallback(true);
+                  }}
                 />
+                {submitted && (
+                  <>
+                    <p role="status">Answer sent…</p>
+                    <WaitingDots status="Answer sent. Transcribing your answer." />
+                  </>
+                )}
                 <div className="sticky-action">
-                  <button type="button" className="primary" disabled={!answerOpen} onClick={closeVoice}>
+                  <button type="button" className="primary" disabled={!answerOpen || submitted} onClick={() => finishAnswer('done')}>
                     Done
                   </button>
                 </div>
@@ -672,7 +740,16 @@ function QuestionScreen(props: {
                 value={draft} onChange={setDraft}
               />
               <div className="sticky-action">
-                <button type="button" className="primary" onClick={() => props.onAnswered(splitTextToLines(draftRef.current))}>
+                <button
+                  type="button" className="primary" disabled={submitted}
+                  onClick={() => {
+                    // Typed fallback after a transcription error delivers
+                    // even though the timer already stopped for the voice turn.
+                    const turn = turnRef.current!;
+                    if (turn.isStopped) deliverAnswerLines(splitTextToLines(draftRef.current));
+                    else finishAnswer('done');
+                  }}
+                >
                   Done
                 </button>
               </div>
