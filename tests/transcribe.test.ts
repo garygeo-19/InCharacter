@@ -55,7 +55,14 @@ function stubNetwork(seen: SeenRequest[], metaStatus = 200) {
         ) as Record<string, unknown>,
         audioBytes: audioRaw instanceof Blob ? (await audioRaw.arrayBuffer()).byteLength : -1,
       });
-      if (metaStatus !== 200) return { ok: false, status: metaStatus, json: async () => ({}) };
+      if (metaStatus !== 200) {
+        return {
+          ok: false,
+          status: metaStatus,
+          text: async () => 'upstream overloaded',
+          json: async () => ({}),
+        };
+      }
       return { ok: true, status: 200, json: async () => RECORDED };
     }
     throw new Error(`unstubbed fetch: ${u}`);
@@ -135,6 +142,11 @@ describe('POST /api/transcribe (Meta mocked)', () => {
     const app = createApp({ MODEL_API_KEY: 'test-key' });
     const failed = await app.request('/api/transcribe', { method: 'POST', body: wavForm() });
     expect(failed.status).toBe(502);
+    // Meta's error text is included so the client can explain the failure;
+    // the key itself never appears in the response.
+    const failedBody = (await failed.json()) as { error: string };
+    expect(failedBody.error).toContain('upstream overloaded');
+    expect(failedBody.error).not.toContain('test-key');
 
     const noKey: SeenRequest[] = [];
     stubNetwork(noKey);

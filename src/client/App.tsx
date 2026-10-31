@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import comingSoon from '../../content/coming-soon.json';
+import { friendlyErrorMessage } from '../shared/errors';
 import { CastRow, ClassroomFigure } from './art';
+import { LevelBar } from './levelbar';
 import { buildNotes, PackSchema, stripPrefix } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { api, type CatalogPack, type PartsResponse } from './api';
@@ -44,6 +46,7 @@ function App() {
   const [view, setView] = useState<View>({ name: 'home' });
   const [catalog, setCatalog] = useState<CatalogPack[] | null>(null);
   const [catalogError, setCatalogError] = useState<string | null>(null);
+  const [catalogSeq, setCatalogSeq] = useState(0);
   const [partsCache, setPartsCache] = useState<Record<string, PartsResponse>>({});
   const [history, setHistory] = useState<AttemptRecord[]>(() => loadHistory());
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
@@ -69,7 +72,7 @@ function App() {
 
   useEffect(() => {
     api.catalog().then((d) => setCatalog(d.packs)).catch((e: Error) => setCatalogError(e.message));
-  }, []);
+  }, [catalogSeq]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const partsFor = async (packId: string): Promise<PartsResponse> => {
     const hit = partsCache[packId];
@@ -103,6 +106,10 @@ function App() {
         <Home
           catalog={catalog} catalogError={catalogError} query={query} setQuery={setQuery}
           history={history} partsCache={partsCache} partsFor={partsFor}
+          onRetryCatalog={() => {
+            setCatalogError(null);
+            setCatalogSeq((s) => s + 1);
+          }}
           onOpenPack={(packId) => setView({ name: 'pack', packId })}
           onTeachAgain={(h) => setView({ name: 'briefing', packId: h.packId, partId: h.partId, attempt: Date.now() })}
           onNextClass={(h) => setView({ name: 'list', packId: h.packId })}
@@ -204,6 +211,7 @@ function Home(props: {
   history: AttemptRecord[];
   partsCache: Record<string, PartsResponse>;
   partsFor: (packId: string) => Promise<PartsResponse>;
+  onRetryCatalog: () => void;
   onOpenPack: (packId: string) => void;
   onTeachAgain: (h: AttemptRecord) => void;
   onNextClass: (h: AttemptRecord) => void;
@@ -270,7 +278,14 @@ function Home(props: {
           type="search" aria-label="Search packs" placeholder="Search packs"
           value={props.query} onChange={(e) => props.setQuery(e.target.value)}
         />
-        {props.catalogError && <p className="error">Couldn&apos;t load the catalog: {props.catalogError}</p>}
+        {props.catalogError && (
+          <>
+            <p className="error">Couldn&apos;t load the catalog: {friendlyErrorMessage(props.catalogError)}</p>
+            <button type="button" className="secondary" onClick={props.onRetryCatalog}>
+              Try again
+            </button>
+          </>
+        )}
         {!catalog && !props.catalogError && <p>Loading packs…</p>}
         <ul className="pack-list">
           {packs.map((p) => (
@@ -349,16 +364,30 @@ function ClassList(props: {
   const cached = props.partsCache[props.packId] ?? null;
   const [parts, setParts] = useState<PartsResponse | null>(cached);
   const [error, setError] = useState<string | null>(null);
+  const [seq, setSeq] = useState(0);
   useEffect(() => {
     if (cached) return;
     props.partsFor(props.packId).then(setParts).catch((e: Error) => setError(e.message));
-  }, [props.packId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.packId, seq]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!pack) return <p>Loading…</p>;
   return (
     <>
       <button type="button" className="secondary" onClick={props.onBack}>‹ {pack.name}</button>
       <h1>Choose a class</h1>
-      {error && <p className="error">{error}</p>}
+      {error && (
+        <>
+          <p className="error">{friendlyErrorMessage(error)}</p>
+          <button
+            type="button" className="secondary"
+            onClick={() => {
+              setError(null);
+              setSeq((s) => s + 1);
+            }}
+          >
+            Try again
+          </button>
+        </>
+      )}
       {!parts && !error && <p>Loading classes…</p>}
       {parts?.lessons.map((lesson) => (
         <section key={lesson.id} aria-label={stripPrefix(lesson.title)}>
@@ -402,6 +431,7 @@ function Briefing(props: {
   const [notes, setNotes] = useState<{ label: string; text: string }[] | null>(null);
   const [title, setTitle] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [seq, setSeq] = useState(0);
 
   useEffect(() => {
     api.pack(props.packId)
@@ -412,7 +442,7 @@ function Briefing(props: {
         setNotes(buildNotes(parsed, props.partId));
       })
       .catch((e: Error) => setError(e.message));
-  }, [props.packId, props.partId]);
+  }, [props.packId, props.partId, seq]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const roleLine = pack && pack.language !== 'en' && pack.language !== 'en-US' ? (
     <p className="role">You&apos;re the {languageName(pack.language)} teacher. Today&apos;s class: <strong>{title}</strong>.</p>
@@ -432,7 +462,20 @@ function Briefing(props: {
       </section>
       <section aria-label="Notes">
         <h2>Notes</h2>
-        {error && <p className="error">{error}</p>}
+        {error && (
+          <>
+            <p className="error">{friendlyErrorMessage(error)}</p>
+            <button
+              type="button" className="secondary"
+              onClick={() => {
+                setError(null);
+                setSeq((s) => s + 1);
+              }}
+            >
+              Try again
+            </button>
+          </>
+        )}
         {!notes && !error && <p>Loading notes…</p>}
         <ul className="notes">
           {(notes ?? []).map((n) => (
@@ -505,9 +548,7 @@ function ModePicker(props: {
       {mic === 'checking' && (
         <>
           <p className="fine" role="status">Listening — speak to test your mic…</p>
-          <div className="meter" aria-hidden>
-            <div className="meter-fill" style={{ width: `${Math.round(level * 100)}%` }} />
-          </div>
+          <LevelBar level={level} />
         </>
       )}
       {mic === 'denied' && (

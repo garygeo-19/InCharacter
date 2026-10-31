@@ -40,7 +40,9 @@ export async function transcribeWav(opts: {
     body: form,
   });
   if (!res.ok) {
-    const err = new Error(`Transcription failed with status ${res.status}`) as Error & {
+    // Meta's error body explains a rejected request; it holds no key or transcript.
+    const detail = (await res.text().catch(() => '')).slice(0, 300);
+    const err = new Error(`Transcription failed with status ${res.status}${detail ? `: ${detail}` : ''}`) as Error & {
       status?: number;
     };
     err.status = res.status === 429 ? 429 : 502;

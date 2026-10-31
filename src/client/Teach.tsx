@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { friendlyErrorMessage } from '../shared/errors';
 import { splitTextToLines } from '../shared/lines';
 import { buildNotes, buildOutline, PackSchema, stripPrefix, type Note } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
@@ -6,6 +7,7 @@ import { formatPoints, headlineFor, scoreSession } from '../shared/scoring';
 import type { Line, Peek } from '../shared/types';
 import { api, type BankDisplay, type LineIn } from './api';
 import { Segments, VerdictChip, mmss } from './format';
+import { LevelBar, useReducedMotion } from './levelbar';
 import { captureToWav, startCapture, type VoiceCapture } from './voice';
 import {
   excludeIds,
@@ -64,6 +66,7 @@ export function Teach(props: {
   const [bank, setBank] = useState<BankDisplay[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>({ name: 'countdown', count: 3 });
+  const [loadSeq, setLoadSeq] = useState(0);
   const [classLines, setClassLines] = useState<Line[]>([]);
   const [peeks, setPeeks] = useState<Peek[]>([]);
   const [picks, setPicks] = useState<{ questionId: string }[]>([]);
@@ -96,7 +99,7 @@ export function Teach(props: {
       })
       .catch(() => {});
     return () => { live = false; };
-  }, [props.packId, props.partId]);
+  }, [props.packId, props.partId, loadSeq]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const outline = useMemo(() => (notes ? buildOutline(notes) : null), [notes]);
   const notesById = useMemo(() => new Map((notes ?? []).map((n) => [n.id, n])), [notes]);
@@ -107,8 +110,19 @@ export function Teach(props: {
   if (error) {
     return (
       <>
-        <p className="error">{error}</p>
-        <button type="button" className="primary" onClick={props.onExit}>Home</button>
+        <p className="error">{friendlyErrorMessage(error)}</p>
+        <div className="sticky-action">
+          <button
+            type="button" className="primary"
+            onClick={() => {
+              setError(null);
+              setLoadSeq((s) => s + 1);
+            }}
+          >
+            Try again
+          </button>
+          <button type="button" className="secondary" onClick={props.onExit}>Home</button>
+        </div>
       </>
     );
   }
@@ -208,7 +222,7 @@ export function Teach(props: {
       {phase.name === 'failed' && (
         <>
           <h1>Grading hit a snag</h1>
-          <p className="lede">{phase.error}</p>
+          <p className="lede">{friendlyErrorMessage(phase.error)}</p>
           {classGrade ? (
             <NoScoreDebrief
               classLines={classLines} peeks={peeks}
@@ -220,7 +234,10 @@ export function Teach(props: {
             />
           ) : (
             <div className="sticky-action">
-              <button type="button" className="primary" onClick={props.onNextClass}>Back to classes</button>
+              <button type="button" className="primary" onClick={() => setPhase({ name: 'choosing' })}>
+                Try again
+              </button>
+              <button type="button" className="secondary" onClick={props.onNextClass}>Back to classes</button>
             </div>
           )}
         </>
@@ -309,10 +326,11 @@ function WaitingDots({ status }: { status: string }) {
   );
 }
 
-// Voice turn: records while `active`, transcribes once it flips false.
-// Each returned turn becomes a transcript line (§9.6). The WAV is kept
-// until the POST succeeds, so "Try again" re-sends the same audio; "Type
-// instead" hands back to the typed box (§10.1, §11.7).
+// Voice turn: records from mount (answers mount it only after the "Start
+// answer" tap), transcribes once `active` flips false. Each returned turn
+// becomes a transcript line (§9.6). The WAV is kept until the POST
+// succeeds, so "Try again" re-sends the same audio without re-recording;
+// "Type it instead" hands back to the typed box (§10.1, §11.7).
 function VoiceLineTaker(props: {
   packId: string;
   partId: string;
@@ -377,7 +395,7 @@ function VoiceLineTaker(props: {
   if (status === 'error') {
     return (
       <>
-        <p className="error">{error}</p>
+        <p className="error">{friendlyErrorMessage(error)}</p>
         <div className="row">
           <button
             type="button" className="primary"
@@ -387,7 +405,7 @@ function VoiceLineTaker(props: {
             Try again
           </button>
           <button type="button" className="secondary" onClick={props.onTypeInstead}>
-            Type instead
+            Type it instead
           </button>
         </div>
       </>
@@ -395,12 +413,10 @@ function VoiceLineTaker(props: {
   }
   return (
     <>
-      <p className="rec" role="status">
+      <LevelBar level={level} />
+      <p className="rec" aria-hidden="true">
         <span className="rec-dot" aria-hidden>●</span> Recording
       </p>
-      <div className="meter" aria-hidden>
-        <div className="meter-fill" style={{ width: `${Math.round(level * 100)}%` }} />
-      </div>
       <p className="lede">{props.cue}</p>
     </>
   );
@@ -545,6 +561,9 @@ function QuestionScreen(props: {
   const useVoice = props.mode === 'voice';
   const [typedFallback, setTypedFallback] = useState(false);
   const [answerOpen, setAnswerOpen] = useState(true);
+  // Voice answers never auto-record: recording (and the timer) starts on
+  // the "Start answer" tap, which mounts the VoiceLineTaker below.
+  const [started, setStarted] = useState(false);
   const answeredRef = useRef(false);
   const closeVoice = () => {
     if (answeredRef.current) return;
@@ -558,11 +577,12 @@ function QuestionScreen(props: {
     setDraft('');
     setTypedFallback(false);
     setAnswerOpen(true);
+    setStarted(false);
     answeredRef.current = false;
   }, [props.index]);
 
   useEffect(() => {
-    if (!props.asking) {
+    if (!props.asking && (!answeringVoice || started)) {
       if (left <= 0) {
         if (answeringVoice) closeVoice();
         else props.onAnswered(splitTextToLines(draftRef.current));
@@ -572,11 +592,11 @@ function QuestionScreen(props: {
       return () => clearTimeout(t);
     }
     return undefined;
-  }, [left, props.asking, answeringVoice]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [left, props.asking, answeringVoice, started]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // No recorded student audio yet (M3 cut line): the caption is the
-  // question in both modes, and voice recording starts 2 s after it
-  // appears, with a "Your turn" cue (§4.6).
+  // question in both modes, shown for ~2.5 s before the learner can answer.
+  // In voice mode the "Start answer" button then starts recording (§4.6).
   useEffect(() => {
     if (props.asking) {
       const t = setTimeout(props.onAsked, 2500);
@@ -619,20 +639,31 @@ function QuestionScreen(props: {
             />
           </details>
           {answeringVoice ? (
-            <>
-              <p className="lede">Your turn — speak now.</p>
-              <VoiceLineTaker
-                packId={props.packId} partId={props.partId}
-                active={answerOpen} cue="Answer the question — speak now."
-                onDone={(voiceLines) => props.onAnswered(voiceLines)}
-                onTypeInstead={() => setTypedFallback(true)}
-              />
-              <div className="sticky-action">
-                <button type="button" className="primary" disabled={!answerOpen} onClick={closeVoice}>
-                  Done
-                </button>
-              </div>
-            </>
+            started ? (
+              <>
+                <p className="lede">Your turn — speak now.</p>
+                <VoiceLineTaker
+                  packId={props.packId} partId={props.partId}
+                  active={answerOpen} cue="Answer the question — speak now."
+                  onDone={(voiceLines) => props.onAnswered(voiceLines)}
+                  onTypeInstead={() => setTypedFallback(true)}
+                />
+                <div className="sticky-action">
+                  <button type="button" className="primary" disabled={!answerOpen} onClick={closeVoice}>
+                    Done
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="lede">Tap Start answer when you&apos;re ready — recording and the timer start then.</p>
+                <div className="sticky-action">
+                  <button type="button" className="primary" onClick={() => setStarted(true)}>
+                    Start answer
+                  </button>
+                </div>
+              </>
+            )
           ) : (
             <>
               <LongBox
@@ -703,23 +734,6 @@ function NoScoreDebrief(props: {
       </div>
     </>
   );
-}
-
-function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  );
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const onChange = () => setReduced(mq.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
-  return reduced;
 }
 
 // The celebration at the top of the debrief: the headline, the score

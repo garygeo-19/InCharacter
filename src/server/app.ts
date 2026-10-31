@@ -194,7 +194,10 @@ export function createApp(env: Record<string, string>) {
       return c.json({ error: 'Audio is too large (at most 10 MB).' }, 400);
     }
     const problem = wavProblem(wav);
-    if (problem) return c.json({ error: problem }, 400);
+    if (problem) {
+      console.error('[transcribe] bad wav:', problem, `wav=${wav.length}B`);
+      return c.json({ error: problem }, 400);
+    }
     try {
       const entry = await catalogEntry(meta.data.packId);
       const pack = await fetchPack(base, entry);
@@ -213,6 +216,12 @@ export function createApp(env: Record<string, string>) {
       );
       return c.json({ lines: turnsToLines(result.turns), audioDurationMs: result.audioDurationMs });
     } catch (err) {
+      // Message and status only, never the key or headers.
+      if (process.env.SAVE_FAILED_WAV) {
+        const { writeFileSync } = await import('node:fs');
+        writeFileSync(process.env.SAVE_FAILED_WAV, wav);
+      }
+      console.error('[transcribe] failed:', (err as { status?: number }).status ?? '-', (err as Error).message, `wav=${wav.length}B`);
       const status = (err as { status?: number }).status ?? 502;
       return c.json({ error: (err as Error).message }, status as 502);
     }
