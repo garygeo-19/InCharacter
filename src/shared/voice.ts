@@ -13,6 +13,13 @@ export const VOICE_MAX_KEYWORDS = 50;
 /** Model id for transcription (§9.1). */
 export const VOICE_MODEL = 'muse-voice-transcribe-1.0';
 
+/**
+ * Mic start budget: when capture neither opens nor fails within this long
+ * (a hanging permission prompt or worklet load), the turn falls back to
+ * typing instead of waiting on silence (§4.4: switch to Type and say so).
+ */
+export const VOICE_START_TIMEOUT_MS = 8000;
+
 /** Cap on the audio the server accepts per request (§10.2). */
 export const TRANSCRIBE_MAX_AUDIO_BYTES = 10 * 1024 * 1024;
 

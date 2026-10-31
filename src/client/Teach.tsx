@@ -1,7 +1,15 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import {
+  countdownBudgetMs,
+  countdownTickMs,
+  startCountdown,
+  tickCountdown,
+  type CountdownState,
+} from '../shared/countdown';
 import { friendlyErrorMessage } from '../shared/errors';
 import { splitTextToLines } from '../shared/lines';
 import { TimedTurn } from '../shared/timed-turn';
+import { VOICE_START_TIMEOUT_MS } from '../shared/voice';
 import { buildNotes, buildOutline, PackSchema, stripPrefix, type Note } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { formatPoints, headlineFor, scoreSession } from '../shared/scoring';
@@ -278,16 +286,36 @@ function useTimerAnnouncement(left: number): string {
 }
 
 function Countdown({ fast, onDone }: { fast: boolean; onDone: () => void }) {
-  const [count, setCount] = useState(3);
+  const [state, setState] = useState<CountdownState>(() => startCountdown());
+  // The class starts exactly once: the last tick and the watchdog below
+  // race, and StrictMode's dev double-effect re-fires, so a ref guards it.
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+  const doneRef = useRef(false);
+  const finish = useCallback(() => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    onDoneRef.current();
+  }, []);
+
+  const step = countdownTickMs(fast);
   useEffect(() => {
-    if (count <= 0) {
-      onDone();
+    if (state.done) {
+      finish();
       return;
     }
-    const t = setTimeout(() => setCount((c) => c - 1), fast ? 300 : 1000);
+    const t = setTimeout(() => setState((s) => tickCountdown(s)), step);
     return () => clearTimeout(t);
-  }, [count]); // eslint-disable-line react-hooks/exhaustive-deps
-  return <h1 className="countdown" aria-live="assertive">{count > 0 ? count : 'Teach!'}</h1>;
+  }, [state, step, finish]);
+
+  // Absolute backstop: even a dropped or long-delayed tick still starts the
+  // class. Budgeted past the last tick, so this never fires on a healthy run.
+  useEffect(() => {
+    const w = setTimeout(finish, countdownBudgetMs(fast));
+    return () => clearTimeout(w);
+  }, [fast, finish]);
+
+  return <h1 className="countdown" aria-live="assertive">{state.count > 0 ? state.count : 'Teach!'}</h1>;
 }
 
 // One multi-line box for teaching and answers. The learner writes freely
@@ -331,7 +359,9 @@ function WaitingDots({ status }: { status: string }) {
 // answer" tap), transcribes once `active` flips false. Each returned turn
 // becomes a transcript line (§9.6). The WAV is kept until the POST
 // succeeds, so "Try again" re-sends the same audio without re-recording;
-// "Type it instead" hands back to the typed box (§10.1, §11.7).
+// "Type it instead" hands back to the typed box (§10.1, §11.7). A mic
+// start that fails or hangs falls back to the typed box on its own
+// (onMicUnavailable), so a bad mic never holds the turn on silence.
 function VoiceLineTaker(props: {
   packId: string;
   partId: string;
@@ -339,6 +369,7 @@ function VoiceLineTaker(props: {
   cue: string;
   onDone: (lines: Line[]) => void;
   onTypeInstead: () => void;
+  onMicUnavailable: () => void;
 }) {
   const [level, setLevel] = useState(0);
   const [status, setStatus] = useState<'recording' | 'transcribing' | 'error'>('recording');
@@ -346,23 +377,42 @@ function VoiceLineTaker(props: {
   const captureRef = useRef<VoiceCapture | null>(null);
   const wavRef = useRef<Uint8Array | null>(null);
   const doneRef = useRef(false);
+  const unavailableRef = useRef(props.onMicUnavailable);
+  unavailableRef.current = props.onMicUnavailable;
 
   useEffect(() => {
     let live = true;
+    let settled = false;
+    // A failed or hanging mic start falls back to Type at once (§4.4:
+    // switch to Type and say so) instead of holding voice on silence.
+    const failMic = () => {
+      if (!live || settled) return;
+      settled = true;
+      unavailableRef.current();
+    };
+    const slow = setTimeout(failMic, VOICE_START_TIMEOUT_MS);
     startCapture((peak) => {
       if (live) setLevel(peak);
     })
       .then((capture) => {
-        if (live) captureRef.current = capture;
-        else capture.stop();
+        // A capture that opens after the fallback is stopped at once so the
+        // mic is released.
+        if (!live || settled) {
+          capture.stop();
+          return;
+        }
+        settled = true;
+        clearTimeout(slow);
+        captureRef.current = capture;
       })
       .catch(() => {
-        if (!live) return;
-        setError('The mic is unavailable.');
-        setStatus('error');
+        if (!live || settled) return;
+        clearTimeout(slow);
+        failMic();
       });
     return () => {
       live = false;
+      clearTimeout(slow);
       captureRef.current?.stop();
       captureRef.current = null;
     };
@@ -443,6 +493,7 @@ function ClassScreen(props: {
   const announcement = useTimerAnnouncement(left);
   const voice = props.mode === 'voice';
   const [typedFallback, setTypedFallback] = useState(false);
+  const [micNotice, setMicNotice] = useState(false);
   const [voiceActive, setVoiceActive] = useState(true);
   // One class is submitted exactly once: Done/End stops the timer at once
   // and a timeout firing mid-transcription does nothing a second time.
@@ -466,6 +517,14 @@ function ClassScreen(props: {
   };
   const deliverClassLines = (lines: Line[]) => {
     if (turnRef.current!.deliver()) props.onEnd(lines);
+  };
+  // A failed or hanging mic start falls back to typing with a fresh turn,
+  // keeping the remaining time; the notice says so (§4.4).
+  const fallBackToTyping = (notice: boolean) => {
+    turnRef.current = new TimedTurn();
+    setStopped(false);
+    setTypedFallback(true);
+    if (notice) setMicNotice(true);
   };
 
   useEffect(() => {
@@ -491,19 +550,17 @@ function ClassScreen(props: {
         outline={props.outline} noteText={props.noteText} phase="class"
         peekStyle={props.peekStyle} onPeek={props.onPeek}
       />
+      {micNotice && (
+        <p className="error" role="status">Mic unavailable — using Type instead.</p>
+      )}
       {useVoice ? (
         <>
           <VoiceLineTaker
             packId={props.packId} partId={props.partId}
             active={voiceActive} cue="Teach your class — speak now."
             onDone={deliverClassLines}
-            onTypeInstead={() => {
-              // Transcription failed: let the learner type instead with a
-              // fresh turn, keeping the remaining time.
-              turnRef.current = new TimedTurn();
-              setStopped(false);
-              setTypedFallback(true);
-            }}
+            onTypeInstead={() => fallBackToTyping(false)}
+            onMicUnavailable={() => fallBackToTyping(true)}
           />
           {sending && (
             <>
@@ -599,6 +656,7 @@ function QuestionScreen(props: {
   const announcement = useTimerAnnouncement(left);
   const useVoice = props.mode === 'voice';
   const [typedFallback, setTypedFallback] = useState(false);
+  const [micNotice, setMicNotice] = useState(false);
   const [answerOpen, setAnswerOpen] = useState(true);
   // Voice answers never auto-record: recording (and the timer) starts on
   // the "Start answer" tap, which mounts the VoiceLineTaker below.
@@ -626,11 +684,20 @@ function QuestionScreen(props: {
   const deliverAnswerLines = (lines: Line[]) => {
     if (turnRef.current!.deliver()) props.onAnswered(lines);
   };
+  // A failed or hanging mic start falls back to typing with a fresh turn,
+  // keeping the remaining time; the notice says so (§4.4).
+  const fallBackToTyping = (notice: boolean) => {
+    turnRef.current = new TimedTurn();
+    setSubmitted(false);
+    setTypedFallback(true);
+    if (notice) setMicNotice(true);
+  };
 
   useEffect(() => {
     setElapsed(0);
     setDraft('');
     setTypedFallback(false);
+    setMicNotice(false);
     setAnswerOpen(true);
     setStarted(false);
     turnRef.current = new TimedTurn();
@@ -698,17 +765,15 @@ function QuestionScreen(props: {
             started ? (
               <>
                 <p className="lede">Your turn — speak now.</p>
+                {micNotice && (
+                  <p className="error" role="status">Mic unavailable — using Type instead.</p>
+                )}
                 <VoiceLineTaker
                   packId={props.packId} partId={props.partId}
                   active={answerOpen} cue="Answer the question — speak now."
                   onDone={deliverAnswerLines}
-                  onTypeInstead={() => {
-                    // Transcription failed: let the learner type instead
-                    // with a fresh turn, keeping the remaining time.
-                    turnRef.current = new TimedTurn();
-                    setSubmitted(false);
-                    setTypedFallback(true);
-                  }}
+                  onTypeInstead={() => fallBackToTyping(false)}
+                  onMicUnavailable={() => fallBackToTyping(true)}
                 />
                 {submitted && (
                   <>
