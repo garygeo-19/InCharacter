@@ -113,7 +113,7 @@ async function main() {
     schemaName: 'WriteSession',
     schema: sessionWriteSchema(notes.map((n) => n.id)),
     reasoningEffort: 'high',
-    maxTokens: 16000,
+    maxTokens: 32000,
     onUsage: track('write', writerModel),
   });
   console.log(`Writer drafted ${written.nodes.length} nodes.`);
@@ -234,7 +234,7 @@ async function main() {
         schemaName: 'CheckSession',
         schema: sessionCheckSchema(checkable.map((n) => n.id)),
         reasoningEffort: effort,
-        maxTokens: 16000,
+        maxTokens: 32000,
         onUsage: track('check', model),
       });
     let results: SessionCheckerResult[] = [];
@@ -249,6 +249,13 @@ async function main() {
       } else {
         throw err;
       }
+    }
+    // A checker answer that misses nodes (seen 1 Nov 2026: Wonder spent its
+    // output on reasoning and returned results: []) is retried once.
+    const missing = () => checkable.filter((n) => !results.some((r) => r.nodeId === n.id)).length;
+    if (missing() > 0) {
+      console.log(`Checker returned no verdict for ${missing()} node(s); retrying once.`);
+      ({ results } = await runCheck(checkerModel, checkerModel === 'muse-wonder-1.0' ? 'high' : 'max'));
     }
     afterCode = applySessionCheckerResults(afterCode, results, checkerModel, at);
   }

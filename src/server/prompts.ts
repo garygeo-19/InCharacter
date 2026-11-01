@@ -309,6 +309,10 @@ Local lines are Spanish only, at most 120 characters, using phrases the notes te
 Rules:
 - Every fact a reply needs must be in the notes. Write from the note text only.
 - expectedPoints: 1 to 2 short points a strong reply makes, each with the ids of the notes it comes from.
+- The game is understanding directions: a local tells the traveler the way in Spanish (turns, corners, blocks, near or far, using the notes' phrases), and the traveler replies with what they will do (in Spanish where the notes teach the words, English is understood). Routes follow the direction the traveler says they'll take: the right one leads on toward the goal; a wrong one leads to a short detour node where a different local helps kindly. The traveler may also ask "¿Está lejos o cerca?" style follow-ups where the notes teach them.
+- brief: one sentence on the traveler's situation only (where they are and where they need to go), never the directions.
+- cast: only the locals who speak. The traveler is never in the cast. Each node's speaker is a cast id. Give each local a short visual description (age, clothing) for a portrait.
+- The opening line is narration (reply false) with exactly one route. Two endings: "arrive" (reached the goal) and "arrive-late" (reached it after a detour).
 - Each reply node needs 1-3 routes and a default; each end node has no routes and reply false.
 - Be kind and respectful.`;
 

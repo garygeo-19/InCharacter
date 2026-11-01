@@ -1,0 +1,616 @@
+{
+  "schemaVersion": 1,
+  "role": "travel",
+  "packId": "spanish-travel-lodging",
+  "packVersion": "1.0.7",
+  "lessonId": "l5-travel",
+  "partId": "p14-asking-directions",
+  "builtAt": "2026-11-01",
+  "notes": [
+    {
+      "id": "fact-cuadra-vs-manzana",
+      "hash": "4969b45fe593777b3ba819e28b255ba47704479701472b202bdc1e74701be9db"
+    },
+    {
+      "id": "fact-gira-dobla-esquina",
+      "hash": "52825daa20018f7c928a77c189cd1401c2eb59e9650207a56ebcb397ccb60900"
+    },
+    {
+      "id": "fact-lejos-o-cerca",
+      "hash": "3511aee6dc31a40e5bce34132e838bf1a226c111ad7c6f199587e43dc37c2697"
+    },
+    {
+      "id": "fi-ot-directions-recto",
+      "hash": "446bc046ccd4f224f5a9e8afdf4c27bc1814b4d58b53fe5f911f8b945b4b3357"
+    },
+    {
+      "id": "fi-ot-directions-derecha",
+      "hash": "debe4fedab6f2d59ad6c4bf49d739b8c2253b81dbd3d26c8dc7c4f362ec47293"
+    },
+    {
+      "id": "pair-derecha",
+      "hash": "1ab2605dca1d9c963070cd243af176ff608f016ff4b63bbd74c41ff7805bb539"
+    },
+    {
+      "id": "pair-izquierda",
+      "hash": "5d06cf241e5c18d4c541249d2529dbea1e6ae66cf999e1a04a5cf47a9a1c1ee5"
+    },
+    {
+      "id": "pair-recto",
+      "hash": "6e4bb75e48634fb73fee0ee88146c789f0200fd1d3c5ff9b1307287e053393d9"
+    },
+    {
+      "id": "pair-cruzar",
+      "hash": "8cf60fe8801433b1ff7aa39dec831e5ee28154bc9c99a3e3ace8a3ee00e6bf3d"
+    },
+    {
+      "id": "pair-esquina",
+      "hash": "50464f11a0a29174185855a70f9f59b3fd02ef7817b82e7070ff76075ac936f8"
+    },
+    {
+      "id": "pair-cuadra",
+      "hash": "e4c8e93fc32c3724aa42bbe2a151a71d06687880c04e4f13fdea0e66430c31f2"
+    }
+  ],
+  "brief": "You're in the main plaza of a small Mexican town and ask Lucía the way to the bus station before the last bus leaves.",
+  "cast": [
+    {
+      "id": "lucia",
+      "name": "Doña Lucía",
+      "description": "Older woman in her 60s wearing a blue rebozo",
+      "voiceId": "<pick>",
+      "portrait": "art/travel/lucia.webp"
+    },
+    {
+      "id": "pablo",
+      "name": "Don Pablo",
+      "description": "Middle-aged man in his 50s wearing a straw hat and guayabera",
+      "voiceId": "<pick>",
+      "portrait": "art/travel/pablo.webp"
+    },
+    {
+      "id": "marisol",
+      "name": "Marisol",
+      "description": "Young woman in her 20s wearing a yellow market apron",
+      "voiceId": "<pick>",
+      "portrait": "art/travel/marisol.webp"
+    }
+  ],
+  "scene": "art/travel/scene.webp",
+  "start": "lucia-1",
+  "nodes": [
+    {
+      "id": "lucia-1",
+      "status": "checked",
+      "speaker": "lucia",
+      "text": "Dobla a la derecha en la esquina, está a tres cuadras.",
+      "gloss": "Turn right at the corner, it is three blocks away.",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "fact-gira-dobla-esquina",
+        "fact-cuadra-vs-manzana",
+        "pair-derecha",
+        "pair-esquina",
+        "pair-cuadra"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-derecha",
+            "pair-esquina"
+          ],
+          "text": "Say you will turn right at the corner"
+        },
+        {
+          "noteIds": [
+            "pair-cuadra",
+            "fact-cuadra-vs-manzana"
+          ],
+          "text": "Say you will go three blocks"
+        }
+      ],
+      "routes": [
+        {
+          "id": "lucia-right",
+          "next": "pablo-2",
+          "when": "traveler says they will turn right at the corner"
+        },
+        {
+          "id": "lucia-left",
+          "next": "detour-plaza",
+          "when": "traveler says they will turn left"
+        }
+      ],
+      "default": "lucia-perdon",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Turning right at the corner and going three blocks are supported by the derecha, esquina, cuadra, and tres-cuadras notes cited."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "The Spanish direction sounds natural spoken aloud and is within the 120-character travel limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The correct route follows the turn-right expected point, and turning left is a plausible learner mistake."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The exchange is respectful directions practice with no prohibited topic or book quotation."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "lucia-perdon",
+      "status": "checked",
+      "speaker": "lucia",
+      "text": "¿Perdón? Gira a la derecha en la esquina.",
+      "gloss": "Sorry? Turn right at the corner.",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "fact-gira-dobla-esquina",
+        "pair-derecha",
+        "pair-esquina",
+        "fi-ot-directions-derecha"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-derecha",
+            "pair-esquina"
+          ],
+          "text": "Say you will turn right at the corner"
+        }
+      ],
+      "routes": [
+        {
+          "id": "lucia-perdon-right",
+          "next": "pablo-2",
+          "when": "traveler says they will turn right"
+        }
+      ],
+      "default": "pablo-2",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Turning right at the corner is supported by the cited derecha and esquina notes and the node's turn-direction notes."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "The brief correction and repeated direction sound natural spoken aloud and are within 120 characters."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The route follows directly from the expected turn-right reply."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The correction is respectful and contains no prohibited topic or book quotation."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "pablo-2",
+      "status": "checked",
+      "speaker": "pablo",
+      "text": "Todo derecho dos cuadras, luego a la izquierda.",
+      "gloss": "Straight ahead two blocks, then to the left.",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "fact-lejos-o-cerca",
+        "pair-recto",
+        "pair-cuadra",
+        "pair-izquierda"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-lejos-o-cerca",
+            "pair-recto",
+            "pair-cuadra"
+          ],
+          "text": "Understands todo derecho dos cuadras: go straight ahead two blocks."
+        },
+        {
+          "noteIds": [
+            "pair-izquierda"
+          ],
+          "text": "Understands luego a la izquierda: then turn left."
+        }
+      ],
+      "routes": [
+        {
+          "id": "pablo-straight-left",
+          "when": "says they'll go straight two blocks and then turn left",
+          "next": "marisol-3"
+        },
+        {
+          "id": "pablo-wrong",
+          "when": "says they'll turn right or go another wrong way",
+          "next": "detour-plaza"
+        }
+      ],
+      "default": "pablo-perdon",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Going straight ahead and asking whether it is lejos o cerca are both supported by the notes cited for those points."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "The Spanish direction sounds natural spoken aloud and is within the 120-character travel limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: the routes now match both parts of Pablo's directions, and an unclear reply gets Pablo's own repeat."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The exchange is respectful directions practice with no prohibited topic or book quotation."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "pablo-perdon",
+      "status": "checked",
+      "speaker": "pablo",
+      "text": "¿Perdón? Todo derecho dos cuadras, y luego a la izquierda.",
+      "gloss": "Sorry? Straight ahead two blocks, and then to the left.",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "fact-lejos-o-cerca",
+        "pair-recto",
+        "pair-cuadra",
+        "pair-izquierda"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-lejos-o-cerca",
+            "pair-recto",
+            "pair-cuadra"
+          ],
+          "text": "Understands todo derecho dos cuadras: go straight ahead two blocks."
+        },
+        {
+          "noteIds": [
+            "pair-izquierda"
+          ],
+          "text": "Understands luego a la izquierda: then turn left."
+        }
+      ],
+      "routes": [
+        {
+          "id": "pablo-perdon-on",
+          "when": "any reply",
+          "next": "marisol-3"
+        }
+      ],
+      "default": "marisol-3",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: added by the reviewer as this local's simpler repeat, using the same phrases as the original line."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: added by the reviewer as this local's simpler repeat, using the same phrases as the original line."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: added by the reviewer as this local's simpler repeat, using the same phrases as the original line."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: added by the reviewer as this local's simpler repeat, using the same phrases as the original line."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "marisol-3",
+      "status": "checked",
+      "speaker": "marisol",
+      "text": "Está cerca, dobla a la derecha en la esquina.",
+      "gloss": "It is near, turn right at the corner.",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "fact-lejos-o-cerca",
+        "fact-gira-dobla-esquina",
+        "pair-derecha",
+        "pair-esquina"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-derecha",
+            "pair-esquina"
+          ],
+          "text": "Say you will turn right at the corner"
+        },
+        {
+          "noteIds": [
+            "fact-lejos-o-cerca"
+          ],
+          "text": "Confirm it is near"
+        }
+      ],
+      "routes": [
+        {
+          "id": "marisol-right",
+          "next": "arrive",
+          "when": "traveler says they will turn right at the corner"
+        },
+        {
+          "id": "marisol-wrong",
+          "next": "detour-plaza",
+          "when": "traveler says they will go left or straight"
+        }
+      ],
+      "default": "marisol-perdon",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Turning right at the corner and confirming cerca as near are supported by the cited direction and lejos-o-cerca notes."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "The Spanish line sounds natural spoken aloud and is within the 120-character travel limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The correct route follows the turn-right expected point, and going left or straight is a plausible learner mistake."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The exchange is respectful and contains no prohibited topic or book quotation."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "marisol-perdon",
+      "status": "checked",
+      "speaker": "marisol",
+      "text": "¿Perdón? A la derecha en la esquina. Está cerca.",
+      "gloss": "Sorry? To the right at the corner. It is near.",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "fact-lejos-o-cerca",
+        "fact-gira-dobla-esquina",
+        "pair-derecha",
+        "pair-esquina"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-derecha",
+            "pair-esquina"
+          ],
+          "text": "Say you will turn right at the corner"
+        },
+        {
+          "noteIds": [
+            "fact-lejos-o-cerca"
+          ],
+          "text": "Confirm it is near"
+        }
+      ],
+      "routes": [
+        {
+          "id": "marisol-perdon-on",
+          "when": "any reply",
+          "next": "arrive"
+        }
+      ],
+      "default": "arrive",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: added by the reviewer as this local's simpler repeat, using the same phrases as the original line."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: added by the reviewer as this local's simpler repeat, using the same phrases as the original line."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: added by the reviewer as this local's simpler repeat, using the same phrases as the original line."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: added by the reviewer as this local's simpler repeat, using the same phrases as the original line."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "detour-plaza",
+      "status": "checked",
+      "speaker": "pablo",
+      "text": "Está cerca, todo derecho una cuadra.",
+      "gloss": "It is near, straight ahead one block.",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "fact-lejos-o-cerca",
+        "fi-ot-directions-recto",
+        "pair-recto",
+        "pair-cuadra"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "pair-recto",
+            "pair-cuadra"
+          ],
+          "text": "Say you will go straight one block"
+        }
+      ],
+      "routes": [
+        {
+          "id": "detour-go",
+          "next": "arrive-late",
+          "when": "traveler says they will go straight"
+        }
+      ],
+      "default": "arrive-late",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Going straight for one block is supported by the cited todo derecho and cuadra notes."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "The Spanish direction sounds natural spoken aloud and is within the 120-character travel limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The route follows directly from the expected straight-ahead reply."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The exchange is respectful and contains no prohibited topic or book quotation."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "arrive",
+      "status": "checked",
+      "speaker": "marisol",
+      "text": "¡Aquí está la estación, buen viaje!",
+      "gloss": "Here is the station, have a good trip!",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [],
+      "expectedPoints": [],
+      "routes": [],
+      "default": null,
+      "end": true,
+      "reply": false,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "There are no expected points, so no unsupported learner point or citation is introduced."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "The arrival line sounds natural spoken aloud and is within the 120-character travel limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "This terminal node has no routes that could require an unsupported or implausible reply."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The closing line is respectful and contains no prohibited topic or book quotation."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "arrive-late",
+      "status": "checked",
+      "speaker": "pablo",
+      "text": "¡Aquí está la estación, qué bueno que llegó!",
+      "gloss": "Here is the station, so glad you arrived!",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [],
+      "expectedPoints": [],
+      "routes": [],
+      "default": null,
+      "end": true,
+      "reply": false,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "There are no expected points, so no unsupported learner point or citation is introduced."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "The arrival line sounds natural spoken aloud and is within the 120-character travel limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "This terminal node has no routes that could require an unsupported or implausible reply."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The closing line is respectful and contains no prohibited topic or book quotation."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    }
+  ]
+}

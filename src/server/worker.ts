@@ -15,6 +15,7 @@ import p10 from '../../content/banks/spanish-food-shopping/p10-at-the-restaurant
 import p11 from '../../content/banks/spanish-food-shopping/p11-common-foods.json';
 import p12 from '../../content/banks/spanish-food-shopping/p12-drinks-sweets.json';
 import ahP8 from '../../content/sessions/atomic-habits/part-8.json';
+import stlP14 from '../../content/sessions/spanish-travel-lodging/p14-asking-directions.json';
 
 setBankFiles({
   'spanish-food-shopping/p10-at-the-restaurant': p10,
@@ -25,6 +26,7 @@ setBankFiles({
 // Register each content/sessions/{packId}/{partId}.json here on deploy.
 setSessionFiles({
   'atomic-habits/part-8': ahP8,
+  'spanish-travel-lodging/p14-asking-directions': stlP14,
 });
 
 type Env = {

@@ -195,6 +195,8 @@ export function Session(props: {
             key={phase.nodeId}
             node={node}
             speaker={speakerName(session, node.speaker)}
+            portrait={session.cast.find((c) => c.id === node.speaker)?.portrait ?? ''}
+            speakerDescription={session.cast.find((c) => c.id === node.speaker)?.description ?? ''}
             mode={props.settings.mode}
             soundOn={props.settings.sound}
             packId={props.packId}
@@ -370,9 +372,32 @@ function SessionBriefing(props: {
   );
 }
 
+// The English meaning of a Spanish line (travel) is hidden: understanding
+// the Spanish is the game. "Show English" reveals it and counts as a peek
+// (§5, §8.4), like peeking at a note.
+function GlossPeek({ gloss, noteId, onPeek }: { gloss: string; noteId: string; onPeek: (peek: Peek) => void }) {
+  const [shown, setShown] = useState(false);
+  if (shown) return <p className="fine">{gloss}</p>;
+  return (
+    <button
+      type="button"
+      className="secondary"
+      onClick={() => {
+        const now = Date.now();
+        onPeek({ noteId, phase: 'session', startedAt: now, endedAt: now, ms: 0 });
+        setShown(true);
+      }}
+    >
+      Show English (counts as a peek)
+    </button>
+  );
+}
+
 function TurnScreen(props: {
   node: SessionNodeDisplay;
   speaker: string;
+  portrait: string;
+  speakerDescription: string;
   mode: Settings['mode'];
   soundOn: boolean;
   packId: string;
@@ -482,11 +507,11 @@ function TurnScreen(props: {
     <>
       <SceneImg scene={node.scene} label={`${props.speaker}'s scene`} />
       <div className="question">
-        <span className="portrait" aria-hidden>{props.speaker[0]}</span>
+        <SessionPortrait portrait={props.portrait} name={props.speaker} description={props.speakerDescription} />
         <div className="bubble">
           <p className="asker">{props.speaker}</p>
           <p>{node.text}</p>
-          {node.gloss && <p className="fine">{node.gloss}</p>}
+          {node.gloss && <GlossPeek gloss={node.gloss} noteId={node.noteIds[0] ?? node.id} onPeek={props.onPeek} />}
           {audioWanted === 'audio' && audioUrl && (
             <>
               <QuestionAudioSlot src={audioUrl} />
