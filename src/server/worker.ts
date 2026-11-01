@@ -14,6 +14,7 @@ import { setBankFiles, setSessionFiles } from './content';
 import p10 from '../../content/banks/spanish-food-shopping/p10-at-the-restaurant.json';
 import p11 from '../../content/banks/spanish-food-shopping/p11-common-foods.json';
 import p12 from '../../content/banks/spanish-food-shopping/p12-drinks-sweets.json';
+import ahP8 from '../../content/sessions/atomic-habits/part-8.json';
 
 setBankFiles({
   'spanish-food-shopping/p10-at-the-restaurant': p10,
@@ -21,9 +22,10 @@ setBankFiles({
   'spanish-food-shopping/p12-drinks-sweets': p12,
 });
 
-// No approved sessions ship yet (the reviewer runs session:build live);
-// register each new content/sessions/{packId}/{partId}.json here on deploy.
-setSessionFiles({});
+// Register each content/sessions/{packId}/{partId}.json here on deploy.
+setSessionFiles({
+  'atomic-habits/part-8': ahP8,
+});
 
 type Env = {
   MODEL_API_KEY: string;

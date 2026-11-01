@@ -80,7 +80,19 @@ export function totalScore(lesson: number, questions: number, penalty: number): 
 
 /** Celebration headline for a result, from the stars (§8.6). Warm for a
  *  strong class, encouraging for a weak one, never mocking. */
-export function headlineFor(stars: number): string {
+export function headlineFor(stars: number, role: 'teach' | 'coach' | 'travel' = 'teach'): string {
+  if (role === 'coach') {
+    if (stars >= 3) return 'Great session — Alex is on track!';
+    if (stars === 2) return 'Good session — Alex has a plan.';
+    if (stars === 1) return "Good effort — here's what to try next session.";
+    return "Good start. Here's what to try next session.";
+  }
+  if (role === 'travel') {
+    if (stars >= 3) return '¡Llegaste! You found your way.';
+    if (stars === 2) return 'You made it — nice Spanish!';
+    if (stars === 1) return "Good effort — here's what to practice next time.";
+    return "Good start. Here's what to practice next time.";
+  }
   if (stars >= 3) return 'Congratulations, class dismissed!';
   if (stars === 2) return 'Great class — congratulations!';
   if (stars === 1) return "Good effort — here's what to teach next time.";

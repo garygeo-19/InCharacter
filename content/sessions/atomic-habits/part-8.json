@@ -1,0 +1,563 @@
+{
+  "schemaVersion": 1,
+  "role": "coach",
+  "packId": "atomic-habits",
+  "packVersion": "1.0.15",
+  "lessonId": "lesson-4",
+  "partId": "part-8",
+  "builtAt": "2026-11-01",
+  "notes": [
+    {
+      "id": "ah-p8-f1",
+      "hash": "9460bda28b20ddfe8c980f99a7ffefc5565934e6f0f801caa594a7dd2624f190"
+    },
+    {
+      "id": "ah-p8-f2",
+      "hash": "16790c69cf9ef0df79443cd5c5fcd849a85775a132ad5236d1c197892a516039"
+    },
+    {
+      "id": "ah-p8-f3",
+      "hash": "c162bf6ede466f8145f8ba855a1dac903f74df833d2aec44ba21debe6017b0fc"
+    },
+    {
+      "id": "ah-p8-f4",
+      "hash": "45cf4e0041530f30d8199eb6f6a69e42b13f9e211d811cbf3b7c0c1e769b4ded"
+    },
+    {
+      "id": "ah-p8-d1",
+      "hash": "542a5acb0c40b18a1705be28bf21c84e10a9d40de41c1eeff037f60e6ae994c0"
+    },
+    {
+      "id": "ah-p8-d2",
+      "hash": "c484fe8eed7e3a5b29a7e07712a648ccc29fbbf55fc950b82cd8bce37e810565"
+    },
+    {
+      "id": "ah-p8-p1",
+      "hash": "741f759f07a2737ab54a630c737071a10a6f180eb48c7b3d2c060c759a5b5167"
+    },
+    {
+      "id": "ah-p8-p2",
+      "hash": "e11be314b2f10b3fd491a94e17e6d59c2ecc25d84d268a8e10242305d7a55740"
+    },
+    {
+      "id": "ah-p8-p3",
+      "hash": "f800287df04fe370edb5587814d5dff465797b5811b1ccf76e1769836acc5c9a"
+    }
+  ],
+  "brief": "Alex wants to read before bed but ends up on the couch with the phone.",
+  "cast": [
+    {
+      "id": "alex",
+      "name": "Alex",
+      "description": "a woman in her late twenties, shoulder-length dark brown hair, olive green hoodie, friendly but tired smile",
+      "voiceId": "<pick>",
+      "portrait": "art/coach/alex.webp"
+    }
+  ],
+  "scene": "art/coach/scene.webp",
+  "start": "open",
+  "nodes": [
+    {
+      "id": "open",
+      "status": "checked",
+      "speaker": "alex",
+      "text": "I get home, drop my bag, and sink onto the couch with my phone while my book sits untouched.",
+      "gloss": null,
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [],
+      "expectedPoints": [],
+      "routes": [
+        {
+          "id": "r-open",
+          "next": "s1",
+          "when": "begin coaching"
+        }
+      ],
+      "default": null,
+      "end": false,
+      "reply": false,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:03:52.062Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "This node has no expected points, so there is nothing in its reply requirements that needs support from the notes."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Alex speaks in the first person in a natural, conversational line that is within the 200-character coach limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The single route is a session-start navigation route rather than an applied learner response, so it is plausible and does not need to follow an expected point."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The line is respectful and contains no forbidden topic or quotation from the book."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "s1",
+      "status": "checked",
+      "speaker": "alex",
+      "text": "I want to read before bed, but I picture thirty minutes and skip it. Where should I even start?",
+      "gloss": null,
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "ah-p8-f1"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "ah-p8-f1"
+          ],
+          "text": "Shrink to less than two minutes, like read one page."
+        },
+        {
+          "noteIds": [
+            "ah-p8-f1"
+          ],
+          "text": "Train showing up first, not the full routine yet."
+        }
+      ],
+      "routes": [
+        {
+          "id": "r-s1-applied",
+          "next": "s2",
+          "when": "shrinks to under two minutes like one page to train showing up"
+        },
+        {
+          "id": "r-s1-missed",
+          "next": "p1",
+          "when": "pushes full thirty minutes or stays vague about starting"
+        }
+      ],
+      "default": "p1",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:03:52.062Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Shrinking \"read before bed\" to one page and training showing up rather than the routine are both stated in ah-p8-f1."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Alex asks naturally in the first person within the 200-character coach limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The applied route follows directly from the under-two-minute expected point, and pushing thirty minutes or staying vague is a plausible missed reply."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The coaching exchange is respectful, stays on a reading habit, and contains no forbidden topic or book quotation."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "p1",
+      "status": "checked",
+      "speaker": "alex",
+      "text": "That feels too tiny to count. Shouldn't I just push myself to do thirty minutes properly?",
+      "gloss": null,
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "ah-p8-f1"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "ah-p8-f1"
+          ],
+          "text": "Hold the under-two-minute start as training showing up."
+        }
+      ],
+      "routes": [
+        {
+          "id": "r-p1-good",
+          "next": "s2",
+          "when": "holds tiny start and frames showing up as the win"
+        },
+        {
+          "id": "r-p1-pass",
+          "next": "s2",
+          "when": "agrees to big plan or stays vague"
+        }
+      ],
+      "default": "s2",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:03:52.062Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Holding the under-two-minute start as training in showing up is exactly what ah-p8-f1 states."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Alex's pushback sounds natural in the first person and is within the 200-character coach limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The good route follows from the showing-up expected point, while agreeing to the big plan or staying vague is a plausible alternative learner reply."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The node is respectful, has no forbidden topic, and does not quote the book."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "s2",
+      "status": "checked",
+      "speaker": "alex",
+      "text": "Okay, tiny makes sense. But my evenings blur — I walk in, phone in hand, couch calls. What should I do?",
+      "gloss": null,
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "ah-p8-f2",
+        "ah-p8-p1",
+        "ah-p8-f4",
+        "ah-p8-d2"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "ah-p8-f2",
+            "ah-p8-p1"
+          ],
+          "text": "Pick a two-minute entry that leads into the bigger routine."
+        },
+        {
+          "noteIds": [
+            "ah-p8-f4",
+            "ah-p8-d2"
+          ],
+          "text": "Aim it at the fork when you walk in from work."
+        }
+      ],
+      "routes": [
+        {
+          "id": "r-s2-applied",
+          "next": "s3",
+          "when": "picks opener that leads into reading and aims it at walking in from work"
+        },
+        {
+          "id": "r-s2-missed",
+          "next": "p2",
+          "when": "suggests any easy task without linking it forward"
+        }
+      ],
+      "default": "p2",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:03:52.062Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "A two-minute entry leading into a bigger routine is supported by ah-p8-f2 and ah-p8-p1, and aiming it at walking in from work is supported by ah-p8-f4 and ah-p8-d2."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Alex describes the evening naturally in the first person within the 200-character coach limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The applied route combines the gateway and walk-in-fork expected points, and suggesting any easy task without a forward link is a plausible missed reply."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The node is respectful, contains no forbidden topic, and does not quote the book."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "p2",
+      "status": "checked",
+      "speaker": "alex",
+      "text": "I already change into comfy clothes and scroll a bit to unwind. Isn't any little start the same?",
+      "gloss": null,
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "ah-p8-f2"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "ah-p8-f2"
+          ],
+          "text": "A small start should be the opening move of what Alex actually wants to do, not merely something easy."
+        }
+      ],
+      "routes": [
+        {
+          "id": "r-p2-good",
+          "next": "s3",
+          "when": "explains the small start must lead into reading, not just be easy"
+        },
+        {
+          "id": "r-p2-pass",
+          "next": "s3",
+          "when": "agrees that any small, easy start is fine"
+        }
+      ],
+      "default": "s3",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:03:52.062Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: the point now restates ah-p8-f2 ('not merely easy, it is the opening move of the thing you actually want to be doing')."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Alex's question sounds natural in the first person and is within the 200-character coach limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "Reviewer fix 1 Nov 2026: the routes now answer Alex's question about direction (any small start vs one that leads into reading)."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The node is respectful, contains no forbidden topic, and does not quote the book."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "s3",
+      "status": "checked",
+      "speaker": "alex",
+      "text": "I've read one page a few nights. Part of me wants longer chapters now. Should I grow it yet?",
+      "gloss": null,
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "ah-p8-f3",
+        "ah-p8-d1"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "ah-p8-f3"
+          ],
+          "text": "Establish the tiny habit before trying to improve it."
+        },
+        {
+          "noteIds": [
+            "ah-p8-f3",
+            "ah-p8-d1"
+          ],
+          "text": "Master one small phase until it runs itself, then advance."
+        }
+      ],
+      "routes": [
+        {
+          "id": "r-s3-applied",
+          "next": "close-good",
+          "when": "keeps tiny version steady and masters one phase before advancing"
+        },
+        {
+          "id": "r-s3-missed",
+          "next": "p3",
+          "when": "jumps to full routine before showing up is reliable"
+        }
+      ],
+      "default": "p3",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:03:52.062Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Establishing before improving and mastering one small phase until it runs itself before advancing are stated in ah-p8-f3, with habit shaping defined in ah-p8-d1."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Alex asks naturally in the first person within the 200-character coach limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The applied route follows from the establish-before-improving expected points, and jumping to the full routine early is a plausible missed reply."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The node is respectful, contains no forbidden topic, and does not quote the book."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "p3",
+      "status": "checked",
+      "speaker": "alex",
+      "text": "If the tiny bit works, why not do the full routine now? I don't want to waste time going slow.",
+      "gloss": null,
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "ah-p8-f3"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "ah-p8-f3"
+          ],
+          "text": "Note there is nothing to improve until showing up is reliable."
+        }
+      ],
+      "routes": [
+        {
+          "id": "r-p3-good",
+          "next": "close-unsure",
+          "when": "restates steady first then grow once it runs itself"
+        },
+        {
+          "id": "r-p3-pass",
+          "next": "close-unsure",
+          "when": "agrees to scale up now or stays vague"
+        }
+      ],
+      "default": "close-unsure",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:03:52.062Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Ah-p8-f3 states that if you cannot reliably show up there is nothing yet to make better, which supports the expected point."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Alex's pushback sounds natural in the first person and is within the 200-character coach limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "The good route restates the steady-before-growing expected point, while agreeing to scale up now or staying vague is a plausible learner reply."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The node is respectful, contains no forbidden topic, and does not quote the book."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "close-good",
+      "status": "checked",
+      "speaker": "alex",
+      "text": "One page by the bed at the same time feels doable. I'll keep it steady and let it grow when it's easy.",
+      "gloss": null,
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [],
+      "expectedPoints": [],
+      "routes": [],
+      "default": null,
+      "end": true,
+      "reply": false,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:03:52.062Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "This closing node has no expected points, so no reply requirement needs additional support from the notes."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Alex closes naturally in the first person within the 200-character coach limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "This is a terminal node with no learner routes to assess."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The closing line is respectful, contains no forbidden topic, and does not quote the book."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "close-unsure",
+      "status": "checked",
+      "speaker": "alex",
+      "text": "I'm still unsure tiny is enough, but I'll think about my evenings and what small bit I could try.",
+      "gloss": null,
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [],
+      "expectedPoints": [],
+      "routes": [],
+      "default": null,
+      "end": true,
+      "reply": false,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:03:52.062Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "This closing node has no expected points, so no reply requirement needs additional support from the notes."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Alex closes naturally in the first person within the 200-character coach limit."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "This is a terminal node with no learner routes to assess."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "The closing line is respectful, contains no forbidden topic, and does not quote the book."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    }
+  ]
+}

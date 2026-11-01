@@ -628,7 +628,7 @@ function SessionDebrief(props: {
     }
   }, [score]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const headline = headlineFor(score.stars);
+  const headline = headlineFor(score.stars, props.session.role);
 
   return (
     <>
@@ -684,15 +684,6 @@ function SessionDebrief(props: {
             </div>
           );
         })}
-      </section>
-
-      <section aria-label="How the conversation went">
-        <h2>How the conversation went</h2>
-        <p>
-          {props.routePath.length > 0
-            ? `The path you took: ${props.routePath.join(' → ')}.`
-            : 'The conversation ran straight through.'}
-        </p>
       </section>
 
       <section aria-label="Peeks">

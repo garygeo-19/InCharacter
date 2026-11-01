@@ -118,12 +118,35 @@ async function main() {
   });
   console.log(`Writer drafted ${written.nodes.length} nodes.`);
 
-  let drafts: SessionNode[] = written.nodes.map((n) => ({
+  // Normalize the writer's output before the code checks (owner review,
+  // 1 Nov 2026): speakers may come back as cast names ("Alex") rather than
+  // ids; narration nodes may use `default` instead of their single route;
+  // end nodes carry no routes; the cast keeps only characters who speak
+  // (never the learner); the scene is always the role's picture path.
+  const castKey = (s: string) => s.trim().toLowerCase();
+  const speakerId = new Map<string, string>();
+  for (const c of written.cast) {
+    speakerId.set(castKey(c.id), c.id);
+    speakerId.set(castKey(c.name), c.id);
+  }
+  const normalized = written.nodes.map((n) => {
+    const speaker = speakerId.get(castKey(n.speaker)) ?? n.speaker;
+    if (n.end) return { ...n, speaker, reply: false, routes: [], default: null };
+    if (!n.reply && n.routes.length === 0 && n.default) {
+      return { ...n, speaker, routes: [{ id: 'next', when: 'Always', next: n.default }], default: null };
+    }
+    if (!n.reply && n.routes.length === 1) return { ...n, speaker, default: null };
+    return { ...n, speaker };
+  });
+  const speakers = new Set(normalized.map((n) => n.speaker));
+  written.cast = written.cast.filter((c) => speakers.has(c.id));
+
+  let drafts: SessionNode[] = normalized.map((n) => ({
     id: n.id,
     status: 'draft' as const,
     speaker: n.speaker,
     text: n.text,
-    gloss: n.gloss,
+    gloss: role === 'travel' ? n.gloss : null,
     scene: null,
     ttsText: null,
     noteIds: n.noteIds,
@@ -151,7 +174,7 @@ async function main() {
       id: c.id, name: c.name, description: c.description,
       voiceId: '<pick>', portrait: `art/${role}/${c.id}.webp`,
     })),
-    scene: written.scene || `art/${role}/scene.webp`,
+    scene: `art/${role}/scene.webp`,
     start: written.start,
     nodes: drafts,
   };

@@ -1421,6 +1421,10 @@ Rules:
 - expectedPoints: 1 to 2 short points a strong reply makes, each with the ids of the notes it comes from. Use the notes' wording where you can.
 - Each reply node needs 1-3 routes and a default; each end node has no routes and reply false.
 - Never medical, mental-health, diet or weight, substance, money or relationship topics. No quotes of the book; Alex doesn't name the author.
+- Alex is a real person, not a student of the book: Alex never uses the notes' terms ("gateway habit", "decisive moment", "fork", "standardize") unless the coach said them first, and talks about everyday life (evenings, work, the couch, the phone).
+- brief: one sentence on Alex's situation only, never the solution or the lesson's terms (good: "Alex wants to read before bed but hasn't opened a book in weeks.").
+- cast: only the characters who speak (Alex). The learner is never in the cast. Each node's speaker is a cast id.
+- The opening line is narration (reply false) with exactly one route to the first stage.
 - Be kind and respectful.
 ```
 
