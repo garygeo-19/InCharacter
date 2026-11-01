@@ -1158,6 +1158,110 @@ All dates are in 2026. Submission is due Wed 4 Nov at 9 PM ET (7 PM Arizona).
 
 ---
 
+## 16. Roles: the Coach and the Traveler (added 1 Nov 2026)
+
+The classroom is the first **role**. Two more show that the harness works for different kinds of knowledge:
+**Coach a client** (Atomic Habits) and **Find your way** (Spanish: Travel & Lodging). They share one engine, the
+**session**: a small script of checked lines, where Muse Spark acts as the game master and chooses which checked line
+comes next from what the learner said. As in the classroom, nothing a character says is generated live, and every
+line is grounded in the part's notes.
+
+### 16.1 Roles on the pack screen
+- `content/roles.json` lists the roles: `teach` (the existing classroom), `coach` and `travel`, each with a tile
+  title and subtitle:
+  - `teach`: "Teach a class" — "You teach. Four students listen. Three ask questions."
+  - `coach`: "Coach a client" — "Alex wants a habit to stick. You coach, using the lesson."
+  - `travel`: "Find your way" — "You're in a Mexican town. Ask the locals, in Spanish."
+- A pack shows a `coach` or `travel` tile when it has at least one usable session of that role
+  (`content/sessions/{packId}/{partId}.json`, status rules as for banks, §7.6 and USABLE_STATUSES). It replaces that
+  pack's "coming soon" tile. The tile opens the part list (§4.3) filtered to parts with a usable session of that role.
+- History, "Keep teaching" and the best score keep working per part and per role.
+
+### 16.2 The session file: `content/sessions/{packId}/{partId}.json`
+```jsonc
+{
+  "role": "coach",                       // or "travel"
+  "packId": "atomic-habits", "partId": "part-8", "builtAt": "2026-11-01",
+  "notes": [{ "id": "ah-p8-f1", "hash": "…" }],        // as in banks: stale when a note changes (§7.6)
+  "brief": "Alex wants to read more and run, but the plans never stick.",   // shown on the briefing
+  "cast": [{ "id": "alex", "name": "Alex", "description": "…", "voiceId": "…", "portrait": "art/coach/alex.webp" }],
+  "scene": "art/coach/office.webp",      // travel: each node may set its own "scene"
+  "start": "open",
+  "nodes": [
+    {
+      "id": "open", "speaker": "alex",
+      "text": "…",                       // what the character says (caption); travel: Spanish
+      "gloss": null,                     // travel only: the English meaning, shown under the caption
+      "ttsText": null, "audio": null,    // as in banks (§9.7)
+      "reply": true,                     // false for narration-only or ending nodes
+      "noteIds": ["ah-p8-f1"],
+      "expectedPoints": [{ "text": "Shrinks the habit to a two-minute version", "noteIds": ["ah-p8-f1"] }],
+      "routes": [
+        { "id": "applied", "when": "The coach shrinks the habit to something under two minutes", "next": "obstacle" },
+        { "id": "missed",  "when": "Anything else", "next": "open-push" }
+      ],
+      "default": "open-push",            // used when the reply is unclear or the model fails
+      "end": false,
+      "status": "draft", "check": null, "review": null
+    }
+  ]
+}
+```
+- **Graph rules (code-checked):** every `next` and `default` names a node; `start` exists; every node is reachable;
+  every path ends at an `end` node within 8 learner replies; a reply node has 1–3 routes and a `default`; an `end` node
+  has no routes and `reply: false`.
+- Nodes carry the same `status`, `check`, `review` and `audio` fields as bank questions, and the same scripts work on
+  them: `session:build`, `session:review`, `session:approve`, `session:audio` (multi-speaker: each node's voice comes from
+  its speaker in `cast`). A session is usable only when every node is usable.
+
+### 16.3 Running a session (both roles)
+- **Briefing:** the notes and outline as in §4.4, plus the role's intro ("Your client: Alex — {brief}" or "You're
+  in {town}. {brief}"), the cast portraits, the mode choice and Start. Start unlocks audio (§4.4).
+- **Turns:** the current node's line plays from its audio with the caption (and the gloss in travel), a Replay button,
+  and the speaker's portrait. If `reply`, the learner answers as in §4.6 (Voice 1:00, auto-start after the audio with
+  "Your turn", live captions when on; Type 2:00). Peeking works as in §5.
+- **Game master:** after each reply, show "{name} is thinking…" and POST `/api/turn`
+  `{ packId, partId, nodeId, lines }`. The server calls `muse-spark-1.3` (low reasoning, 8 s timeout, prompt in A.7)
+  with the node's text, its notes' texts, the routes (`id`, `when`) and the reply lines. Output:
+  `{ route: <route id> | "unclear" }` (an enum of the node's route ids plus "unclear"). Code maps "unclear", a timeout
+  or an invalid answer to `default`. Returns `{ next, route, source: "model" | "fallback" }`. A node already visited
+  in this session follows `default` (no loops).
+- **End:** an `end` node plays, then grading.
+- **Grading:** one call when the session ends, the answers grader (§9.4, A.3) with each reply node as a "question"
+  (its text, expected points, notes) and the reply as its answer; the evidence rules (§8.5) apply.
+- **Score (out of 100):** the expected-point verdicts of the reply nodes visited, scored as §8.2 but scaled to 100, then
+  peeks (§8.4). Stars as §8.6. Debrief: one row per visited reply node: the line (and gloss), your reply, the verdict
+  per expected point with your quote, and "A strong reply…" listing the points; then the path taken (route ids, e.g.
+  "Alex took the advice" / "Alex pushed back").
+
+### 16.4 The Coach (`coach`)
+- **Content:** Atomic Habits parts with practical notes; first `part-8` (The Two-Minute Rule and Commitment Devices),
+  then `part-4` (Habit Stacking and Environment Design).
+- **Alex:** one adult client, voiced and drawn (Muse Image: a portrait and a calm coaching room). Alex wants an everyday
+  habit to stick (reading, running, practicing guitar, tidying) and is friendly but realistic.
+- **Shape:** an opening, then three stages (for example: the goal is too big; a busy week broke the streak; making it
+  last), each a reply node with an `applied` route to the next stage and a `missed` route to one pushback node (Alex
+  resists or asks for something concrete), whose routes both lead on. Two endings: `close-good` when the last stage was
+  applied, `close-unsure` otherwise. About 9 nodes.
+- **Writer rules (A.8):** Alex speaks in the first person, naturally, at most 200 characters per line. Each reply node
+  has 1–2 expected points, each grounded in one of the part's notes, and its `applied` route describes a reply that uses
+  one of them. Never medical, mental-health, diet or weight, substance, money or relationship topics. No quotes of the
+  book; Alex doesn't name the author.
+
+### 16.5 The Traveler (`travel`)
+- **Content:** Spanish: Travel & Lodging, the "asking the way" part (and its neighbors if they fit).
+- **Shape:** a choose-your-path walk through a small Mexican town toward a goal (for example the bus station before
+  the last bus). Locals (2–4, voiced in Spanish, Latin American) speak in Spanish using the notes' phrases; the
+  learner replies in Spanish (voice or type). Some nodes offer real choices ("¿Al museo o a la estación?"), with one
+  route per choice plus an "unclear" default where the local says "¿Perdón?" and repeats more simply. 6–10 nodes, 2–3
+  routes to the goal, each node with its own scene picture (Muse Image).
+- **Writer rules (A.9):** local lines at most 120 characters, Spanish only, using phrases the notes teach; `gloss` is
+  the English meaning. Expected points name the Spanish the learner should use (from the notes). Routes describe what
+  the learner asked or chose, in plain English.
+- **Voice in:** language bias Spanish + English, keywords from the notes, as now.
+
+---
+
 ## Appendix A. Prompts (drafts)
 
 Send each prompt as the system message. The user message is the JSON input described in §9. Keep the wording; adjust it
