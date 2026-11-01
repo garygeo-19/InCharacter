@@ -180,6 +180,13 @@ function App() {
               />
               Sound on
             </label>
+            <label className="check">
+              <input
+                type="checkbox" checked={settings.liveCaptions}
+                onChange={(e) => updateSettings({ ...settings, liveCaptions: e.target.checked })}
+              />
+              Live captions
+            </label>
             <button
               type="button" className="secondary"
               onClick={() => { clearHistory(); setHistory([]); }}

@@ -105,6 +105,22 @@ type ChunkLine = {
 };
 
 /**
+ * The leading run of chunks whose transcription has returned: chunk 0, 1,
+ * … up to (not including) the first chunk still pending (null/undefined).
+ * A later chunk that returns first waits here until the earlier ones are
+ * shown. Used for live captions; the final transcript still joins every
+ * chunk once all succeed.
+ */
+export function visibleChunkPrefix<T extends ChunkLine>(results: (T[] | null | undefined)[]): T[][] {
+  const out: T[][] = [];
+  for (const r of results) {
+    if (r == null) break;
+    out.push(r);
+  }
+  return out;
+}
+
+/**
  * Join per-chunk transcript lines in chunk order (chunks may finish out
  * of order; the caller awaits them into index order first). Lines are
  * renumbered from 1. Chunk-relative startMs/endMs are kept as-is.

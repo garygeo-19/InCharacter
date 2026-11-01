@@ -7,7 +7,7 @@ import {
   type CountdownState,
 } from '../shared/countdown';
 import { friendlyErrorMessage } from '../shared/errors';
-import { joinChunkLines } from '../shared/chunks';
+import { joinChunkLines, visibleChunkPrefix } from '../shared/chunks';
 import { splitTextToLines } from '../shared/lines';
 import {
   QUESTION_CAPTION_FALLBACK_MS,
@@ -169,7 +169,7 @@ export function Teach(props: {
           totalSecs={classSecs} endAfterSecs={endAfterSecs}
           mode={props.settings.mode} packId={props.packId} partId={props.partId}
           outline={outline} noteText={(id) => notesById.get(id)?.text ?? ''}
-          peekStyle={props.settings.peekStyle} onPeek={recordPeek}
+          peekStyle={props.settings.peekStyle} liveCaptions={props.settings.liveCaptions} onPeek={recordPeek}
           onEnd={(lines) => {
             if (lines.length === 0) setPhase({ name: 'empty' });
             else {
@@ -215,7 +215,7 @@ export function Teach(props: {
           packId={props.packId} partId={props.partId}
           totalSecs={answerSecs}
           outline={outline} noteText={(id) => notesById.get(id)?.text ?? ''}
-          peekStyle={props.settings.peekStyle} onPeek={recordPeek}
+          peekStyle={props.settings.peekStyle} liveCaptions={props.settings.liveCaptions} onPeek={recordPeek}
           onAsked={() => setPhase({ name: 'questions', index: phase.index, asking: false })}
           onAnswered={(lines) => {
             const next = answers.map((a, i) =>
@@ -390,6 +390,7 @@ function VoiceLineTaker(props: {
   partId: string;
   active: boolean;
   cue: string;
+  liveCaptions: boolean;
   onDone: (lines: Line[]) => void;
   onTypeInstead: () => void;
   onMicUnavailable: () => void;
@@ -397,6 +398,9 @@ function VoiceLineTaker(props: {
   const [level, setLevel] = useState(0);
   const [status, setStatus] = useState<'recording' | 'transcribing' | 'error'>('recording');
   const [error, setError] = useState('');
+  // Live captions: the joined lines of the in-order revealed prefix, from
+  // chunk results already fetched for the final transcript (no new calls).
+  const [captionLines, setCaptionLines] = useState<Line[]>([]);
   const captureRef = useRef<{ stop: () => Int16Array | null } | null>(null);
   const entriesRef = useRef<ChunkEntry[]>([]);
   const doneRef = useRef(false);
@@ -407,11 +411,15 @@ function VoiceLineTaker(props: {
     [props.packId, props.partId],
   );
 
-  // One POST with a single retry; success stores the chunk's lines.
+  // One POST with a single retry; success stores the chunk's lines and
+  // reveals the newly visible in-order prefix as live captions.
   const postEntry = (entry: ChunkEntry): Promise<void> => {
     const attempt = () =>
       api.transcribe(entry.wav, meta).then((d) => {
         entry.lines = d.lines;
+        setCaptionLines(
+          joinChunkLines(visibleChunkPrefix(entriesRef.current.map((e) => e.lines))),
+        );
       });
     const promise = attempt().catch(() => attempt());
     entry.promise = promise.catch(() => {
@@ -543,11 +551,37 @@ function VoiceLineTaker(props: {
   return (
     <>
       <LevelBar level={level} />
+      {props.liveCaptions && <LiveCaptions lines={captionLines} />}
       <p className="rec" aria-hidden="true">
         <span className="rec-dot" aria-hidden>●</span> Recording
       </p>
       <p className="lede">{props.cue}</p>
     </>
+  );
+}
+
+// Live captions (§4.5, §9.6 should): each chunk's lines appear as soon as
+// that chunk's transcription returns, in chunk order (a later chunk waits
+// for the earlier ones). The box scrolls itself with instant jumps — never
+// smooth — so the newest line is visible without moving the page, and
+// reduced motion needs no special case. Hidden by the "Live captions"
+// setting; transcription and grading are unchanged.
+function LiveCaptions({ lines }: { lines: Line[] }) {
+  const boxRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = boxRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [lines]);
+  return (
+    <section aria-label="Live captions">
+      <div ref={boxRef} className="captions" aria-live="polite">
+        {lines.length === 0 ? (
+          <p className="captions-hint">Captions appear about every 20 seconds.</p>
+        ) : (
+          lines.map((l) => <p key={l.n}>{l.text}</p>)
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -560,6 +594,7 @@ function ClassScreen(props: {
   outline: ReturnType<typeof buildOutline>;
   noteText: (id: string) => string;
   peekStyle: Settings['peekStyle'];
+  liveCaptions: boolean;
   onPeek: (peek: Peek) => void;
   onEnd: (lines: Line[]) => void;
 }) {
@@ -636,6 +671,7 @@ function ClassScreen(props: {
           <VoiceLineTaker
             packId={props.packId} partId={props.partId}
             active={voiceActive} cue="Teach your class — speak now."
+            liveCaptions={props.liveCaptions}
             onDone={deliverClassLines}
             onTypeInstead={() => fallBackToTyping(false)}
             onMicUnavailable={() => fallBackToTyping(true)}
@@ -739,6 +775,7 @@ function QuestionScreen(props: {
   outline: ReturnType<typeof buildOutline>;
   noteText: (id: string) => string;
   peekStyle: Settings['peekStyle'];
+  liveCaptions: boolean;
   onPeek: (peek: Peek) => void;
   onAsked: () => void;
   onAnswered: (lines: Line[]) => void;
@@ -906,6 +943,7 @@ function QuestionScreen(props: {
               <VoiceLineTaker
                 packId={props.packId} partId={props.partId}
                 active={answerOpen} cue="Answer the question — speak now."
+                liveCaptions={props.liveCaptions}
                 onDone={deliverAnswerLines}
                 onTypeInstead={() => fallBackToTyping(false)}
                 onMicUnavailable={() => fallBackToTyping(true)}

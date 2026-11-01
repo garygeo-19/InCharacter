@@ -6,6 +6,7 @@ import {
   findChunkCut,
   joinChunkLines,
   PcmChunker,
+  visibleChunkPrefix,
 } from './chunks';
 
 const RATE = 24000;
@@ -60,6 +61,28 @@ describe('PcmChunker', () => {
     const tail = chunker.flush();
     expect(tail?.length).toBe(pcm.length - gapStart);
     expect(chunker.flush()).toBeNull();
+  });
+});
+
+describe('visibleChunkPrefix', () => {
+  it('holds a later chunk until the earlier ones are shown, then reveals in order', () => {
+    const first = [{ text: 'first' }];
+    const second = [{ text: 'second' }];
+    // Chunk 1 returns first: nothing is visible yet.
+    expect(visibleChunkPrefix([null, second])).toEqual([]);
+    // Chunk 0 returns: both show, in chunk order.
+    expect(visibleChunkPrefix([first, null])).toEqual([first]);
+    const lines = joinChunkLines(visibleChunkPrefix([first, second]));
+    expect(lines.map((l) => [l.n, l.text, l.source])).toEqual([
+      [1, 'first', 'voice'],
+      [2, 'second', 'voice'],
+    ]);
+  });
+
+  it('treats undefined like pending and empty input as empty', () => {
+    expect(visibleChunkPrefix([])).toEqual([]);
+    expect(visibleChunkPrefix([undefined, undefined])).toEqual([]);
+    expect(visibleChunkPrefix([[{ text: 'a' }], undefined])).toEqual([[{ text: 'a' }]]);
   });
 });
 

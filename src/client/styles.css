@@ -360,6 +360,21 @@ button:disabled { opacity: 0.45; cursor: default; }
 .chat-input .primary { width: auto; flex: none; }
 .teach-box { min-height: 160px; resize: vertical; line-height: 1.55; }
 
+/* Live captions (§4.5): a self-scrolling box under the level bar. Newest
+   line stays visible via instant scrollTop jumps (never smooth scrolling),
+   so the page itself never moves. */
+.captions {
+  max-height: 148px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--wash);
+}
+.captions p { margin: 0 0 6px; line-height: 1.5; }
+.captions p:last-child { margin-bottom: 0; }
+.captions-hint { color: var(--muted); font-size: 14px; }
+
 .waiting { display: flex; justify-content: center; margin: 16px 0; }
 .dots { display: inline-flex; gap: 8px; }
 .dot {

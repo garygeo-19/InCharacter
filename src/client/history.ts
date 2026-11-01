@@ -5,6 +5,7 @@ export type Settings = {
   mode: 'typed' | 'voice';
   peekStyle: 'hold' | 'tap';
   sound: boolean;
+  liveCaptions: boolean;
 };
 
 export type AttemptRecord = {
@@ -22,7 +23,7 @@ export type AttemptRecord = {
 const SETTINGS_KEY = 'ic-settings';
 const HISTORY_KEY = 'ic-history';
 
-const DEFAULT_SETTINGS: Settings = { mode: 'typed', peekStyle: 'hold', sound: true };
+const DEFAULT_SETTINGS: Settings = { mode: 'typed', peekStyle: 'hold', sound: true, liveCaptions: true };
 
 export function loadSettings(): Settings {
   try {
