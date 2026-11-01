@@ -74,6 +74,20 @@
       "description": "Young woman in her 20s wearing a yellow market apron",
       "voiceId": "<pick>",
       "portrait": "art/travel/marisol.webp"
+    },
+    {
+      "id": "elena",
+      "name": "Elena",
+      "description": "a woman in her forties selling flowers from a bucket, embroidered blouse, hair in a braid",
+      "voiceId": "<pick>",
+      "portrait": "art/travel/elena.webp"
+    },
+    {
+      "id": "jorge",
+      "name": "Jorge",
+      "description": "a man in his thirties working at the bus station, navy uniform shirt and cap, friendly",
+      "voiceId": "<pick>",
+      "portrait": "art/travel/jorge.webp"
     }
   ],
   "scene": "art/travel/scene.webp",
@@ -114,12 +128,24 @@
         {
           "id": "lucia-right",
           "next": "pablo-2",
-          "when": "traveler says they will turn right at the corner"
+          "when": "traveler says they will turn right at the corner",
+          "moves": [
+            {
+              "turn": "right",
+              "blocks": 3
+            }
+          ]
         },
         {
           "id": "lucia-left",
           "next": "detour-plaza",
-          "when": "traveler says they will turn left"
+          "when": "traveler says they will turn left",
+          "moves": [
+            {
+              "turn": "left",
+              "blocks": 1
+            }
+          ]
         }
       ],
       "default": "lucia-perdon",
@@ -177,7 +203,13 @@
         {
           "id": "lucia-perdon-right",
           "next": "pablo-2",
-          "when": "traveler says they will turn right"
+          "when": "traveler says they will turn right",
+          "moves": [
+            {
+              "turn": "right",
+              "blocks": 3
+            }
+          ]
         }
       ],
       "default": "pablo-2",
@@ -242,12 +274,28 @@
         {
           "id": "pablo-straight-left",
           "when": "says they'll go straight two blocks and then turn left",
-          "next": "marisol-3"
+          "next": "marisol-3",
+          "moves": [
+            {
+              "turn": "none",
+              "blocks": 2
+            },
+            {
+              "turn": "left",
+              "blocks": 1
+            }
+          ]
         },
         {
           "id": "pablo-wrong",
           "when": "says they'll turn right or go another wrong way",
-          "next": "detour-plaza"
+          "next": "detour-plaza",
+          "moves": [
+            {
+              "turn": "right",
+              "blocks": 1
+            }
+          ]
         }
       ],
       "default": "pablo-perdon",
@@ -312,7 +360,17 @@
         {
           "id": "pablo-perdon-on",
           "when": "any reply",
-          "next": "marisol-3"
+          "next": "marisol-3",
+          "moves": [
+            {
+              "turn": "none",
+              "blocks": 2
+            },
+            {
+              "turn": "left",
+              "blocks": 1
+            }
+          ]
         }
       ],
       "default": "marisol-3",
@@ -376,12 +434,24 @@
         {
           "id": "marisol-right",
           "next": "arrive",
-          "when": "traveler says they will turn right at the corner"
+          "when": "traveler says they will turn right at the corner",
+          "moves": [
+            {
+              "turn": "right",
+              "blocks": 1
+            }
+          ]
         },
         {
           "id": "marisol-wrong",
           "next": "detour-plaza",
-          "when": "traveler says they will go left or straight"
+          "when": "traveler says they will go left or straight",
+          "moves": [
+            {
+              "turn": "left",
+              "blocks": 1
+            }
+          ]
         }
       ],
       "default": "marisol-perdon",
@@ -445,7 +515,13 @@
         {
           "id": "marisol-perdon-on",
           "when": "any reply",
-          "next": "arrive"
+          "next": "arrive",
+          "moves": [
+            {
+              "turn": "right",
+              "blocks": 1
+            }
+          ]
         }
       ],
       "default": "arrive",
@@ -479,31 +555,135 @@
     {
       "id": "detour-plaza",
       "status": "checked",
-      "speaker": "pablo",
-      "text": "Está cerca, todo derecho una cuadra.",
-      "gloss": "It is near, straight ahead one block.",
+      "speaker": "elena",
+      "text": "Está cerca. Gira a la derecha en la esquina, y todo derecho una cuadra.",
+      "gloss": "It's near. Turn right at the corner, and straight ahead one block.",
       "scene": null,
       "ttsText": null,
       "noteIds": [
-        "fact-lejos-o-cerca",
-        "fi-ot-directions-recto",
+        "fact-gira-dobla-esquina",
+        "pair-derecha",
+        "pair-esquina",
         "pair-recto",
-        "pair-cuadra"
+        "pair-cuadra",
+        "fact-lejos-o-cerca"
       ],
       "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-gira-dobla-esquina",
+            "pair-derecha",
+            "pair-esquina"
+          ],
+          "text": "Understands gira a la derecha en la esquina: turn right at the corner."
+        },
         {
           "noteIds": [
             "pair-recto",
             "pair-cuadra"
           ],
-          "text": "Say you will go straight one block"
+          "text": "Understands todo derecho una cuadra: straight ahead one block."
         }
       ],
       "routes": [
         {
-          "id": "detour-go",
+          "id": "elena-right",
+          "when": "says they'll turn right at the corner and go straight",
           "next": "arrive-late",
-          "when": "traveler says they will go straight"
+          "moves": [
+            {
+              "turn": "right",
+              "blocks": 1
+            },
+            {
+              "turn": "none",
+              "blocks": 1
+            }
+          ]
+        },
+        {
+          "id": "elena-wrong",
+          "when": "says they'll turn left or go another wrong way",
+          "next": "elena-perdon",
+          "moves": []
+        }
+      ],
+      "default": "elena-perdon",
+      "end": false,
+      "reply": true,
+      "check": {
+        "model": "muse-wonder-1.0",
+        "at": "2026-11-01T22:13:00.647Z",
+        "results": {
+          "groundedInNotes": {
+            "pass": true,
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the detour local is now Elena, a new person, with the same phrases the checked lines use."
+          },
+          "naturalVoice": {
+            "pass": true,
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the detour local is now Elena, a new person, with the same phrases the checked lines use."
+          },
+          "routeFair": {
+            "pass": true,
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the detour local is now Elena, a new person, with the same phrases the checked lines use."
+          },
+          "safe": {
+            "pass": true,
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the detour local is now Elena, a new person, with the same phrases the checked lines use."
+          }
+        }
+      },
+      "review": null,
+      "audio": null
+    },
+    {
+      "id": "elena-perdon",
+      "status": "checked",
+      "speaker": "elena",
+      "text": "¿Perdón? A la derecha en la esquina. Todo derecho. Está cerca.",
+      "gloss": "Sorry? To the right at the corner. Straight ahead. It's near.",
+      "scene": null,
+      "ttsText": null,
+      "noteIds": [
+        "fact-gira-dobla-esquina",
+        "pair-derecha",
+        "pair-esquina",
+        "pair-recto",
+        "pair-cuadra",
+        "fact-lejos-o-cerca"
+      ],
+      "expectedPoints": [
+        {
+          "noteIds": [
+            "fact-gira-dobla-esquina",
+            "pair-derecha",
+            "pair-esquina"
+          ],
+          "text": "Understands gira a la derecha en la esquina: turn right at the corner."
+        },
+        {
+          "noteIds": [
+            "pair-recto",
+            "pair-cuadra"
+          ],
+          "text": "Understands todo derecho una cuadra: straight ahead one block."
+        }
+      ],
+      "routes": [
+        {
+          "id": "elena-perdon-on",
+          "when": "any reply",
+          "next": "arrive-late",
+          "moves": [
+            {
+              "turn": "right",
+              "blocks": 1
+            },
+            {
+              "turn": "none",
+              "blocks": 1
+            }
+          ]
         }
       ],
       "default": "arrive-late",
@@ -515,19 +695,19 @@
         "results": {
           "groundedInNotes": {
             "pass": true,
-            "reason": "Going straight for one block is supported by the cited todo derecho and cuadra notes."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): Elena's simpler repeat, same phrases."
           },
           "naturalVoice": {
             "pass": true,
-            "reason": "The Spanish direction sounds natural spoken aloud and is within the 120-character travel limit."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): Elena's simpler repeat, same phrases."
           },
           "routeFair": {
             "pass": true,
-            "reason": "The route follows directly from the expected straight-ahead reply."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): Elena's simpler repeat, same phrases."
           },
           "safe": {
             "pass": true,
-            "reason": "The exchange is respectful and contains no prohibited topic or book quotation."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): Elena's simpler repeat, same phrases."
           }
         }
       },
@@ -537,7 +717,7 @@
     {
       "id": "arrive",
       "status": "checked",
-      "speaker": "marisol",
+      "speaker": "jorge",
       "text": "¡Aquí está la estación, buen viaje!",
       "gloss": "Here is the station, have a good trip!",
       "scene": null,
@@ -554,19 +734,19 @@
         "results": {
           "groundedInNotes": {
             "pass": true,
-            "reason": "There are no expected points, so no unsupported learner point or citation is introduced."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the station clerk Jorge says the arrival line, so no local appears twice."
           },
           "naturalVoice": {
             "pass": true,
-            "reason": "The arrival line sounds natural spoken aloud and is within the 120-character travel limit."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the station clerk Jorge says the arrival line, so no local appears twice."
           },
           "routeFair": {
             "pass": true,
-            "reason": "This terminal node has no routes that could require an unsupported or implausible reply."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the station clerk Jorge says the arrival line, so no local appears twice."
           },
           "safe": {
             "pass": true,
-            "reason": "The closing line is respectful and contains no prohibited topic or book quotation."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the station clerk Jorge says the arrival line, so no local appears twice."
           }
         }
       },
@@ -576,7 +756,7 @@
     {
       "id": "arrive-late",
       "status": "checked",
-      "speaker": "pablo",
+      "speaker": "jorge",
       "text": "¡Aquí está la estación, qué bueno que llegó!",
       "gloss": "Here is the station, so glad you arrived!",
       "scene": null,
@@ -593,24 +773,28 @@
         "results": {
           "groundedInNotes": {
             "pass": true,
-            "reason": "There are no expected points, so no unsupported learner point or citation is introduced."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the station clerk Jorge says the arrival line, so no local appears twice."
           },
           "naturalVoice": {
             "pass": true,
-            "reason": "The arrival line sounds natural spoken aloud and is within the 120-character travel limit."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the station clerk Jorge says the arrival line, so no local appears twice."
           },
           "routeFair": {
             "pass": true,
-            "reason": "This terminal node has no routes that could require an unsupported or implausible reply."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the station clerk Jorge says the arrival line, so no local appears twice."
           },
           "safe": {
             "pass": true,
-            "reason": "The closing line is respectful and contains no prohibited topic or book quotation."
+            "reason": "Reviewer change 1 Nov 2026 (owner: never meet the same character twice on a path): the station clerk Jorge says the arrival line, so no local appears twice."
           }
         }
       },
       "review": null,
       "audio": null
     }
-  ]
+  ],
+  "map": {
+    "start": "Plaza",
+    "goal": "Estación"
+  }
 }
