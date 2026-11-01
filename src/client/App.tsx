@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import comingSoon from '../../content/coming-soon.json';
+import roles from '../../content/roles.json';
 import { friendlyErrorMessage } from '../shared/errors';
 import { CastRow, ClassroomFigure } from './art';
-import { LevelBar } from './levelbar';
 import { buildNotes, PackSchema, stripPrefix } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
-import { api, type CatalogPack, type PartsResponse } from './api';
+import { api, type CatalogPack, type PartsResponse, type SessionRole } from './api';
 import { Segments, languageName, mmss } from './format';
-import { checkMic, ensureAudioContext, unlockAudioPlayback } from './voice';
+import { ensureAudioContext, unlockAudioPlayback } from './voice';
 import {
   bestFor,
   clearHistory,
@@ -18,6 +18,8 @@ import {
   type Settings,
 } from './history';
 import { Teach } from './Teach';
+import { Session } from './Session';
+import { ModePicker } from './mode';
 import './styles.css';
 
 type View =
@@ -25,7 +27,15 @@ type View =
   | { name: 'pack'; packId: string }
   | { name: 'list'; packId: string }
   | { name: 'briefing'; packId: string; partId: string; attempt: number }
-  | { name: 'teach'; packId: string; partId: string; attempt: number };
+  | { name: 'teach'; packId: string; partId: string; attempt: number }
+  | { name: 'session-list'; packId: string; role: SessionRole }
+  | { name: 'session'; packId: string; partId: string; role: SessionRole; attempt: number };
+
+const ROLE_ORDER: SessionRole[] = ['coach', 'travel'];
+
+function roleTile(role: SessionRole): { title: string; subtitle: string } {
+  return (roles as Record<SessionRole, { title: string; subtitle: string }>)[role];
+}
 
 const PRIVACY =
   "What you say is sent to Meta's API to be transcribed and graded. In Character doesn't keep it. Your scores stay on this device.";
@@ -112,6 +122,10 @@ function App() {
           }}
           onOpenPack={(packId) => setView({ name: 'pack', packId })}
           onTeachAgain={(h) => setView({ name: 'briefing', packId: h.packId, partId: h.partId, attempt: Date.now() })}
+          onPlayAgain={(h) => setView({
+            name: 'session', packId: h.packId, partId: h.partId,
+            role: h.role === 'travel' ? 'travel' : 'coach', attempt: Date.now(),
+          })}
           onNextClass={(h) => setView({ name: 'list', packId: h.packId })}
         />
       )}
@@ -120,6 +134,31 @@ function App() {
           packId={view.packId} catalog={catalog} partsCache={partsCache} partsFor={partsFor}
           onBack={() => setView({ name: 'home' })}
           onTeach={() => setView({ name: 'list', packId: view.packId })}
+          onRole={(role) => setView({ name: 'session-list', packId: view.packId, role })}
+        />
+      )}
+      {view.name === 'session-list' && (
+        <SessionList
+          packId={view.packId} role={view.role} catalog={catalog} history={history}
+          partsCache={partsCache} partsFor={partsFor}
+          onBack={() => setView({ name: 'pack', packId: view.packId })}
+          onOpenPart={(partId) => setView({
+            name: 'session', packId: view.packId, partId, role: view.role, attempt: Date.now(),
+          })}
+        />
+      )}
+      {view.name === 'session' && (
+        <Session
+          key={`${view.packId}/${view.partId}/${view.role}/${view.attempt}`}
+          packId={view.packId} partId={view.partId} role={view.role} catalog={catalog}
+          settings={settings} updateSettings={updateSettings}
+          history={history} setHistory={setHistory} fast={FAST}
+          onExit={() => setView({ name: 'home' })}
+          onMoreSessions={() => setView({ name: 'session-list', packId: view.packId, role: view.role })}
+          onRetry={() => setView({
+            name: 'session', packId: view.packId, partId: view.partId,
+            role: view.role, attempt: Date.now(),
+          })}
         />
       )}
       {view.name === 'list' && (
@@ -221,6 +260,7 @@ function Home(props: {
   onRetryCatalog: () => void;
   onOpenPack: (packId: string) => void;
   onTeachAgain: (h: AttemptRecord) => void;
+  onPlayAgain: (h: AttemptRecord) => void;
   onNextClass: (h: AttemptRecord) => void;
 }) {
   const { catalog } = props;
@@ -261,20 +301,24 @@ function Home(props: {
         <section aria-label="Keep teaching">
           <h2>Keep teaching</h2>
           <div className="cards">
-            {props.history.slice(0, 3).map((h) => (
-              <div className="card" key={`${h.packId}/${h.partId}`}>
-                <p className="card-title">{h.icon} {h.partTitle}</p>
-                <p className="fine">Best {h.best}</p>
-                <div className="row">
-                  <button type="button" className="secondary" onClick={() => props.onTeachAgain(h)}>
-                    Teach again
-                  </button>
-                  <button type="button" className="secondary" onClick={() => props.onNextClass(h)}>
-                    Next class
-                  </button>
+            {props.history.slice(0, 3).map((h) => {
+              const role = h.role ?? 'teach';
+              const again = role === 'teach' ? props.onTeachAgain : props.onPlayAgain;
+              return (
+                <div className="card" key={`${h.packId}/${h.partId}/${role}`}>
+                  <p className="card-title">{h.icon} {h.partTitle}</p>
+                  <p className="fine">Best {h.best}</p>
+                  <div className="row">
+                    <button type="button" className="secondary" onClick={() => again(h)}>
+                      {role === 'teach' ? 'Teach again' : 'Play again'}
+                    </button>
+                    <button type="button" className="secondary" onClick={() => props.onNextClass(h)}>
+                      Next class
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}
@@ -327,15 +371,29 @@ function PackView(props: {
   partsFor: (packId: string) => Promise<PartsResponse>;
   onBack: () => void;
   onTeach: () => void;
+  onRole: (role: SessionRole) => void;
 }) {
   const pack = usePack(props.packId, props.catalog);
   const [ready, setReady] = useState<number | null>(null);
+  const [roleReady, setRoleReady] = useState<Record<SessionRole, number> | null>(null);
   useEffect(() => {
     props.partsFor(props.packId)
-      .then((parts) => setReady(parts.lessons.flatMap((l) => l.parts).filter((x) => x.teachable && x.ready).length))
-      .catch(() => setReady(0));
+      .then((parts) => {
+        const all = parts.lessons.flatMap((l) => l.parts);
+        setReady(all.filter((x) => x.teachable && x.ready).length);
+        setRoleReady({
+          coach: all.filter((x) => x.sessions?.coach).length,
+          travel: all.filter((x) => x.sessions?.travel).length,
+        });
+      })
+      .catch(() => {
+        setReady(0);
+        setRoleReady({ coach: 0, travel: 0 });
+      });
   }, [props.packId]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!pack) return <p>Loading…</p>;
+  // A usable session replaces that pack's "coming soon" tile (§16.1).
+  const soonTitles = comingSoonFor(pack.id);
   return (
     <>
       <button type="button" className="secondary" onClick={props.onBack}>‹ Packs</button>
@@ -348,12 +406,107 @@ function PackView(props: {
         <span className="fine">You teach. Four students listen. Three ask questions.</span>
         {ready !== null && <span className="fine">{ready} classes ready</span>}
       </button>
-      {comingSoonFor(pack.id).map((title) => (
-        <div className="tile soon" key={title} aria-disabled>
-          <strong>{title}</strong>
-          <span className="fine">Coming soon</span>
-        </div>
-      ))}
+      {ROLE_ORDER.map((role) => {
+        const tile = roleTile(role);
+        const count = roleReady?.[role] ?? 0;
+        if (roleReady && count > 0) {
+          return (
+            <button type="button" className="tile primary-tile" key={role} onClick={() => props.onRole(role)}>
+              <strong>{tile.title}</strong>
+              <span className="fine">{tile.subtitle}</span>
+              <span className="fine">{count} session{count === 1 ? '' : 's'} ready</span>
+            </button>
+          );
+        }
+        if (!soonTitles.includes(tile.title)) return null;
+        return (
+          <div className="tile soon" key={role} aria-disabled>
+            <strong>{tile.title}</strong>
+            <span className="fine">Coming soon</span>
+          </div>
+        );
+      })}
+      {soonTitles
+        .filter((t) => !ROLE_ORDER.some((r) => roleTile(r).title === t))
+        .map((title) => (
+          <div className="tile soon" key={title} aria-disabled>
+            <strong>{title}</strong>
+            <span className="fine">Coming soon</span>
+          </div>
+        ))}
+    </>
+  );
+}
+
+function SessionList(props: {
+  packId: string;
+  role: SessionRole;
+  catalog: CatalogPack[] | null;
+  history: AttemptRecord[];
+  partsCache: Record<string, PartsResponse>;
+  partsFor: (packId: string) => Promise<PartsResponse>;
+  onBack: () => void;
+  onOpenPart: (partId: string) => void;
+}) {
+  const pack = usePack(props.packId, props.catalog);
+  const cached = props.partsCache[props.packId] ?? null;
+  const [parts, setParts] = useState<PartsResponse | null>(cached);
+  const [error, setError] = useState<string | null>(null);
+  const [seq, setSeq] = useState(0);
+  useEffect(() => {
+    if (cached) {
+      setParts(cached);
+      return;
+    }
+    props.partsFor(props.packId).then(setParts).catch((e: Error) => setError(e.message));
+  }, [props.packId, seq]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (!pack) return <p>Loading…</p>;
+  const tile = roleTile(props.role);
+  const playable = parts?.lessons.flatMap((l) =>
+    l.parts.filter((p) => p.sessions?.[props.role]),
+  ) ?? [];
+  return (
+    <>
+      <button type="button" className="secondary" onClick={props.onBack}>‹ {pack.name}</button>
+      <h1>{tile.title}</h1>
+      <p className="lede">{tile.subtitle}</p>
+      {error && (
+        <>
+          <p className="error">{friendlyErrorMessage(error)}</p>
+          <button
+            type="button" className="secondary"
+            onClick={() => {
+              setError(null);
+              setSeq((s) => s + 1);
+            }}
+          >
+            Try again
+          </button>
+        </>
+      )}
+      {!parts && !error && <p>Loading sessions…</p>}
+      {parts && playable.length === 0 && <p>No sessions ready yet.</p>}
+      {playable.length > 0 && (
+        <ul className="part-list">
+          {playable.map((p) => {
+            const best = bestFor(props.history, props.packId, p.id, props.role);
+            return (
+              <li key={p.id}>
+                <button
+                  type="button" className="part-row"
+                  onClick={() => props.onOpenPart(p.id)}
+                >
+                  <span className="part-title">{stripPrefix(p.title)}</span>
+                  {p.blurb && <span className="fine">{p.blurb}</span>}
+                  <span className="fine">
+                    Ready{best !== null ? ` · best ${best}` : ''}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </>
   );
 }
@@ -514,58 +667,6 @@ function Briefing(props: {
         </button>
       </div>
     </>
-  );
-}
-
-// Mode choice with the §4.4 mic check: permission prompt, then a 2-second
-// level meter. Denial falls back to Type and says so.
-function ModePicker(props: {
-  settings: Settings;
-  updateSettings: (s: Settings) => void;
-}) {
-  const [mic, setMic] = useState<'idle' | 'checking' | 'denied'>('idle');
-  const [level, setLevel] = useState(0);
-
-  const chooseVoice = () => {
-    setMic('checking');
-    setLevel(0);
-    checkMic(setLevel)
-      .then(() => {
-        setMic('idle');
-        props.updateSettings({ ...props.settings, mode: 'voice' });
-      })
-      .catch(() => setMic('denied'));
-  };
-
-  return (
-    <section aria-label="Mode">
-      <h2>Mode</h2>
-      <div className="row" role="radiogroup" aria-label="Mode">
-        <button
-          type="button" aria-pressed={props.settings.mode === 'typed'}
-          className="secondary"
-          onClick={() => props.updateSettings({ ...props.settings, mode: 'typed' })}
-        >
-          Type (mic off){props.settings.mode === 'typed' ? ' ✓' : ''}
-        </button>
-        <button
-          type="button" aria-pressed={props.settings.mode === 'voice'}
-          className="secondary" disabled={mic === 'checking'}
-          onClick={chooseVoice}
-        >
-          Voice{props.settings.mode === 'voice' ? ' ✓' : ''}
-        </button>
-      </div>
-      {mic === 'checking' && (
-        <>
-          <p className="fine" role="status">Listening — speak to test your mic…</p>
-          <LevelBar level={level} />
-        </>
-      )}
-      {mic === 'denied' && (
-        <p className="error" role="status">Mic unavailable — using Type instead.</p>
-      )}
-    </section>
   );
 }
 

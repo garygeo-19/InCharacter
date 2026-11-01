@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "role": "coach",
+  "packId": "atomic-habits",
+  "packVersion": "1.0.0",
+  "lessonId": "l8-commitment",
+  "partId": "part-8",
+  "builtAt": "2026-11-01",
+  "notes": [
+    {
+      "id": "ah-p8-f1",
+      "hash": "4d7bc16e36b6a68ba728ad6ba7b41a72761104bca4ca4059ea2c49a3148c3bff"
+    },
+    {
+      "id": "ah-p8-f2",
+      "hash": "fc1361466cfc5e00a4d36ddbc20e0230c8d03fb4615aa803326ec926de197148"
+    },
+    {
+      "id": "ah-p8-f3",
+      "hash": "6fe3bd7c955bb14843eecc3beb9bf7da78e6b16991d776135c7f08a6f2b25021"
+    }
+  ],
+  "brief": "Alex wants to read more and keep running, but the plans never stick.",
+  "cast": [
+    {
+      "id": "alex",
+      "name": "Alex",
+      "description": "an adult client in a soft blue sweater, friendly but tired",
+      "voiceId": "<pick>",
+      "portrait": "art/coach/alex.webp"
+    }
+  ],
+  "scene": "art/coach/office.webp",
+  "start": "open",
+  "nodes": [
+    {
+      "id": "open",
+      "speaker": "alex",
+      "text": "I keep telling myself I'll read every night, but after a long day I just scroll on my phone instead.",
+      "gloss": null,
+      "ttsText": null,
+      "audio": null,
+      "reply": true,
+      "noteIds": [
+        "ah-p8-f1"
+      ],
+      "expectedPoints": [
+        {
+          "text": "Shrink the habit to a two-minute version, like reading one page",
+          "noteIds": [
+            "ah-p8-f1"
+          ]
+        }
+      ],
+      "routes": [
+        {
+          "id": "applied",
+          "when": "The coach shrinks the habit to something under two minutes",
+          "next": "stage2"
+        },
+        {
+          "id": "missed",
+          "when": "Anything else",
+          "next": "open-push"
+        }
+      ],
+      "default": "open-push",
+      "end": false,
+      "status": "approved",
+      "check": null,
+      "review": {
+        "by": "fixture",
+        "at": "2026-11-01",
+        "note": "Hand-written test fixture."
+      },
+      "scene": null
+    },
+    {
+      "id": "open-push",
+      "speaker": "alex",
+      "text": "Honestly, even opening the book feels like a lot when I'm already exhausted. Isn't small stuff pointless?",
+      "gloss": null,
+      "ttsText": null,
+      "audio": null,
+      "reply": true,
+      "noteIds": [
+        "ah-p8-f1"
+      ],
+      "expectedPoints": [
+        {
+          "text": "A two-minute start still counts and keeps the streak alive",
+          "noteIds": [
+            "ah-p8-f1"
+          ]
+        }
+      ],
+      "routes": [
+        {
+          "id": "on",
+          "when": "Any reply, coached forward",
+          "next": "stage2"
+        }
+      ],
+      "default": "stage2",
+      "end": false,
+      "status": "approved",
+      "check": null,
+      "review": {
+        "by": "fixture",
+        "at": "2026-11-01",
+        "note": "Hand-written test fixture."
+      },
+      "scene": null
+    },
+    {
+      "id": "stage2",
+      "speaker": "alex",
+      "text": "Okay, say I do the tiny version. My running shoes live in the closet behind boxes, so I still skip it.",
+      "gloss": null,
+      "ttsText": null,
+      "audio": null,
+      "reply": true,
+      "noteIds": [
+        "ah-p8-f2",
+        "ah-p8-f3"
+      ],
+      "expectedPoints": [
+        {
+          "text": "Make it easy: lay the shoes out the night before",
+          "noteIds": [
+            "ah-p8-f2"
+          ]
+        },
+        {
+          "text": "Lock it in with a commitment, like texting a friend a photo each morning",
+          "noteIds": [
+            "ah-p8-f3"
+          ]
+        }
+      ],
+      "routes": [
+        {
+          "id": "applied",
+          "when": "The coach makes it easy or adds a commitment device",
+          "next": "close-good"
+        },
+        {
+          "id": "missed",
+          "when": "Anything else",
+          "next": "close-unsure"
+        }
+      ],
+      "default": "close-unsure",
+      "end": false,
+      "status": "approved",
+      "check": null,
+      "review": {
+        "by": "fixture",
+        "at": "2026-11-01",
+        "note": "Hand-written test fixture."
+      },
+      "scene": null
+    },
+    {
+      "id": "close-good",
+      "speaker": "alex",
+      "text": "One page tonight, shoes by the door, photo to my sister. I think this might actually stick.",
+      "gloss": null,
+      "ttsText": null,
+      "audio": null,
+      "reply": false,
+      "noteIds": [
+        "ah-p8-f1",
+        "ah-p8-f2"
+      ],
+      "expectedPoints": [],
+      "routes": [],
+      "default": null,
+      "end": true,
+      "status": "approved",
+      "check": null,
+      "review": {
+        "by": "fixture",
+        "at": "2026-11-01",
+        "note": "Hand-written test fixture."
+      },
+      "scene": null
+    },
+    {
+      "id": "close-unsure",
+      "speaker": "alex",
+      "text": "I'll think about it. Maybe next week will just be calmer and it'll happen on its own.",
+      "gloss": null,
+      "ttsText": null,
+      "audio": null,
+      "reply": false,
+      "noteIds": [
+        "ah-p8-f1"
+      ],
+      "expectedPoints": [],
+      "routes": [],
+      "default": null,
+      "end": true,
+      "status": "approved",
+      "check": null,
+      "review": {
+        "by": "fixture",
+        "at": "2026-11-01",
+        "note": "Hand-written test fixture."
+      },
+      "scene": null
+    }
+  ]
+}

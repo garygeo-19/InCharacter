@@ -12,7 +12,7 @@ export type Line = {
 
 export type Peek = {
   noteId: string;
-  phase: 'class' | 'questions';
+  phase: 'class' | 'questions' | 'session';
   startedAt: number;
   endedAt: number;
   ms: number;

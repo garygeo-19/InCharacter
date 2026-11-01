@@ -289,7 +289,7 @@ export function Teach(props: {
 
 // Timers are announced at 30 s and 10 s (§11.3): the visual timer stays
 // quiet for screen readers, and this live region speaks only at crossings.
-function useTimerAnnouncement(left: number): string {
+export function useTimerAnnouncement(left: number): string {
   const [msg, setMsg] = useState('');
   useEffect(() => {
     if (left === 30) setMsg('30 seconds left.');
@@ -298,7 +298,7 @@ function useTimerAnnouncement(left: number): string {
   return msg;
 }
 
-function Countdown({ fast, onDone }: { fast: boolean; onDone: () => void }) {
+export function Countdown({ fast, onDone }: { fast: boolean; onDone: () => void }) {
   const [state, setState] = useState<CountdownState>(() => startCountdown());
   // The class starts exactly once: the last tick and the watchdog below
   // race, and StrictMode's dev double-effect re-fires, so a ref guards it.
@@ -335,7 +335,7 @@ function Countdown({ fast, onDone }: { fast: boolean; onDone: () => void }) {
 // (phone dictation lands here as one block); the sticky action submits, and
 // code splits the text into numbered lines for the evidence rules. The split
 // is never shown.
-function LongBox(props: {
+export function LongBox(props: {
   label: string;
   placeholder: string;
   value: string;
@@ -355,7 +355,7 @@ function LongBox(props: {
 
 // Motion feedback for model waits: three bouncing dots plus an accessible
 // status message. Under prefers-reduced-motion the dots sit still.
-function WaitingDots({ status }: { status: string }) {
+export function WaitingDots({ status }: { status: string }) {
   return (
     <p className="waiting" role="status">
       <span className="sr-only">{status}</span>
@@ -385,7 +385,7 @@ type ChunkEntry = {
   promise: Promise<void> | null;
 };
 
-function VoiceLineTaker(props: {
+export function VoiceLineTaker(props: {
   packId: string;
   partId: string;
   active: boolean;
@@ -566,7 +566,7 @@ function VoiceLineTaker(props: {
 // smooth — so the newest line is visible without moving the page, and
 // reduced motion needs no special case. Hidden by the "Live captions"
 // setting; transcription and grading are unchanged.
-function LiveCaptions({ lines }: { lines: Line[] }) {
+export function LiveCaptions({ lines }: { lines: Line[] }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const el = boxRef.current;
@@ -748,7 +748,7 @@ function Choosing(props: {
 // The shared question audio element, mounted in the question view so the
 // mp3 URL is in the DOM (and the iOS-unlocked element of voice.ts is the
 // one that plays). Unmounting pauses it.
-function QuestionAudioSlot({ src }: { src: string }) {
+export function QuestionAudioSlot({ src }: { src: string }) {
   const slotRef = useRef<HTMLSpanElement | null>(null);
   useEffect(() => {
     const el = sharedQuestionAudio();
@@ -1047,7 +1047,7 @@ function NoScoreDebrief(props: {
 // skips the animation. No sound. The visible score stays silent for screen
 // readers while counting; one live region announces the final headline and
 // score once.
-function Celebration({ headline, total, stars }: { headline: string; total: number; stars: number }) {
+export function Celebration({ headline, total, stars }: { headline: string; total: number; stars: number }) {
   const reduceMotion = useReducedMotion();
   const [shown, setShown] = useState(reduceMotion ? total : 0);
   const done = shown >= total;

@@ -18,6 +18,8 @@ export type AttemptRecord = {
   stars: number;
   lastTaught: string;
   asked: string[][];
+  /** Which role this attempt played; absent means the classroom (§16.1). */
+  role?: 'teach' | 'coach' | 'travel';
 };
 
 const SETTINGS_KEY = 'ic-settings';
@@ -50,7 +52,12 @@ export function loadHistory(): AttemptRecord[] {
   }
 }
 
-/** Record a finished class: best score wins, asked ids keep the last two. */
+function roleOf(h: AttemptRecord): 'teach' | 'coach' | 'travel' {
+  return h.role ?? 'teach';
+}
+
+/** Record a finished class: best score wins, asked ids keep the last two.
+ *  History is per part and per role (§16.1). */
 export function recordAttempt(input: {
   packId: string;
   packName: string;
@@ -60,9 +67,13 @@ export function recordAttempt(input: {
   total: number;
   stars: number;
   askedIds: string[];
+  role?: 'teach' | 'coach' | 'travel';
 }): AttemptRecord[] {
   const history = loadHistory();
-  const prev = history.find((h) => h.packId === input.packId && h.partId === input.partId);
+  const role = input.role ?? 'teach';
+  const prev = history.find(
+    (h) => h.packId === input.packId && h.partId === input.partId && roleOf(h) === role,
+  );
   const asked = [...(prev?.asked ?? []), input.askedIds].slice(-2);
   const best = Math.max(prev?.best ?? 0, input.total);
   const next: AttemptRecord = {
@@ -75,21 +86,38 @@ export function recordAttempt(input: {
     stars: input.total >= best ? input.stars : (prev?.stars ?? input.stars),
     lastTaught: new Date().toISOString(),
     asked,
+    role,
   };
-  const rest = history.filter((h) => !(h.packId === input.packId && h.partId === input.partId));
+  const rest = history.filter(
+    (h) => !(h.packId === input.packId && h.partId === input.partId && roleOf(h) === role),
+  );
   const out = [next, ...rest];
   localStorage.setItem(HISTORY_KEY, JSON.stringify(out));
   return out;
 }
 
 /** Questions asked in this part's last two attempts: never pick them (§9.2). */
-export function excludeIds(history: AttemptRecord[], packId: string, partId: string): string[] {
-  const prev = history.find((h) => h.packId === packId && h.partId === partId);
+export function excludeIds(
+  history: AttemptRecord[],
+  packId: string,
+  partId: string,
+  role: 'teach' | 'coach' | 'travel' = 'teach',
+): string[] {
+  const prev = history.find(
+    (h) => h.packId === packId && h.partId === partId && roleOf(h) === role,
+  );
   return [...new Set((prev?.asked ?? []).flat())];
 }
 
-export function bestFor(history: AttemptRecord[], packId: string, partId: string): number | null {
-  const prev = history.find((h) => h.packId === packId && h.partId === partId);
+export function bestFor(
+  history: AttemptRecord[],
+  packId: string,
+  partId: string,
+  role: 'teach' | 'coach' | 'travel' = 'teach',
+): number | null {
+  const prev = history.find(
+    (h) => h.packId === packId && h.partId === partId && roleOf(h) === role,
+  );
   return prev ? prev.best : null;
 }
 

@@ -1,0 +1,14 @@
+{
+  "teach": {
+    "title": "Teach a class",
+    "subtitle": "You teach. Four students listen. Three ask questions."
+  },
+  "coach": {
+    "title": "Coach a client",
+    "subtitle": "Alex wants a habit to stick. You coach, using the lesson."
+  },
+  "travel": {
+    "title": "Find your way",
+    "subtitle": "You're in a Mexican town. Ask the locals, in Spanish."
+  }
+}

@@ -21,6 +21,7 @@ export type PartStatus = {
   teachable: boolean;
   ready: boolean;
   usableByDifficulty: [number, number, number];
+  sessions?: { coach: boolean; travel: boolean };
 };
 
 export type PartsResponse = {
@@ -43,6 +44,41 @@ export type BankDisplay = {
 };
 
 export type LineIn = { n: number; text: string };
+
+export type SessionRole = 'coach' | 'travel';
+
+export type SessionNodeDisplay = {
+  id: string;
+  speaker: string;
+  text: string;
+  gloss: string | null;
+  scene: string;
+  reply: boolean;
+  end: boolean;
+  noteIds: string[];
+  expectedPoints: { text: string; noteIds: string[] }[];
+  routes: { id: string }[];
+  audioUrl: string | null;
+};
+
+export type SessionDisplay = {
+  role: SessionRole;
+  brief: string;
+  cast: { id: string; name: string; description: string; portrait: string }[];
+  scene: string;
+  start: string;
+  nodes: SessionNodeDisplay[];
+};
+
+export type SessionGrade = {
+  answers: {
+    nodeId: string;
+    points: { index: number; result: 'hit' | 'partial' | 'none'; quote: string | null }[];
+    contradictions: { quote: string; noteId: string; why: string }[];
+    empty: boolean;
+  }[];
+  dropped: number;
+};
 
 export type TranscribedLine = {
   n: number;
@@ -116,4 +152,20 @@ export const api = {
         dropped: number;
       }>,
     ),
+  session: (packId: string, partId: string, role: SessionRole) =>
+    fetch(
+      `/api/session/${encodeURIComponent(packId)}/${encodeURIComponent(partId)}?role=${encodeURIComponent(role)}`,
+    ).then(json<SessionDisplay>),
+  turn: (body: { packId: string; partId: string; nodeId: string; lines: LineIn[]; visited: string[] }) =>
+    fetch('/api/turn', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    }).then(json<{ next: string; route: string; source: 'model' | 'fallback' }>),
+  gradeSession: (body: { packId: string; partId: string; answers: { nodeId: string; lines: LineIn[] }[] }) =>
+    fetch('/api/grade/session', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    }).then(json<SessionGrade>),
 };

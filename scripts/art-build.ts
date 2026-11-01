@@ -24,6 +24,12 @@
  *   final classroom picture and saves public/art/classroom-masks.json
  *   with boxes assigned to the cast left to right. --hand writes the
  *   Must fallback (hand-set boxes) instead.
+ * - Roles (§16): --session content/sessions/<packId>/<partId>.json draws a
+ *   role's cast portraits from the session file's cast descriptions plus
+ *   its scene (from --scene-prompt, or a per-role default when omitted),
+ *   in the same warm flat style as the classroom art. --only limits the
+ *   pictures to <castId>|scene; --finalize compresses the kept attempts to
+ *   public/art/<role>/ and the scene path. Not run by the roles milestone.
  * - MODEL_API_KEY is read from .dev.vars and never printed or logged;
  *   only counts, sizes and statuses are logged.
  */
@@ -31,6 +37,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadEnv, requireModelApiKey } from '../src/server/env';
+import { SessionFileSchema } from '../src/shared/session';
 
 const API = 'https://api.meta.ai/v1/responses';
 const IMAGE_MODEL = 'muse-image-1.0';
@@ -423,6 +430,123 @@ function writeHandBoxes(file: string): void {
   console.log('Wrote public/art/classroom-masks.json (hand boxes, Must fallback).');
 }
 
+// --- Roles (§16): cast portraits + scene from a session file ----------------
+// Portraits are drawn from the session file's cast descriptions in the same
+// warm flat style as the classroom art (the style travels in the prompt;
+// the classroom reference candidates no longer exist). The session file
+// carries no scene description, so the scene prompt comes from
+// --scene-prompt, falling back to a per-role default (Decision 1 Nov 2026).
+
+const ROLE_SCENE_PROMPTS: Record<string, string> = {
+  coach:
+    'A warm, flat illustration of a calm coaching room: two comfortable chairs, a small table with a notebook, a window with daylight, a plant. No people, no text, letters, logos or brand marks anywhere.',
+  travel:
+    'A warm, flat illustration of a small Mexican town square at midday: a bandstand, colorful facades, a church tower, string lights. No people, no text, letters, logos or brand marks anywhere.',
+};
+
+function rolePortraitPrompt(name: string, description: string): string {
+  return `A warm, flat illustration in the same style as the classroom picture: a head-and-shoulders portrait of ${name}, ${description}. Plain warm background, looking at the viewer with a friendly expression. No text, letters, logos or brand marks anywhere.`;
+}
+
+async function runRoleSession(opts: {
+  key: string;
+  file: string;
+  only: string[] | null;
+  scenePrompt: string | null;
+  keep: Record<string, number>;
+  finalizeOnly: boolean;
+}): Promise<void> {
+  const raw = JSON.parse(readFileSync(opts.file, 'utf8')) as unknown;
+  const session = SessionFileSchema.parse(raw);
+  const role = session.role;
+  const pics = opts.only ?? [...session.cast.map((c) => c.id), 'scene'];
+  for (const pic of pics) {
+    if (pic !== 'scene' && !session.cast.some((c) => c.id === pic)) {
+      throw new Error(`Unknown picture --only ${pic} for ${opts.file}; use a cast id or scene.`);
+    }
+  }
+  const scenePrompt = opts.scenePrompt ?? ROLE_SCENE_PROMPTS[role];
+  if (!scenePrompt) throw new Error(`No scene prompt for role ${role}; pass --scene-prompt "...".`);
+  if (!opts.finalizeOnly) {
+    for (const pic of pics) {
+      if (pic === 'scene') {
+        await generatePicture({ key: opts.key, pic: `${role}-scene`, prompt: scenePrompt, referenceB64: null, size: '1536x1024' });
+      } else {
+        const member = session.cast.find((c) => c.id === pic)!;
+        await generatePicture({
+          key: opts.key,
+          pic: `${role}-${pic}`,
+          prompt: rolePortraitPrompt(member.name, member.description),
+          referenceB64: null,
+          size: '1024x1024',
+        });
+      }
+    }
+    const ledger = loadLedger();
+    console.log(
+      `Ledger: ${ledger.imageCalls} image calls total, attempts ${JSON.stringify(ledger.attempts)}. ` +
+        `Rough image spend: $${(ledger.imageCalls * 0.01).toFixed(2)} (billed only for returned images, $0.01 each).`,
+    );
+    return;
+  }
+  // Finalize: portraits to public/art/<role>/, the scene to the session's
+  // scene path, all as WebP.
+  const roleDir = join(process.cwd(), 'public', 'art', role);
+  mkdirSync(roleDir, { recursive: true });
+  const files: { pic: string; src: string; dest: string; maxW: number }[] = [];
+  for (const pic of pics) {
+    if (pic === 'scene') {
+      files.push({
+        pic: `${role}-scene`,
+        src: latestCandidate(`${role}-scene`, opts.keep.scene ?? opts.keep[`${role}-scene`] ?? null),
+        dest: join(process.cwd(), 'public', session.scene),
+        maxW: 1024,
+      });
+    } else {
+      const member = session.cast.find((c) => c.id === pic)!;
+      files.push({
+        pic: `${role}-${pic}`,
+        src: latestCandidate(`${role}-${pic}`, opts.keep[pic] ?? null),
+        dest: join(roleDir, `${member.id}.webp`),
+        maxW: 512,
+      });
+    }
+  }
+  mkdirSync(join(process.cwd(), 'public', dirnameOf(session.scene)), { recursive: true });
+  const spec = JSON.stringify(files.map((f) => ({ src: f.src, dest: f.dest, maxW: f.maxW })));
+  const py = `
+import json, sys
+from PIL import Image
+spec = json.loads(sys.argv[1])
+budget = int(sys.argv[2])
+for quality in (80, 70, 60, 50, 40, 30):
+    total = 0
+    for item in spec:
+        im = Image.open(item["src"]).convert("RGB")
+        if im.width > item["maxW"]:
+            im = im.resize((item["maxW"], round(im.height * item["maxW"] / im.width)), Image.LANCZOS)
+        im.save(item["dest"], "WEBP", quality=quality, method=6)
+    import os
+    total = sum(os.path.getsize(item["dest"]) for item in spec)
+    print(f"quality {quality}: total {total} bytes")
+    if total <= budget:
+        break
+else:
+    sys.exit("over budget at quality 30")
+`;
+  try {
+    const out = execFileSync('python3', ['-c', py, spec, String(SIZE_BUDGET_BYTES)], { encoding: 'utf8' });
+    console.log(out.trim());
+  } catch (err) {
+    throw new Error(`Compression failed: ${(err as Error).message}`);
+  }
+}
+
+function dirnameOf(p: string): string {
+  const i = p.lastIndexOf('/');
+  return i < 0 ? '.' : p.slice(0, i);
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const onlyAll = args.filter((a, i) => args[i - 1] === '--only');
@@ -438,6 +562,8 @@ async function main(): Promise<void> {
       if (pic && n) keep[pic.trim()] = Number(n);
     }
   }
+  const sessionFile = args.includes('--session') ? args[args.indexOf('--session') + 1] : null;
+  const scenePrompt = args.includes('--scene-prompt') ? args[args.indexOf('--scene-prompt') + 1] : null;
 
   if (handFile) {
     writeHandBoxes(handFile);
@@ -446,6 +572,18 @@ async function main(): Promise<void> {
 
   const env = loadEnv();
   const key = requireModelApiKey(env);
+
+  if (sessionFile) {
+    await runRoleSession({
+      key,
+      file: sessionFile,
+      only,
+      scenePrompt,
+      keep,
+      finalizeOnly,
+    });
+    return;
+  }
 
   if (finalizeOnly) {
     finalize(keep);

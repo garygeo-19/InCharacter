@@ -6,8 +6,9 @@ import { applyAnswersEvidence, applyClassEvidence } from '../shared/evidence';
 import { fetchCatalog, fetchPack, liveEntries } from '../shared/notes';
 import { fallbackPick, validatePicks, type UsableQuestion } from '../shared/picker';
 import { questionAudioUrl } from '../shared/question-audio';
+import { resolveTurn } from '../shared/session';
 import { TRANSCRIBE_MAX_AUDIO_BYTES, turnsToLines, wavProblem } from '../shared/voice';
-import { classContent, partStatuses } from './content';
+import { classContent, partStatuses, sessionContent } from './content';
 import { requireModelApiKey } from './env-shared';
 import { chatStructured, createMetaClient } from './meta';
 import { transcribeStream } from './transcribe';
@@ -21,9 +22,11 @@ import {
   GRADE_ANSWERS_SYSTEM,
   GRADE_CLASS_SYSTEM,
   PICK_SYSTEM,
+  TURN_SYSTEM,
   gradeAnswersSchema,
   gradeClassSchema,
   pickSchema,
+  turnSchema,
 } from './prompts';
 
 // Hono app (REQUIREMENTS.md §10.2/§10.3). Runs on Node in dev and on
@@ -49,21 +52,38 @@ const GradeAnswersBody = z.object({
     .array(z.object({ questionId: z.string(), lines: z.array(LineSchema).max(400) }))
     .max(3),
 });
+const TurnBody = z.object({
+  packId: z.string(),
+  partId: z.string(),
+  nodeId: z.string(),
+  lines: z.array(LineSchema).max(400),
+  visited: z.array(z.string()).default([]),
+});
+const GradeSessionBody = z.object({
+  packId: z.string(),
+  partId: z.string(),
+  answers: z
+    .array(z.object({ nodeId: z.string(), lines: z.array(LineSchema).max(400) }))
+    .max(8),
+});
 
 function totalChars(lines: { text: string }[]): number {
   return lines.reduce((s, l) => s + l.text.length, 0);
 }
 
-// Per-IP rate limits (§10.4): 36 class-op calls an hour ≈ 12 classes (pick +
-// class grade + answers grade each), and 240 transcriptions an hour on the
-// transcribe route (chunked upload, owner fix 31 Oct 2026: a 3:00 class
-// plus 3 answers POSTs ~18 chunks). Decision 30 Oct 2026, raised 31 Oct
-// 2026. These counters live in module
-// scope: on Node the process is the unit; on Workers each isolate keeps its
-// own (best effort — see README "Deploy").
+// Per-IP rate limits (§10.4, §16.3): 72 class-op calls an hour on the
+// shared class-op counter (pick, class grade, answers grade, turn, session
+// grade). A teach class costs 3 calls and a full 9-node coach session costs
+// up to 9 (8 turns + 1 session grade), so 72 fits e.g. 12 classes plus 4
+// sessions an hour. Transcriptions keep their own counter (240/hour, chunked
+// upload, owner fix 31 Oct 2026). Decision 30 Oct 2026, raised 31 Oct 2026
+// (transcribe split) and 1 Nov 2026 (36 → 72 for sessions). These counters
+// live in module scope: on Node the process is the unit; on Workers each
+// isolate keeps its own (best effort — see README "Deploy").
+const CLASS_OP_LIMIT = 72;
 const HITS = new Map<string, number[]>();
 const TRANSCRIBE_HITS = new Map<string, number[]>();
-function rateLimited(ip: string, limit = 36, store = HITS): boolean {
+function rateLimited(ip: string, limit = CLASS_OP_LIMIT, store = HITS): boolean {
   const now = Date.now();
   const kept = (store.get(ip) ?? []).filter((t) => now - t < 3_600_000);
   kept.push(now);
@@ -90,7 +110,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
 
 export function createApp(
   env: Record<string, string>,
-  opts?: { saveFailedWav?: (wav: Uint8Array) => void },
+  opts?: { saveFailedWav?: (wav: Uint8Array) => void; modelFetch?: typeof fetch },
 ) {
   const app = new Hono();
   const origin = env.APP_ORIGIN ?? 'http://localhost:5173';
@@ -179,6 +199,174 @@ export function createApp(
       });
     } catch (err) {
       return c.json({ error: (err as Error).message }, 502);
+    }
+  });
+
+  // Sessions (§16.2–16.3): the playable script for one part. Usable
+  // sessions only; node audio goes out as mp3 URLs like banks, and the
+  // client never sees voiceId.
+  app.get('/api/session/:packId/:partId', async (c) => {
+    try {
+      const entry = await catalogEntry(c.req.param('packId'));
+      const { session } = await sessionContent(base, entry, c.req.param('partId'), statuses);
+      const wantRole = c.req.query('role');
+      if (wantRole && wantRole !== session.role) {
+        return c.json({ error: 'No usable session for this role.' }, 404);
+      }
+      return c.json({
+        role: session.role,
+        brief: session.brief,
+        cast: session.cast.map(({ id, name, description, portrait }) => ({
+          id, name, description, portrait,
+        })),
+        scene: session.scene,
+        start: session.start,
+        nodes: session.nodes.map((n) => ({
+          id: n.id,
+          speaker: n.speaker,
+          text: n.text,
+          gloss: n.gloss,
+          scene: n.scene ?? session.scene,
+          reply: n.reply,
+          end: n.end,
+          noteIds: n.noteIds,
+          expectedPoints: n.expectedPoints,
+          routes: n.routes.map((r) => ({ id: r.id })),
+          audioUrl: questionAudioUrl(c.req.param('packId'), c.req.param('partId'), n.id, n.audio),
+        })),
+      });
+    } catch (err) {
+      const message = (err as Error).message;
+      const missing = message === 'no usable session for this part' || message.startsWith('Unknown part');
+      return c.json({ error: message }, missing ? 404 : 502);
+    }
+  });
+
+  // Game master (§16.3): after each reply, route to the next checked line.
+  // muse-spark-1.3 at low reasoning with an 8 s timeout and an enum output
+  // (the node's route ids plus "unclear"); code maps "unclear", a timeout
+  // or an invalid answer to `default`, and a revisited node follows
+  // `default` without calling the model (no loops).
+  app.post('/api/turn', async (c) => {
+    const ip = clientIp(c);
+    if (rateLimited(ip)) return c.json({ error: 'Too many classes this hour.' }, 429);
+    const parsed = TurnBody.safeParse(await c.req.json());
+    if (!parsed.success) return c.json({ error: 'Bad request.' }, 400);
+    const { packId, partId, nodeId, lines, visited } = parsed.data;
+    if (totalChars(lines) > 30_000) return c.json({ error: 'Reply too long.' }, 400);
+    try {
+      const entry = await catalogEntry(packId);
+      const { notes, session } = await sessionContent(base, entry, partId, statuses);
+      const node = session.nodes.find((n) => n.id === nodeId);
+      if (!node) return c.json({ error: 'Unknown node.' }, 400);
+      if (!node.reply || visited.includes(node.id)) {
+        return c.json(resolveTurn(node, null, visited));
+      }
+      const noteTexts = new Map(notes.map((n) => [n.id, n.text]));
+      const client = createMetaClient(requireModelApiKey(env), opts?.modelFetch);
+      const input = JSON.stringify({
+        line: node.text,
+        notes: node.noteIds.map((id) => ({ id, text: noteTexts.get(id) ?? '' })),
+        routes: node.routes.map((r) => ({ id: r.id, when: r.when })),
+        reply: lines.map((l, i) => `L${i + 1}: ${l.text}`),
+      });
+      try {
+        checkBudget();
+        const model = await withTimeout(
+          chatStructured<{ route: string }>({
+            client, model: 'muse-spark-1.3', system: TURN_SYSTEM, user: input,
+            schemaName: 'GameMasterTurn',
+            schema: turnSchema(node.routes.map((r) => r.id)),
+            reasoningEffort: 'low',
+          }),
+          8000,
+          'turn',
+        );
+        return c.json(resolveTurn(node, model.route, visited));
+      } catch {
+        // Unclear, timeout or invalid answer: the default (§16.3).
+        return c.json(resolveTurn(node, null, visited));
+      }
+    } catch (err) {
+      const status = (err as { status?: number }).status ?? 502;
+      return c.json({ error: (err as Error).message }, status as 502);
+    }
+  });
+
+  // Session grading (§16.3): one call when the session ends. Each visited
+  // reply node grades as a "question" through the answers grader (A.3/B.3)
+  // with the reply as its answer; the evidence rules (§8.5) apply.
+  app.post('/api/grade/session', async (c) => {
+    const ip = clientIp(c);
+    if (rateLimited(ip)) return c.json({ error: 'Too many classes this hour.' }, 429);
+    const parsed = GradeSessionBody.safeParse(await c.req.json());
+    if (!parsed.success) return c.json({ error: 'Bad request.' }, 400);
+    const { packId, partId, answers } = parsed.data;
+    if (answers.some((a) => totalChars(a.lines) > 30_000)) {
+      return c.json({ error: 'Answer too long.' }, 400);
+    }
+    try {
+      const entry = await catalogEntry(packId);
+      const { notes, session } = await sessionContent(base, entry, partId, statuses);
+      const byId = new Map(session.nodes.map((n) => [n.id, n]));
+      const noteTexts = new Map(notes.map((n) => [n.id, n.text]));
+      const picked = answers.map((a) => a.nodeId);
+      const client = createMetaClient(requireModelApiKey(env), opts?.modelFetch);
+      const input = JSON.stringify(
+        answers.map((a) => {
+          const n = byId.get(a.nodeId);
+          if (!n) throw new Error(`Unknown node: ${a.nodeId}`);
+          return {
+            questionId: n.id,
+            text: n.text,
+            type: 'apply',
+            misconception: null,
+            expectedPoints: n.expectedPoints.map((p, i) => ({ index: i, point: p.text })),
+            notes: n.noteIds.map((id) => ({ id, text: noteTexts.get(id) ?? '' })),
+            answer: a.lines.map((l, i) => `L${i + 1}: ${l.text}`),
+          };
+        }),
+      );
+      let lastError: unknown = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          checkBudget();
+          const model = await withTimeout(
+            chatStructured<{ answers: { questionId: string; points: { index: number; result: string; quote: string | null }[]; contradictions: { quote: string; noteId: string; why: string }[] }[] }>({
+              client, model: 'muse-spark-1.3', system: GRADE_ANSWERS_SYSTEM, user: input,
+              schemaName: 'GradeSession',
+              schema: gradeAnswersSchema(picked, notes.map((n) => n.id)),
+              reasoningEffort: 'medium',
+            }),
+            30_000,
+            'grade/session',
+          );
+          const checked = applyAnswersEvidence(
+            {
+              answers: model.answers.map((a) => ({
+                questionId: a.questionId,
+                points: a.points.map((p) => ({
+                  index: p.index,
+                  result: p.result as 'hit' | 'partial' | 'none',
+                  quote: p.quote,
+                })),
+                contradictions: a.contradictions ?? [],
+              })),
+            },
+            new Map(answers.map((a) => [a.nodeId, a.lines.map((l) => l.text)])),
+          );
+          return c.json({
+            answers: checked.answers.map((a) => ({ ...a, nodeId: a.questionId })),
+            dropped: checked.dropped,
+          });
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      return c.json({ error: `Grading failed: ${(lastError as Error)?.message ?? 'unknown'}` }, 502);
+    } catch (err) {
+      const status = (err as { status?: number }).status ?? 502;
+      return c.json({ error: (err as Error).message }, status as 502);
     }
   });
 
@@ -289,7 +477,7 @@ export function createApp(
         bankIndex: i,
       }));
       const transcript = classLines.map((l) => l.text).join('\n');
-      const client = createMetaClient(requireModelApiKey(env));
+      const client = createMetaClient(requireModelApiKey(env), opts?.modelFetch);
       const input = JSON.stringify({
         notes: notes.map((n) => ({ id: n.id, label: n.label, text: n.text })),
         transcript: classLines.map((l, i) => `L${i + 1}: ${l.text}`),
@@ -334,7 +522,7 @@ export function createApp(
     try {
       const entry = await catalogEntry(packId);
       const { notes } = await classContent(base, entry, partId, statuses);
-      const client = createMetaClient(requireModelApiKey(env));
+      const client = createMetaClient(requireModelApiKey(env), opts?.modelFetch);
       const input = JSON.stringify({
         notes: notes.map((n) => ({ id: n.id, kind: n.kind, label: n.label, text: n.text })),
         transcript: classLines.map((l, i) => `L${i + 1}: ${l.text}`),
@@ -393,7 +581,7 @@ export function createApp(
       const byId = new Map(questions.map((q) => [q.id, q]));
       const noteTexts = new Map(notes.map((n) => [n.id, n.text]));
       const picked = answers.map((a) => a.questionId);
-      const client = createMetaClient(requireModelApiKey(env));
+      const client = createMetaClient(requireModelApiKey(env), opts?.modelFetch);
       const input = JSON.stringify(
         answers.map((a) => {
           const q = byId.get(a.questionId);

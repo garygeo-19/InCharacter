@@ -19,7 +19,7 @@ const TAP_CLOSE_MS = 10_000;
 export function OutlinePeek(props: {
   outline: Outline;
   noteText: (id: string) => string;
-  phase: 'class' | 'questions';
+  phase: 'class' | 'questions' | 'session';
   peekStyle: 'hold' | 'tap';
   onPeek: (peek: Peek) => void;
 }) {

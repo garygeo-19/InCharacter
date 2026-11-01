@@ -55,6 +55,19 @@ export function usableQuestions(bank: Bank, statuses: string[]): BankQuestion[] 
   return bank.questions.filter((q) => statuses.includes(q.status));
 }
 
+/** One reference list is fresh when every id still exists with the recorded
+ *  hash. Shared by banks (§7.6) and sessions (§16.2). */
+export function notesFresh(
+  recorded: { id: string; hash: string }[],
+  notes: Note[],
+  ids: string[],
+): boolean {
+  if (ids.length === 0) return false;
+  const hashes = new Map(notes.map((n) => [n.id, n.hash]));
+  const want = new Map(recorded.map((n) => [n.id, n.hash]));
+  return ids.every((id) => hashes.get(id) === want.get(id));
+}
+
 /** Stale guard (§7.6): a question is usable only while all its notes still
  *  exist with the hashes recorded when the bank was written. */
 export function staleUsableIds(bank: Bank, notes: Note[]): Set<string> {

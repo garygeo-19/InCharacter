@@ -8,6 +8,7 @@ import {
   type BankQuestion,
 } from '../shared/bank';
 import { buildNotes, fetchPack, isTeachable, type CatalogEntry, type Note } from '../shared/notes';
+import { isSessionUsable, SessionFileSchema, type SessionFile } from '../shared/session';
 
 // Server content: live packs from the catalog, banks from content/banks/.
 // The client never sees prompts or keys; it only gets notes and verdicts.
@@ -76,6 +77,61 @@ export function loadBank(packId: string, partId: string): Bank | null {
   return bank;
 }
 
+// Session files (§16.2): content/sessions/{packId}/{partId}.json on Node,
+// bundled JSON registered with setSessionFiles() on Workers — the same two
+// sources as banks. Parsed sessions are cached in module scope.
+let sessionFiles: Record<string, unknown> | null = null;
+const sessionCache = new Map<string, SessionFile | null>();
+
+export function setSessionFiles(map: Record<string, unknown>): void {
+  sessionFiles = map;
+  sessionCache.clear();
+}
+
+function readSessionDisk(packId: string, partId: string): unknown {
+  try {
+    const proc = (
+      globalThis as {
+        process?: { getBuiltinModule?: (id: string) => unknown; cwd?: () => string };
+      }
+    ).process;
+    const getBuiltin = proc?.getBuiltinModule;
+    if (typeof getBuiltin !== 'function') return null;
+    const fs = getBuiltin.call(proc, 'node:fs') as {
+      readFileSync?: (path: string, encoding: string) => string;
+    };
+    const cwd = typeof proc?.cwd === 'function' ? proc.cwd() : '.';
+    if (typeof fs?.readFileSync !== 'function') return null;
+    return JSON.parse(
+      fs.readFileSync(`${cwd}/content/sessions/${packId}/${partId}.json`, 'utf8'),
+    ) as unknown;
+  } catch {
+    return null;
+  }
+}
+
+export function loadSession(packId: string, partId: string): SessionFile | null {
+  const key = `${packId}/${partId}`;
+  if (sessionCache.has(key)) return sessionCache.get(key) ?? null;
+  let session: SessionFile | null = null;
+  try {
+    const raw: unknown = sessionFiles ? (sessionFiles[key] ?? null) : readSessionDisk(packId, partId);
+    if (raw) {
+      const parsed = SessionFileSchema.parse(raw);
+      if (parsed.packId === packId && parsed.partId === partId) session = parsed;
+    }
+  } catch {
+    session = null;
+  }
+  sessionCache.set(key, session);
+  return session;
+}
+
+/** A part's session is usable only when every node is (§16.2). */
+export function sessionUsable(session: SessionFile | null, notes: Note[], statuses: string[]): boolean {
+  return !!session && isSessionUsable(session, statuses, notes);
+}
+
 export type PartStatus = {
   id: string;
   title: string;
@@ -84,6 +140,7 @@ export type PartStatus = {
   teachable: boolean;
   ready: boolean;
   usableByDifficulty: [number, number, number];
+  sessions: { coach: boolean; travel: boolean };
 };
 
 export async function partStatuses(
@@ -106,6 +163,8 @@ export async function partStatuses(
         const fresh = staleUsableIds(bank, notes);
         usable = usableQuestions(bank, statuses).filter((q) => fresh.has(q.id));
       }
+      const partSession = loadSession(entry.id, part.id);
+      const sessionOk = sessionUsable(partSession, notes, statuses);
       return {
         id: part.id,
         title: part.title,
@@ -113,6 +172,10 @@ export async function partStatuses(
         noteCount: notes.length,
         teachable: isTeachable(notes),
         ready: isReady(usable),
+        sessions: {
+          coach: sessionOk && partSession?.role === 'coach',
+          travel: sessionOk && partSession?.role === 'travel',
+        },
         usableByDifficulty: [
           usable.filter((q) => q.difficulty === 1).length,
           usable.filter((q) => q.difficulty === 2).length,
@@ -123,6 +186,22 @@ export async function partStatuses(
     return { id: lesson.id, title: lesson.title, parts };
   });
   return { packVersion: pack.packVersion, lessons };
+}
+
+/** Notes plus the fresh, usable session for turns and session grading. */
+export async function sessionContent(
+  base: string,
+  entry: CatalogEntry,
+  partId: string,
+  statuses: string[],
+): Promise<{ notes: Note[]; session: SessionFile }> {
+  const pack = await fetchPack(base, entry);
+  const notes = buildNotes(pack, partId);
+  const session = loadSession(entry.id, partId);
+  if (!session || !sessionUsable(session, notes, statuses)) {
+    throw new Error('no usable session for this part');
+  }
+  return { notes, session };
 }
 
 /** Notes plus the fresh, usable bank questions for grading and picking. */

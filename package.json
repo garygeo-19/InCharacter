@@ -22,6 +22,10 @@
     "bank:review": "tsx scripts/bank-review.ts",
     "bank:approve": "tsx scripts/bank-approve.ts",
     "bank:audio": "tsx scripts/bank-audio.ts",
+    "session:build": "tsx scripts/session-build.ts",
+    "session:review": "tsx scripts/session-review.ts",
+    "session:approve": "tsx scripts/session-approve.ts",
+    "session:audio": "tsx scripts/session-audio.ts",
     "art:build": "tsx scripts/art-build.ts"
   },
   "dependencies": {

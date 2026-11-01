@@ -3,8 +3,15 @@ import OpenAI from 'openai';
 // Meta Model API via the OpenAI SDK (REQUIREMENTS.md §9.1).
 // Chat Completions structured output: response_format json_schema, strict.
 // See https://dev.meta.ai/docs/structured-output
-export function createMetaClient(apiKey: string): OpenAI {
-  return new OpenAI({ baseURL: 'https://api.meta.ai/v1', apiKey });
+export function createMetaClient(apiKey: string, fetchImpl?: typeof fetch): OpenAI {
+  // fetchImpl is dependency injection for tests: the server passes its
+  // request fetch through createApp opts, so unit tests can answer model
+  // calls without touching the network or the SDK's internals.
+  return new OpenAI({
+    baseURL: 'https://api.meta.ai/v1',
+    apiKey,
+    ...(fetchImpl ? { fetch: fetchImpl } : {}),
+  });
 }
 
 export type JsonSchema = Record<string, unknown>;

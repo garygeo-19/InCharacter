@@ -10,7 +10,7 @@
 // banked, add its import and map entry here before redeploying.
 
 import { createApp } from './app';
-import { setBankFiles } from './content';
+import { setBankFiles, setSessionFiles } from './content';
 import p10 from '../../content/banks/spanish-food-shopping/p10-at-the-restaurant.json';
 import p11 from '../../content/banks/spanish-food-shopping/p11-common-foods.json';
 import p12 from '../../content/banks/spanish-food-shopping/p12-drinks-sweets.json';
@@ -20,6 +20,10 @@ setBankFiles({
   'spanish-food-shopping/p11-common-foods': p11,
   'spanish-food-shopping/p12-drinks-sweets': p12,
 });
+
+// No approved sessions ship yet (the reviewer runs session:build live);
+// register each new content/sessions/{packId}/{partId}.json here on deploy.
+setSessionFiles({});
 
 type Env = {
   MODEL_API_KEY: string;
