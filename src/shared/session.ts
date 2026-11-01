@@ -20,10 +20,20 @@ const AudioSchema = z.object({
   model: z.string(),
 });
 
+// One walking-map step (§16.6): turn relative to the current heading, then
+// walk that many blocks. Missing or empty moves stay put (the "¿Perdón?"
+// repeats). Validated here so old sessions without moves still load.
+export const MoveSchema = z.object({
+  turn: z.enum(['left', 'right', 'none']),
+  blocks: z.number().int().min(0).max(5),
+});
+export type SessionMove = z.infer<typeof MoveSchema>;
+
 const RouteSchema = z.object({
   id: z.string(),
   when: z.string(),
   next: z.string(),
+  moves: z.array(MoveSchema).optional(),
 });
 
 const ExpectedPointSchema = z.object({
@@ -75,6 +85,9 @@ export const SessionFileSchema = z.object({
   scene: z.string(),
   start: z.string(),
   nodes: z.array(SessionNodeSchema),
+  // The walking map (§16.6, travel only): when present the session shows the
+  // map. Old sessions without it — and the coach session — still load.
+  map: z.object({ start: z.string(), goal: z.string() }).optional(),
 });
 export type SessionFile = z.infer<typeof SessionFileSchema>;
 
@@ -95,7 +108,11 @@ export function isSessionUsable(
 ): boolean {
   if (session.nodes.length === 0) return false;
   return session.nodes.every(
-    (n) => statuses.includes(n.status) && notesFresh(session.notes, notes, n.noteIds),
+    (n) =>
+      statuses.includes(n.status) &&
+      // An end node cites no notes (the arrival line needs no grounding),
+      // so there is nothing that can go stale.
+      (n.noteIds.length === 0 || notesFresh(session.notes, notes, n.noteIds)),
   );
 }
 

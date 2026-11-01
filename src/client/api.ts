@@ -47,6 +47,12 @@ export type LineIn = { n: number; text: string };
 
 export type SessionRole = 'coach' | 'travel';
 
+export type SessionRouteDisplay = {
+  id: string;
+  /** The walking-map moves for this route (§16.6); absent on old sessions. */
+  moves?: { turn: 'left' | 'right' | 'none'; blocks: number }[] | null;
+};
+
 export type SessionNodeDisplay = {
   id: string;
   speaker: string;
@@ -57,7 +63,7 @@ export type SessionNodeDisplay = {
   end: boolean;
   noteIds: string[];
   expectedPoints: { text: string; noteIds: string[] }[];
-  routes: { id: string }[];
+  routes: SessionRouteDisplay[];
   audioUrl: string | null;
 };
 
@@ -68,6 +74,8 @@ export type SessionDisplay = {
   scene: string;
   start: string;
   nodes: SessionNodeDisplay[];
+  /** The walking map (§16.6, travel only); null on old sessions and coach. */
+  map?: { start: string; goal: string } | null;
 };
 
 export type SessionGrade = {

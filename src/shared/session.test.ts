@@ -223,6 +223,20 @@ describe('session usability (shared with banks)', () => {
     const changed = [{ ...NOTES[0], hash: 'deadbeef' }, NOTES[1]];
     expect(isSessionUsable(s, ['approved'], changed)).toBe(false);
   });
+  it('an end node with no noteIds stays usable (travel arrivals)', () => {
+    const arrival = node({
+      id: 'arrive', speaker: 'alex', reply: false, routes: [], default: null,
+      end: true, noteIds: [], expectedPoints: [],
+    });
+    const s = session([
+      node({
+        id: 'open', noteIds: ['ah-p8-f1'],
+        routes: [{ id: 'on', when: 'Any reply', next: 'arrive' }], default: 'arrive',
+      }),
+      arrival,
+    ]);
+    expect(isSessionUsable(s, ['approved'], NOTES)).toBe(true);
+  });
   it('the fixture parses against the schema', async () => {
     const fs = await import('node:fs');
     const path = await import('node:path');

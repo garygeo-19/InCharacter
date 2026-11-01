@@ -247,3 +247,119 @@ describe('session routes (stubbed pack, session and model)', () => {
     expect(body.dropped).toBe(0);
   });
 });
+
+describe('walking map display shape (§16.6)', () => {
+  const TRAVEL_PACK = {
+    packId: 'spanish-travel-lodging',
+    packName: 'Spanish: Travel & Lodging',
+    packVersion: '1.0.7',
+    language: 'es',
+    lessons: [{
+      id: 'l5-travel', title: 'Lesson 5', order: 0,
+      parts: [{
+        id: 'p14-asking-directions', title: 'Part 14: Asking Directions',
+        blurb: 'Find your way.', itemIds: ['pair-derecha'],
+      }],
+      objectives: [],
+    }],
+    items: [
+      {
+        id: 'pair-derecha', shape: 'pair',
+        sideA: { modality: 'text', value: 'la derecha' },
+        sideB: { modality: 'text', value: 'to the right' },
+      },
+    ],
+  };
+
+  const TRAVEL_CATALOG = {
+    catalogVersion: 1,
+    packs: [{
+      id: 'spanish-travel-lodging', name: 'Spanish: Travel & Lodging', version: '1.0.7',
+      contentHash: 'sha256:y', language: 'es', url: '/packs/spanish-travel-lodging.json',
+      lessonCount: 1, cardCount: 1, status: 'ga',
+    }],
+  };
+
+  function travelSession(noteHash: string) {
+    return {
+      schemaVersion: 1,
+      role: 'travel',
+      packId: 'spanish-travel-lodging',
+      packVersion: '1.0.7',
+      lessonId: 'l5-travel',
+      partId: 'p14-asking-directions',
+      builtAt: '2026-11-01',
+      notes: [{ id: 'pair-derecha', hash: noteHash }],
+      brief: 'Ask the way to the station.',
+      cast: [{ id: 'lucia', name: 'Doña Lucía', description: 'd', voiceId: 'v', portrait: 'art/travel/lucia.webp' }],
+      scene: 'art/travel/scene.webp',
+      start: 'lucia-1',
+      map: { start: 'Plaza', goal: 'Estación' },
+      nodes: [
+        {
+          id: 'lucia-1', speaker: 'lucia', text: 'Dobla a la derecha.',
+          gloss: 'Turn right.', scene: null, ttsText: null, audio: null, reply: true,
+          noteIds: ['pair-derecha'],
+          expectedPoints: [{ text: 'Say you will turn right', noteIds: ['pair-derecha'] }],
+          routes: [{
+            id: 'lucia-right', when: 'traveler says they will turn right',
+            next: 'arrive', moves: [{ turn: 'right', blocks: 1 }],
+          }],
+          default: 'arrive', end: false, status: 'checked', check: null, review: null,
+        },
+        {
+          id: 'arrive', speaker: 'lucia', text: '¡Aquí está!',
+          gloss: 'Here it is!', scene: null, ttsText: null, audio: null, reply: false,
+          noteIds: [], expectedPoints: [], routes: [], default: null,
+          end: true, status: 'checked', check: null, review: null,
+        },
+      ],
+    };
+  }
+
+  async function travelApp() {
+    const { buildNotes } = await import('../src/shared/notes');
+    const notes = buildNotes(TRAVEL_PACK as never, 'p14-asking-directions');
+    const hash = notes.find((n) => n.id === 'pair-derecha')!.hash;
+    setSessionFiles({ 'spanish-travel-lodging/p14-asking-directions': travelSession(hash) });
+    vi.stubGlobal('fetch', async (url: unknown) => {
+      const u = String(url);
+      if (u.endsWith('/packs/catalog.json')) return { ok: true, json: async () => TRAVEL_CATALOG };
+      if (u.endsWith('.json')) return { ok: true, json: async () => TRAVEL_PACK };
+      throw new Error(`unstubbed fetch: ${u}`);
+    });
+    return createApp({ MODEL_API_KEY: 'test-key' }, { modelFetch: modelFetch as typeof fetch });
+  }
+
+  it('serves route moves and the session map', async () => {
+    const app = await travelApp();
+    const res = await app.request(
+      '/api/session/spanish-travel-lodging/p14-asking-directions?role=travel',
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      map: { start: string; goal: string } | null;
+      nodes: { id: string; routes: { id: string; moves: { turn: string; blocks: number }[] }[] }[];
+    };
+    expect(body.map).toEqual({ start: 'Plaza', goal: 'Estación' });
+    expect(body.nodes[0].routes).toEqual([
+      { id: 'lucia-right', moves: [{ turn: 'right', blocks: 1 }] },
+    ]);
+    expect(JSON.stringify(body)).not.toContain('voiceId');
+  });
+
+  it('old sessions without moves or map expose [] and null', async () => {
+    stubNetwork();
+    const app = testApp();
+    const res = await app.request('/api/session/atomic-habits/part-8?role=coach');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      map: { start: string; goal: string } | null;
+      nodes: { routes: { id: string; moves: unknown[] }[] }[];
+    };
+    expect(body.map).toBeNull();
+    for (const n of body.nodes) {
+      for (const r of n.routes) expect(r.moves).toEqual([]);
+    }
+  });
+});

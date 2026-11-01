@@ -11,6 +11,8 @@ import { buildNotes, buildOutline, PackSchema, stripPrefix, type Note } from '..
 import { SCORING_CONFIG } from '../shared/scoring-config';
 import { formatPoints, headlineFor } from '../shared/scoring';
 import { scoreSessionRun } from '../shared/session';
+import { describeWalk, resolveLegMoves, type WalkMove } from '../shared/walk';
+import { TownMap, type TownMapSpeaker } from './TownMap';
 import type { Line, Peek } from '../shared/types';
 import {
   api,
@@ -74,6 +76,10 @@ export function Session(props: {
   const [phase, setPhase] = useState<Phase>({ name: 'briefing' });
   const [visited, setVisited] = useState<string[]>([]);
   const [routePath, setRoutePath] = useState<string[]>([]);
+  // The walking map (§16.6): one entry per transition taken, in order. The
+  // moves come from the route the game master chose (or stay put on the
+  // default); the trail is drawn only from these.
+  const [trail, setTrail] = useState<{ nodeId: string; moves: WalkMove[] }[]>([]);
   const [answers, setAnswers] = useState<{ nodeId: string; lines: Line[] }[]>([]);
   const [peeks, setPeeks] = useState<Peek[]>([]);
   const [grade, setGrade] = useState<SessionGrade | null>(null);
@@ -108,6 +114,23 @@ export function Session(props: {
     () => new Map((session?.nodes ?? []).map((n) => [n.id, n])),
     [session],
   );
+  // Walking-map trail (§16.6): legs taken so far and who was met after each.
+  const trailLegs = useMemo(() => trail.map((t) => t.moves), [trail]);
+  const trailSpeakers = useMemo<TownMapSpeaker[]>(
+    () =>
+      (session ? trail : []).map((t) => {
+        const n = nodesById.get(t.nodeId);
+        const cast = session?.cast.find((c) => c.id === n?.speaker);
+        return {
+          nodeId: t.nodeId,
+          speakerId: n?.speaker ?? '',
+          name: cast?.name ?? n?.speaker ?? t.nodeId,
+          portrait: cast?.portrait ?? '',
+          end: n?.end ?? false,
+        };
+      }),
+    [trail, nodesById, session],
+  );
   const recordPeek = (peek: Peek) => setPeeks((p) => [...p, peek]);
 
   // Advance past a node: end nodes go to grading, anything else asks the
@@ -136,6 +159,11 @@ export function Session(props: {
     })
       .then((t) => {
         setRoutePath((p) => [...p, t.route]);
+        // Walk the moves of the route the game master chose (§16.6). The
+        // display shape carries each route's moves; the default stays put.
+        const cur = nodesById.get(nodeId);
+        const moves = cur ? resolveLegMoves(cur.routes, t.route, t.next) : [];
+        setTrail((tr) => [...tr, { nodeId: t.next, moves }]);
         setPhase({ name: 'turn', nodeId: t.next, asking: true });
       })
       .catch((e: Error) => setPhase({ name: 'failed', error: e.message }));
@@ -183,10 +211,28 @@ export function Session(props: {
           onStart={() => {
             ensureAudioContext();
             unlockAudioPlayback();
+            setTrail([]);
             setPhase({ name: 'turn', nodeId: session.start, asking: true });
           }}
         />
       )}
+      {(phase.name === 'turn' || phase.name === 'thinking') && session.map && (() => {
+        // The walking map (§16.6) stays mounted across turns and the
+        // thinking beat (no key), so when the next leg lands the dot walks
+        // it instead of jumping. The turn screen below remounts per node.
+        const node = nodesById.get(phase.nodeId);
+        const arrived = node?.end ?? false;
+        return (
+          <TownMap
+            legs={trailLegs}
+            speakers={trailSpeakers}
+            startLabel={session.map!.start}
+            goalLabel={session.map!.goal}
+            showGoal={arrived}
+            summary={describeWalk(trailLegs, { arrived, goal: session.map!.goal })}
+          />
+        );
+      })()}
       {phase.name === 'turn' && (() => {
         const node = nodesById.get(phase.nodeId);
         if (!node) return <p>Loading…</p>;
@@ -261,6 +307,8 @@ export function Session(props: {
           grade={grade}
           answers={answers}
           routePath={routePath}
+          legs={trailLegs}
+          speakers={trailSpeakers}
           peeks={peeks}
           packName={pack?.name ?? props.packId}
           icon={pack?.icon}
@@ -631,6 +679,8 @@ function SessionDebrief(props: {
   grade: SessionGrade;
   answers: { nodeId: string; lines: Line[] }[];
   routePath: string[];
+  legs: WalkMove[][];
+  speakers: TownMapSpeaker[];
   peeks: Peek[];
   packName: string;
   icon?: string;
@@ -658,6 +708,21 @@ function SessionDebrief(props: {
   return (
     <>
       <Celebration headline={headline} total={score.total} stars={score.stars} />
+      {props.session.map && (
+        <section aria-label="Your walk">
+          <h2>Your walk</h2>
+          <TownMap
+            legs={props.legs}
+            speakers={props.speakers}
+            startLabel={props.session.map.start}
+            goalLabel={props.session.map.goal}
+            showGoal
+            animate={false}
+            full
+            summary={describeWalk(props.legs, { arrived: true, goal: props.session.map.goal })}
+          />
+        </section>
+      )}
       <section aria-label="How your score was calculated">
         <h2>How your score was calculated</h2>
         <ul className="breakdown">

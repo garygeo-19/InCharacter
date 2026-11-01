@@ -1260,6 +1260,36 @@ line is grounded in the part's notes.
   the learner asked or chose, in plain English.
 - **Voice in:** language bias Spanish + English, keywords from the notes, as now.
 
+### 16.6 The walking map
+A map that draws itself as you walk — an owner request for the Traveler role.
+
+- **Never gives the answer away:** there is no full town map. It shows only where the traveler has been, drawn from
+  what the traveler SAID they would do (the route the game master chose), so it is always consistent with the
+  learner's own words.
+- **Schema:** an optional `moves` array on each route: `{ "turn": "left" | "right" | "none", "blocks": 0-5 }`
+  (turn first, relative to the current heading, then walk that many blocks). Missing or empty means stay put (used by
+  "¿Perdón?" repeats). An optional session-level `map: { "start": "Plaza", "goal": "Estación" }`; when present the
+  session shows the map. Both are validated with Zod; old sessions without them still load. The coach session has
+  neither.
+- **APIs:** `moves` and `map` are exposed in `GET /api/session` (display shape). No new API calls: the client applies
+  the moves of the route returned by `/api/turn` (and the default route's moves when the route is the default).
+- **Walk model** (pure, unit-tested in `src/shared/`): start at (0,0) heading north (up) at the start label's pin;
+  apply each step: turn, then advance `blocks` grid units. Record a pin at the position where each new node's speaker
+  is met (the position after the moves that led to that node). The end node's pin is the goal ("Estación", with a
+  station icon), shown only on arrival.
+- **Client:** a `TownMap` SVG component on the travel turn screen, compact (about 150 px tall on a phone, full width
+  of the column), above the line bubble: a faint street grid (blocks = cuadras) that pans/zooms to fit the trail, the
+  trail as a thick rounded path, a small portrait pin for each local met (their portrait image in a circle, name on
+  hover/title), the start label, and a "you are here" dot. When a move happens, the dot walks along the new segment
+  over ~600 ms (no animation with prefers-reduced-motion; the final state shows at once). The debrief shows the full
+  map with the whole trail. Colors from the existing theme tokens, legible in light and dark. Accessibility:
+  `role="img"` with a text summary ("You walked right 3 blocks, then straight 2 and left 1, and reached the
+  station.").
+- **Unchanged:** the "Show English" gloss peek and everything else.
+- **Acceptance:** unit tests for the walk model (turns, multi-step moves, empty moves, pins, bounds), schema tests
+  (moves/map optional), and a Playwright check (mocked APIs, travel session) that the map shows the start pin, the
+  dot moves after a turn, and the station pin appears only at the end.
+
 ---
 
 ## Appendix A. Prompts (drafts)

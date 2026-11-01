@@ -221,6 +221,9 @@ export function createApp(
         })),
         scene: session.scene,
         start: session.start,
+        // The walking map (§16.6): each route's moves plus the session map.
+        // Old sessions without them expose []/null; the client stays put.
+        map: session.map ?? null,
         nodes: session.nodes.map((n) => ({
           id: n.id,
           speaker: n.speaker,
@@ -231,7 +234,7 @@ export function createApp(
           end: n.end,
           noteIds: n.noteIds,
           expectedPoints: n.expectedPoints,
-          routes: n.routes.map((r) => ({ id: r.id })),
+          routes: n.routes.map((r) => ({ id: r.id, moves: r.moves ?? [] })),
           audioUrl: questionAudioUrl(c.req.param('packId'), c.req.param('partId'), n.id, n.audio),
         })),
       });
