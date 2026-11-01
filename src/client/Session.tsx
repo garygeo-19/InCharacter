@@ -211,7 +211,7 @@ export function Session(props: {
           onStart={() => {
             ensureAudioContext();
             unlockAudioPlayback();
-            setTrail([]);
+            setTrail([{ nodeId: session.start, moves: [] }]);
             setPhase({ name: 'turn', nodeId: session.start, asking: true });
           }}
         />
@@ -788,7 +788,7 @@ function SessionDebrief(props: {
       </section>
 
       <div className="sticky-action">
-        <button type="button" className="primary" onClick={props.onRetry}>Coach again</button>
+        <button type="button" className="primary" onClick={props.onRetry}>{props.session.role === 'travel' ? 'Walk again' : 'Coach again'}</button>
         <div className="row">
           <button type="button" className="secondary" onClick={props.onMoreSessions}>More sessions</button>
           <button type="button" className="secondary" onClick={props.onExit}>Home</button>

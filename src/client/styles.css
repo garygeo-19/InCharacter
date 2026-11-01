@@ -520,7 +520,7 @@ button:disabled { opacity: 0.45; cursor: default; }
 .town-grid { stroke: var(--map-grid); stroke-width: 0.05; opacity: 0.9; }
 .town-trail { stroke: var(--map-trail); stroke-width: 0.32; stroke-linecap: round; stroke-linejoin: round; }
 .town-start-ring { fill: none; stroke: var(--map-label); stroke-width: 0.07; }
-.town-label { fill: var(--map-label); font-weight: 600; }
+.town-label { fill: var(--map-label); font-weight: 600; paint-order: stroke; stroke: var(--wash); stroke-width: 0.14; stroke-linejoin: round; }
 .town-pin-bg { fill: var(--map-pin-bg); stroke: var(--map-pin-ink); stroke-width: 0.06; }
 .town-pin-initial { fill: var(--map-pin-ink); font-weight: 700; }
 .town-pin-ring { fill: none; stroke: var(--map-pin-ink); stroke-width: 0.06; }
