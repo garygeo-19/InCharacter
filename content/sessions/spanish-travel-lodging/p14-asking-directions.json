@@ -95,7 +95,7 @@
   "nodes": [
     {
       "id": "lucia-1",
-      "status": "checked",
+      "status": "approved",
       "speaker": "lucia",
       "text": "Dobla a la derecha en la esquina, está a tres cuadras.",
       "gloss": "Turn right at the corner, it is three blocks away.",
@@ -173,7 +173,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/lucia-1.mp3",
         "textHash": "44fa8c148fefad15678fb63d3dc6681f589881474e6ff249351cd19a3dbf046e",
@@ -183,7 +187,7 @@
     },
     {
       "id": "lucia-perdon",
-      "status": "checked",
+      "status": "approved",
       "speaker": "lucia",
       "text": "¿Perdón? Gira a la derecha en la esquina.",
       "gloss": "Sorry? Turn right at the corner.",
@@ -242,7 +246,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/lucia-perdon.mp3",
         "textHash": "33ec2795c356321781cbe1f0f2b523fcfbde555bf45a1be43e397ee1293e2d53",
@@ -252,7 +260,7 @@
     },
     {
       "id": "pablo-2",
-      "status": "checked",
+      "status": "approved",
       "speaker": "pablo",
       "text": "Todo derecho dos cuadras, luego a la izquierda.",
       "gloss": "Straight ahead two blocks, then to the left.",
@@ -333,7 +341,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/pablo-2.mp3",
         "textHash": "279002a8c9c6db3da7c91a4bf5ed247f11769b3d39e2b00d9fb1d3daf303a163",
@@ -343,7 +355,7 @@
     },
     {
       "id": "pablo-perdon",
-      "status": "checked",
+      "status": "approved",
       "speaker": "pablo",
       "text": "¿Perdón? Todo derecho dos cuadras, y luego a la izquierda.",
       "gloss": "Sorry? Straight ahead two blocks, and then to the left.",
@@ -413,7 +425,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/pablo-perdon.mp3",
         "textHash": "27840a5f6957cdf41e001c45471ae0450fe1d9f7f5ec742f79638a91bec76ead",
@@ -423,7 +439,7 @@
     },
     {
       "id": "marisol-3",
-      "status": "checked",
+      "status": "approved",
       "speaker": "marisol",
       "text": "Está cerca, dobla a la derecha en la esquina.",
       "gloss": "It is near, turn right at the corner.",
@@ -499,7 +515,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/marisol-3.mp3",
         "textHash": "7be730a27b653a9cece1738791376dcde4499e7bd969d8597f2fb0d6a614624a",
@@ -509,7 +529,7 @@
     },
     {
       "id": "marisol-perdon",
-      "status": "checked",
+      "status": "approved",
       "speaker": "marisol",
       "text": "¿Perdón? A la derecha en la esquina. Está cerca.",
       "gloss": "Sorry? To the right at the corner. It is near.",
@@ -574,7 +594,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/marisol-perdon.mp3",
         "textHash": "7abb777877d9eb01762f363b381c934b37aa387f33cbd17c0e6e73d2eb897ad2",
@@ -584,7 +608,7 @@
     },
     {
       "id": "detour-plaza",
-      "status": "checked",
+      "status": "approved",
       "speaker": "elena",
       "text": "Está cerca. Gira a la derecha en la esquina, y todo derecho una cuadra.",
       "gloss": "It's near. Turn right at the corner, and straight ahead one block.",
@@ -663,7 +687,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/detour-plaza.mp3",
         "textHash": "09e1ac36f800667f54b52ef0071857374b3d8f084eb9ec1edb39b3e27e11b698",
@@ -673,7 +701,7 @@
     },
     {
       "id": "elena-perdon",
-      "status": "checked",
+      "status": "approved",
       "speaker": "elena",
       "text": "¿Perdón? A la derecha en la esquina. Todo derecho. Está cerca.",
       "gloss": "Sorry? To the right at the corner. Straight ahead. It's near.",
@@ -746,7 +774,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/elena-perdon.mp3",
         "textHash": "308e8ca2e655bc4b1e71c15eb4476702752955904f1b6d790ce63de9f522172e",
@@ -756,7 +788,7 @@
     },
     {
       "id": "arrive",
-      "status": "checked",
+      "status": "approved",
       "speaker": "jorge",
       "text": "¡Aquí está la estación, buen viaje!",
       "gloss": "Here is the station, have a good trip!",
@@ -790,7 +822,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/arrive.mp3",
         "textHash": "fe688379050ae0c15dd8c8446b3cf71f39d3df43dc58c82c16b3aa491532986e",
@@ -800,7 +836,7 @@
     },
     {
       "id": "arrive-late",
-      "status": "checked",
+      "status": "approved",
       "speaker": "jorge",
       "text": "¡Aquí está la estación, qué bueno que llegó!",
       "gloss": "Here is the station, so glad you arrived!",
@@ -834,7 +870,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:11.534Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-travel-lodging/p14-asking-directions/arrive-late.mp3",
         "textHash": "4a2734fdf8c29123418cb34d439ebfa737e42f61cbfd39208fb02c3b23f6d2c5",

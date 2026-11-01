@@ -59,7 +59,7 @@
   "nodes": [
     {
       "id": "open",
-      "status": "checked",
+      "status": "approved",
       "speaker": "alex",
       "text": "I get home, drop my bag, and sink onto the couch with my phone while my book sits untouched.",
       "gloss": null,
@@ -99,7 +99,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:10.785Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/atomic-habits/part-8/open.mp3",
         "textHash": "d09043d7c58df69a5c87f3ee72bde2e8639724012a517ae6dd17195bf69ba392",
@@ -109,7 +113,7 @@
     },
     {
       "id": "s1",
-      "status": "checked",
+      "status": "approved",
       "speaker": "alex",
       "text": "I want to read before bed, but I picture thirty minutes and skip it. Where should I even start?",
       "gloss": null,
@@ -169,7 +173,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:10.785Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/atomic-habits/part-8/s1.mp3",
         "textHash": "8dc41d7b191361194760c07fa4ba583ac8b1c086ab2812797dd5b4819d026049",
@@ -179,7 +187,7 @@
     },
     {
       "id": "p1",
-      "status": "checked",
+      "status": "approved",
       "speaker": "alex",
       "text": "That feels too tiny to count. Shouldn't I just push myself to do thirty minutes properly?",
       "gloss": null,
@@ -233,7 +241,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:10.785Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/atomic-habits/part-8/p1.mp3",
         "textHash": "173359de31de0bc27a907af219feed0c98aae4c12092e601f7eb720067b130e0",
@@ -243,7 +255,7 @@
     },
     {
       "id": "s2",
-      "status": "checked",
+      "status": "approved",
       "speaker": "alex",
       "text": "Okay, tiny makes sense. But my evenings blur — I walk in, phone in hand, couch calls. What should I do?",
       "gloss": null,
@@ -308,7 +320,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:10.785Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/atomic-habits/part-8/s2.mp3",
         "textHash": "5e3202651dd6940d7ffc199fd6108588e5bd462a7ee75ebc70a717c54cb9e684",
@@ -318,7 +334,7 @@
     },
     {
       "id": "p2",
-      "status": "checked",
+      "status": "approved",
       "speaker": "alex",
       "text": "I already change into comfy clothes and scroll a bit to unwind. Isn't any little start the same?",
       "gloss": null,
@@ -372,7 +388,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:10.785Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/atomic-habits/part-8/p2.mp3",
         "textHash": "2094aa123dde3cc9deb23b7fc397a47192cc18ad4dbe7288115fac4d5182f47e",
@@ -382,7 +402,7 @@
     },
     {
       "id": "s3",
-      "status": "checked",
+      "status": "approved",
       "speaker": "alex",
       "text": "I've read one page a few nights. Part of me wants longer chapters now. Should I grow it yet?",
       "gloss": null,
@@ -444,7 +464,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:10.785Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/atomic-habits/part-8/s3.mp3",
         "textHash": "fe77ba543bf76f12670bd4618e0552dfa4b054251c67b057d42e78d1615f5156",
@@ -454,7 +478,7 @@
     },
     {
       "id": "p3",
-      "status": "checked",
+      "status": "approved",
       "speaker": "alex",
       "text": "If the tiny bit works, why not do the full routine now? I don't want to waste time going slow.",
       "gloss": null,
@@ -508,7 +532,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:10.785Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/atomic-habits/part-8/p3.mp3",
         "textHash": "e366a9d7282a38fbe5d356ad16228172c8b42e7c587d56eb85d46792cfc94c94",
@@ -518,7 +546,7 @@
     },
     {
       "id": "close-good",
-      "status": "checked",
+      "status": "approved",
       "speaker": "alex",
       "text": "One page by the bed at the same time feels doable. I'll keep it steady and let it grow when it's easy.",
       "gloss": null,
@@ -552,7 +580,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:10.785Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/atomic-habits/part-8/close-good.mp3",
         "textHash": "631100661a94ed9276de4dc96516a672fbe9c2e00ce3cdae406843a16344c16e",
@@ -562,7 +594,7 @@
     },
     {
       "id": "close-unsure",
-      "status": "checked",
+      "status": "approved",
       "speaker": "alex",
       "text": "I'm still unsure tiny is enough, but I'll think about my evenings and what small bit I could try.",
       "gloss": null,
@@ -596,7 +628,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T22:54:10.785Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/atomic-habits/part-8/close-unsure.mp3",
         "textHash": "873cc6a28e5eb46671e00185f4f6c4f44be1abc8a056c5179475728258ab2cbd",
