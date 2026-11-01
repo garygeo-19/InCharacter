@@ -50,7 +50,7 @@
       "id": "alex",
       "name": "Alex",
       "description": "a woman in her late twenties, shoulder-length dark brown hair, olive green hoodie, friendly but tired smile",
-      "voiceId": "<pick>",
+      "voiceId": "tnSpp4vdxKPjI9w0GnoV",
       "portrait": "art/coach/alex.webp"
     }
   ],
@@ -100,7 +100,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/atomic-habits/part-8/open.mp3",
+        "textHash": "d09043d7c58df69a5c87f3ee72bde2e8639724012a517ae6dd17195bf69ba392",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_v4"
+      }
     },
     {
       "id": "s1",
@@ -165,7 +170,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/atomic-habits/part-8/s1.mp3",
+        "textHash": "8dc41d7b191361194760c07fa4ba583ac8b1c086ab2812797dd5b4819d026049",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_v4"
+      }
     },
     {
       "id": "p1",
@@ -224,7 +234,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/atomic-habits/part-8/p1.mp3",
+        "textHash": "173359de31de0bc27a907af219feed0c98aae4c12092e601f7eb720067b130e0",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_v4"
+      }
     },
     {
       "id": "s2",
@@ -294,7 +309,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/atomic-habits/part-8/s2.mp3",
+        "textHash": "5e3202651dd6940d7ffc199fd6108588e5bd462a7ee75ebc70a717c54cb9e684",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_v4"
+      }
     },
     {
       "id": "p2",
@@ -353,7 +373,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/atomic-habits/part-8/p2.mp3",
+        "textHash": "2094aa123dde3cc9deb23b7fc397a47192cc18ad4dbe7288115fac4d5182f47e",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_v4"
+      }
     },
     {
       "id": "s3",
@@ -420,7 +445,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/atomic-habits/part-8/s3.mp3",
+        "textHash": "fe77ba543bf76f12670bd4618e0552dfa4b054251c67b057d42e78d1615f5156",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_v4"
+      }
     },
     {
       "id": "p3",
@@ -479,7 +509,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/atomic-habits/part-8/p3.mp3",
+        "textHash": "e366a9d7282a38fbe5d356ad16228172c8b42e7c587d56eb85d46792cfc94c94",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_v4"
+      }
     },
     {
       "id": "close-good",
@@ -518,7 +553,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/atomic-habits/part-8/close-good.mp3",
+        "textHash": "631100661a94ed9276de4dc96516a672fbe9c2e00ce3cdae406843a16344c16e",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_v4"
+      }
     },
     {
       "id": "close-unsure",
@@ -557,7 +597,12 @@
         }
       },
       "review": null,
-      "audio": null
+      "audio": {
+        "file": "public/audio/atomic-habits/part-8/close-unsure.mp3",
+        "textHash": "873cc6a28e5eb46671e00185f4f6c4f44be1abc8a056c5179475728258ab2cbd",
+        "voiceId": "tnSpp4vdxKPjI9w0GnoV",
+        "model": "eleven_v4"
+      }
     }
   ]
 }
