@@ -54,7 +54,7 @@
   "questions": [
     {
       "id": "q-can-you-clarify-when-i-should-say-pez-versus-pes",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -106,7 +106,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-can-you-clarify-when-i-should-say-pez-versus-pes.mp3",
         "textHash": "7dbf9d95fd8b5796e413e01539233a62d073aa52ec2111f4bbd3915a7a87bf47",
@@ -116,7 +120,7 @@
     },
     {
       "id": "q-what-does-pollo-mean-in-english",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -168,7 +172,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-pollo-mean-in-english.mp3",
         "textHash": "7c89781a65ebdd0824a8789aacb7aee72ce1725038f12dedbcadc268a5908bdc",
@@ -178,7 +186,7 @@
     },
     {
       "id": "q-what-does-fruta-mean-i-keep-mixing-it-up",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -222,7 +230,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-fruta-mean-i-keep-mixing-it-up.mp3",
         "textHash": "85bdd5df948274e054220b4d3116a2b55435e86184b4966e83b75cdf3e8eec4c",
@@ -232,7 +244,7 @@
     },
     {
       "id": "q-can-you-clarify-what-verduras-covers",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -283,7 +295,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-can-you-clarify-what-verduras-covers.mp3",
         "textHash": "db38987aef3ebab859585da33654e9f5a0b877503685a107821d7ee02028f2a0",
@@ -293,7 +309,7 @@
     },
     {
       "id": "q-what-does-arroz-mean-in-english",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -344,7 +360,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-arroz-mean-in-english.mp3",
         "textHash": "9bbe0a0943c8ccfcc5691e006d34eb19ca223b09220edc5823e756432d842afc",
@@ -354,7 +374,7 @@
     },
     {
       "id": "q-what-does-aceite-de-oliva-mean",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -405,7 +425,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-aceite-de-oliva-mean.mp3",
         "textHash": "573492d489ae1685e2659c5073239b9bb453a0539df7cae7e9a2dab97e2ff851",
@@ -472,7 +496,7 @@
     },
     {
       "id": "q-what-does-carne-de-res-mean",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -525,7 +549,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-what-does-carne-de-res-mean.mp3",
         "textHash": "bb8893f5c80c5ae0cf4a513b15683f1bbfe7ed615043f28a8129f046304f0a9c",
@@ -592,7 +620,7 @@
     },
     {
       "id": "q-if-i-want-fish-to-eat-should-i-order-pez-or-pesc",
-      "status": "checked",
+      "status": "approved",
       "type": "apply",
       "difficulty": 2,
       "studentId": "leo",
@@ -644,7 +672,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-if-i-want-fish-to-eat-should-i-order-pez-or-pesc.mp3",
         "textHash": "79199b4868ea85fae278fa19591fe3e6294dae66b0191434b2675faba88cc0a2",
@@ -938,7 +970,7 @@
     },
     {
       "id": "q-if-i-want-fruit-after-dinner-do-i-ask-for-fruta",
-      "status": "checked",
+      "status": "approved",
       "type": "apply",
       "difficulty": 2,
       "studentId": "leo",
@@ -982,7 +1014,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-if-i-want-fruit-after-dinner-do-i-ask-for-fruta.mp3",
         "textHash": "6d1ffca1a3a53f1e4a73d32914e35206d6cc46989989cf578c73acc2ceea7f3b",
@@ -992,7 +1028,7 @@
     },
     {
       "id": "q-in-spain-i-want-young-beef-do-i-order-ternera",
-      "status": "checked",
+      "status": "approved",
       "type": "apply",
       "difficulty": 2,
       "studentId": "leo",
@@ -1042,7 +1078,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-in-spain-i-want-young-beef-do-i-order-ternera.mp3",
         "textHash": "f46941f531202c6e256e3f1c1505f5971d74808a755c2768a46e312070b4accc",
@@ -1052,7 +1092,7 @@
     },
     {
       "id": "q-how-do-pez-and-pescado-differ-for-fish",
-      "status": "checked",
+      "status": "approved",
       "type": "compare",
       "difficulty": 3,
       "studentId": "priya",
@@ -1104,7 +1144,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-how-do-pez-and-pescado-differ-for-fish.mp3",
         "textHash": "514824db3ae03d7a6f91a0f67c3bc02737bc557d0db3352011f6449607f1aa99",
@@ -1173,7 +1217,7 @@
     },
     {
       "id": "q-how-does-ternera-differ-in-mexico-and-spain",
-      "status": "checked",
+      "status": "approved",
       "type": "compare",
       "difficulty": 3,
       "studentId": "priya",
@@ -1225,7 +1269,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-how-does-ternera-differ-in-mexico-and-spain.mp3",
         "textHash": "1ae36d229181c6c22c3adc7a2343d2f4fd71dee5857bb6699df81aeb5bbffdc3",
@@ -1464,7 +1512,7 @@
     },
     {
       "id": "q-legumbres-just-means-all-verduras-i-m-right",
-      "status": "checked",
+      "status": "approved",
       "type": "misconception",
       "difficulty": 3,
       "studentId": "sam",
@@ -1518,7 +1566,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.852Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p11-common-foods/q-legumbres-just-means-all-verduras-i-m-right.mp3",
         "textHash": "5a18c98688002e687e4af3be20d94afe74bd69eeae256a18fc09937705de8e04",

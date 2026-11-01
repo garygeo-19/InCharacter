@@ -1,6 +1,6 @@
 # In Character: demo script and submission draft
 
-Drafts for M6 (due Wed 4 Nov 2026, 7 PM Arizona). Fill the bracketed parts after deploying.
+Drafts for M6 (due Wed 4 Nov 2026, 7 PM Arizona). The live link is filled in.
 
 ## Demo video (2–3 minutes)
 
@@ -13,7 +13,7 @@ Record on a phone screen (or the laptop at 390 px wide), voice on, after the stu
 | 0:20 | Teaching by voice (sped up), the level bar at the top, one hold-to-peek | "You teach out loud. Muse Voice Transcribe hears English and Spanish together. Peeking at the notes costs points." |
 | 1:05 | The classroom: Maya, Leo and Sam ask; name tags show who's asking | "Four AI students ask real questions from a checked bank. Sam holds a misconception until you fix it." |
 | 1:50 | The debrief: the score counts up, then "How your score was calculated" with your quotes | "Muse Spark grades, and every verdict quotes your own words. Code checks each quote before it counts." |
-| 2:15 | The tools card, then the link | "Built with Muse Code. Graded by Muse Spark. Heard by Muse Voice Transcribe. Drawn by Muse Image. Try it at [URL]." |
+| 2:15 | The tools card, then the link | "Built with Muse Code. Graded by Muse Spark. Heard by Muse Voice Transcribe. Drawn by Muse Image. Try it at https://incharacter.recurxive.workers.dev." |
 
 For the live finals: Type mode needs no microphone, and keep the recorded video ready.
 
@@ -40,6 +40,6 @@ FlashFeed's knowledge packs to four AI students, answer their questions, and get
 Next: more roles on the same harness, such as coaching a client with Atomic Habits or getting around Mexico City in
 Spanish, and immersive VR on Meta Quest.
 
-- Try it: [URL]
+- Try it: https://incharacter.recurxive.workers.dev
 - Code (Apache-2.0): https://github.com/garygeo-19/InCharacter
 - FlashFeed: https://flashfeedlearningapp.com

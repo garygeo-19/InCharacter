@@ -19,6 +19,6 @@
     "CATALOG_BASE": "https://flashfeed-packs-serving.vercel.app",
     "APP_ORIGIN": "https://incharacter.recurxive.workers.dev",
     "DAILY_CALL_CAP": "3000",
-    "USABLE_STATUSES": "approved,checked"
+    "USABLE_STATUSES": "approved"
   }
 }

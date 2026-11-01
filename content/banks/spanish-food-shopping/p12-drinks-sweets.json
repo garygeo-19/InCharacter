@@ -54,7 +54,7 @@
   "questions": [
     {
       "id": "q-what-does-refresco-mean-in-english",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -98,7 +98,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-refresco-mean-in-english.mp3",
         "textHash": "521078eafd64db08193e41aeeea8c97dc57b59f214c19a6cc795d347a8971da1",
@@ -108,7 +112,7 @@
     },
     {
       "id": "q-what-does-vino-mean-in-english",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -152,7 +156,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-vino-mean-in-english.mp3",
         "textHash": "3af01572b06187d97bbf34edb56e577cef3fbe5725942155985e646a065c571a",
@@ -162,7 +170,7 @@
     },
     {
       "id": "q-what-does-cerveza-mean-in-english",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -206,7 +214,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-cerveza-mean-in-english.mp3",
         "textHash": "7a0d360b9122de7c9613c552eb505a72e7520ac01ac1c56a56c24b8a901c0c14",
@@ -216,7 +228,7 @@
     },
     {
       "id": "q-what-does-dulce-mean-in-english",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -260,7 +272,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-dulce-mean-in-english.mp3",
         "textHash": "490ce74f8e417abe57d9f91fce9c3c9fb9001d3a223f99ee6078dd6775441359",
@@ -270,7 +286,7 @@
     },
     {
       "id": "q-what-does-el-postre-mean-in-english",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -314,7 +330,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-el-postre-mean-in-english.mp3",
         "textHash": "e6ab21738e4efe5c93166e2f96a687220df458fe6f7c33cfc8709227783ceed1",
@@ -324,7 +344,7 @@
     },
     {
       "id": "q-what-does-jugo-mean-in-english",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -368,7 +388,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-does-jugo-mean-in-english.mp3",
         "textHash": "7b5fb0cd67cb3a5d9bff9f32e8dd2ef573dfefda608426d08727d960aeb031c0",
@@ -378,7 +402,7 @@
     },
     {
       "id": "q-what-comes-after-postre-in-spain",
-      "status": "checked",
+      "status": "approved",
       "type": "clarify",
       "difficulty": 1,
       "studentId": "maya",
@@ -428,7 +452,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-what-comes-after-postre-in-spain.mp3",
         "textHash": "3e1ef0371b6e8cfac0295bf05f00c21cc5c2afebbd7ab18ed9fe8ae2031cd34e",
@@ -438,7 +466,7 @@
     },
     {
       "id": "q-in-a-bar-in-spain-how-do-i-order-a-small-draft-b",
-      "status": "checked",
+      "status": "approved",
       "type": "apply",
       "difficulty": 2,
       "studentId": "leo",
@@ -488,7 +516,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-in-a-bar-in-spain-how-do-i-order-a-small-draft-b.mp3",
         "textHash": "496d3ed894f7e963e865f94aa3eccc9406c6067a9c9572c8a25b8eb07018412d",
@@ -498,7 +530,7 @@
     },
     {
       "id": "q-in-spain-what-do-i-ask-for-if-i-want-red-wine",
-      "status": "checked",
+      "status": "approved",
       "type": "apply",
       "difficulty": 2,
       "studentId": "leo",
@@ -548,7 +580,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-in-spain-what-do-i-ask-for-if-i-want-red-wine.mp3",
         "textHash": "6783444f1b82c336e16380bc194af02af7537d1eb75dd1bf55322a1696ea6289",
@@ -723,7 +759,7 @@
     },
     {
       "id": "q-my-friend-wants-something-sweet-in-spain-what-po",
-      "status": "checked",
+      "status": "approved",
       "type": "apply",
       "difficulty": 2,
       "studentId": "leo",
@@ -775,7 +811,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-my-friend-wants-something-sweet-in-spain-what-po.mp3",
         "textHash": "436bb06c076540cd673cab1883dfb33b5d5d0490cdae516629ad69b5668ab919",
@@ -1062,7 +1102,7 @@
     },
     {
       "id": "q-how-does-jugo-differ-from-zumo-and-when-do-i-use",
-      "status": "checked",
+      "status": "approved",
       "type": "compare",
       "difficulty": 3,
       "studentId": "priya",
@@ -1113,7 +1153,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-how-does-jugo-differ-from-zumo-and-when-do-i-use.mp3",
         "textHash": "81e42677154e827c3d19c1e09df93fdeb0e0d515eebee524448d7f505454141f",
@@ -1348,7 +1392,7 @@
     },
     {
       "id": "q-cerveza-means-wine-and-vino-means-beer-tell-me-i",
-      "status": "checked",
+      "status": "approved",
       "type": "misconception",
       "difficulty": 3,
       "studentId": "sam",
@@ -1402,7 +1446,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-cerveza-means-wine-and-vino-means-beer-tell-me-i.mp3",
         "textHash": "bde4abc914d69b922ee1b7c0c47aaea729c52f5de64b29fc4a74840194137fa0",
@@ -1412,7 +1460,7 @@
     },
     {
       "id": "q-el-postre-means-soft-drink-tell-me-i-m-right",
-      "status": "checked",
+      "status": "approved",
       "type": "misconception",
       "difficulty": 3,
       "studentId": "sam",
@@ -1466,7 +1514,11 @@
           }
         }
       },
-      "review": null,
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:51.384Z",
+        "note": null
+      },
       "audio": {
         "file": "public/audio/spanish-food-shopping/p12-drinks-sweets/q-el-postre-means-soft-drink-tell-me-i-m-right.mp3",
         "textHash": "0663213f2dd678c41ad3b32cb9815d33fb8d36ed02cbfafeeded83a085f76bd8",

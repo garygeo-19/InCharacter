@@ -64,7 +64,7 @@
       "noteIds": [
         "pair-la-propina"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "maya",
       "text": "Sorry, I missed one of the words. What's la propina?",
       "ttsText": null,
@@ -74,6 +74,11 @@
         "textHash": "3fa76fa127588d6e0b1f36ae395c2afe904ad690473a4eec3c3034c307c05c83",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -91,7 +96,7 @@
       "noteIds": [
         "pair-el-camarero"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "maya",
       "text": "How do I say 'the waiter' in Spanish?",
       "ttsText": null,
@@ -101,6 +106,11 @@
         "textHash": "cb4d6c0966a82b890a34c1bba3c57a561a6008b0ce31cda897bdbc05ff1646cd",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -118,7 +128,7 @@
       "noteIds": [
         "fact-buen-provecho"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "maya",
       "text": "What does buen provecho actually mean?",
       "ttsText": null,
@@ -128,6 +138,11 @@
         "textHash": "ecd56663559306db555c85187a896995c88fb9ff6ceb8677918201ce15d4982e",
         "voiceId": "tnSpp4vdxKPjI9w0GnoV",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -151,7 +166,7 @@
       "noteIds": [
         "fact-carta-not-menu"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "leo",
       "text": "If I'm in Madrid and ask the waiter for el menú, what am I likely to get?",
       "ttsText": null,
@@ -161,6 +176,11 @@
         "textHash": "673ad95be59bb130eb6952ac895e52a697cb4579194d0d165a0629d5dfbb4ed7",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -184,7 +204,7 @@
       "noteIds": [
         "fact-buen-provecho"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "leo",
       "text": "We're walking past a table where people are eating. Is there anything we should say?",
       "ttsText": null,
@@ -194,6 +214,11 @@
         "textHash": "bd52631a0fc633bc08d39b8ec8c0ce60aa74998d10a28216760a04f4cc043f7c",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -213,7 +238,7 @@
         "fi-mcq-ordering-phrase",
         "fact-carta-not-menu"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "leo",
       "text": "The waiter's going around our table and I want the chicken. What do I say?",
       "ttsText": null,
@@ -223,6 +248,11 @@
         "textHash": "4f070fdea51cc9760de174aaea3620a94b5d2795394fe0915510e7263a34481a",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -248,7 +278,7 @@
         "fi-ot-ask-bill",
         "pair-la-cuenta"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "leo",
       "text": "We've finished eating in Madrid. How do we get the check?",
       "ttsText": null,
@@ -258,6 +288,11 @@
         "textHash": "9847548c0b558d3665b368f0f9d07b3c8b03be6a9baab227db99d7832d8d0e8a",
         "voiceId": "7EzWGsX10sAS4c9m9cPf",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -285,7 +320,7 @@
         "fact-carta-not-menu",
         "fi-mcq-ordering-phrase"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "priya",
       "text": "What's the difference between saying 'quisiera' and 'para mí, el pollo'?",
       "ttsText": null,
@@ -295,6 +330,11 @@
         "textHash": "61cbcb783aeea56412dd3d4cbf82280eeacf4fc14661144e9b9b00e0c0993c7e",
         "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -320,7 +360,7 @@
         "fact-carta-not-menu",
         "pair-la-carta"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "priya",
       "text": "If el menú and la carta both mean the menu, why would anyone bother saying la carta?",
       "ttsText": null,
@@ -330,6 +370,11 @@
         "textHash": "3a82939b8e49bf54d6c822a68d0fe80c4205ef9c01122473305cec8c89ece4f3",
         "voiceId": "eXpIbVcVbLo8ZJQDlDnl",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -355,7 +400,7 @@
         "fi-ot-ask-bill",
         "pair-la-cuenta"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "sam",
       "text": "In Spain the waiter just brings the check when you're done, right? I'll wait for it.",
       "ttsText": null,
@@ -365,6 +410,11 @@
         "textHash": "10ce5875b0228d6aca4f5f68604b5ba95676f8cdd95f8083011fe6a8a5542dd0",
         "voiceId": "4e32WqNVWRquDa1OcRYZ",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -388,7 +438,7 @@
       "noteIds": [
         "ih-paella-valenciana"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "sam",
       "text": "Paella's a seafood dish, isn't it? That's what I'll order to try the real thing.",
       "ttsText": null,
@@ -398,6 +448,11 @@
         "textHash": "eeaf74a280210c549049109a881553dbdbab283c81c52ae6f60ca8d81f571be6",
         "voiceId": "4e32WqNVWRquDa1OcRYZ",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     },
     {
@@ -415,7 +470,7 @@
       "noteIds": [
         "fact-buen-provecho"
       ],
-      "status": "checked",
+      "status": "approved",
       "studentId": "sam",
       "text": "I'd only say buen provecho to people at my own table. Saying it to strangers would be weird, right?",
       "ttsText": null,
@@ -425,6 +480,11 @@
         "textHash": "5698b96c2090d3e05d167ca736c922ee39a8214241c4b7c6ddbfc4a0c41567b9",
         "voiceId": "4e32WqNVWRquDa1OcRYZ",
         "model": "eleven_v4"
+      },
+      "review": {
+        "by": "garygeorge",
+        "at": "2026-11-01T18:22:50.309Z",
+        "note": null
       }
     }
   ],
