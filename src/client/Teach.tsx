@@ -353,6 +353,29 @@ export function LongBox(props: {
   );
 }
 
+// The learner's own words, kept on screen after Done: a "You" bubble under
+// the character's line. While voice is still transcribing it shows
+// "Transcribing…" instead of the text (owner fix, Nov 2026).
+export function YouBubble({ lines, transcribing }: { lines: Line[] | null; transcribing?: boolean }) {
+  const text = (lines ?? []).map((l) => l.text).join(' ').trim();
+  return (
+    <div className="answer">
+      <div className="bubble you">
+        <p className="asker">You</p>
+        {transcribing || text === '' ? (
+          transcribing ? (
+            <p role="status">Transcribing…</p>
+          ) : (
+            <p className="fine">(no reply)</p>
+          )
+        ) : (
+          <p>{text}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Motion feedback for model waits: three bouncing dots plus an accessible
 // status message. Under prefers-reduced-motion the dots sit still.
 export function WaitingDots({ status }: { status: string }) {
@@ -394,6 +417,9 @@ export function VoiceLineTaker(props: {
   onDone: (lines: Line[]) => void;
   onTypeInstead: () => void;
   onMicUnavailable: () => void;
+  /** The caller shows its own "Transcribing…" bubble: keep the status
+   *  for screen readers without a second visible line. */
+  quietTranscribing?: boolean;
 }) {
   const [level, setLevel] = useState(0);
   const [status, setStatus] = useState<'recording' | 'transcribing' | 'error'>('recording');
@@ -529,7 +555,11 @@ export function VoiceLineTaker(props: {
     }
   }, [props.active, status]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (status === 'transcribing') return <p role="status">Transcribing…</p>;
+  if (status === 'transcribing') {
+    return props.quietTranscribing
+      ? <p role="status" className="sr-only">Transcribing…</p>
+      : <p role="status">Transcribing…</p>;
+  }
   if (status === 'error') {
     return (
       <>
@@ -947,13 +977,9 @@ function QuestionScreen(props: {
                 onDone={deliverAnswerLines}
                 onTypeInstead={() => fallBackToTyping(false)}
                 onMicUnavailable={() => fallBackToTyping(true)}
+                quietTranscribing
               />
-              {submitted && (
-                <>
-                  <p role="status">Answer sent…</p>
-                  <WaitingDots status="Answer sent. Transcribing your answer." />
-                </>
-              )}
+              {submitted && <YouBubble lines={null} transcribing />}
               <div className="sticky-action">
                 <button type="button" className="primary" disabled={!answerOpen || submitted} onClick={() => finishAnswer('done')}>
                   Done
@@ -967,6 +993,7 @@ function QuestionScreen(props: {
                 placeholder="Type your answer — write as much as you like"
                 value={draft} onChange={setDraft}
               />
+              {submitted && <YouBubble lines={splitTextToLines(draftRef.current)} />}
               <div className="sticky-action">
                 <button
                   type="button" className="primary" disabled={submitted}

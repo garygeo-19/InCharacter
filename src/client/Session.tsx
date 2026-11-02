@@ -33,6 +33,7 @@ import {
   useTimerAnnouncement,
   VoiceLineTaker,
   WaitingDots,
+  YouBubble,
 } from './Teach';
 import { ModePicker } from './mode';
 
@@ -51,6 +52,42 @@ type Phase =
 
 function speakerName(session: SessionDisplay, speakerId: string): string {
   return session.cast.find((c) => c.id === speakerId)?.name ?? speakerId;
+}
+
+// One answered turn of the conversation so far.
+type PastTurn = {
+  nodeId: string;
+  speaker: string;
+  text: string;
+  gloss: string | null;
+  lines: Line[];
+};
+
+// The conversation so far as a compact scrolling history, newest at the
+// bottom: each earlier character line (the gloss stays behind its peek)
+// with the learner's reply under it.
+function ConversationHistory({ turns, onPeek }: { turns: PastTurn[]; onPeek: (peek: Peek) => void }) {
+  const boxRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = boxRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [turns.length]);
+  if (turns.length === 0) return null;
+  return (
+    <section aria-label="Earlier in this session">
+      <div ref={boxRef} className="history">
+        {turns.map((t) => (
+          <div className="history-turn" key={t.nodeId}>
+            <p className="history-line"><strong>{t.speaker}</strong> {t.text}</p>
+            {t.gloss && <GlossPeek gloss={t.gloss} noteId={t.nodeId} onPeek={onPeek} />}
+            <p className="history-line">
+              <strong>You</strong> {t.lines.map((l) => l.text).join(' ') || '(no reply)'}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export function Session(props: {
@@ -132,6 +169,24 @@ export function Session(props: {
     [trail, nodesById, session],
   );
   const recordPeek = (peek: Peek) => setPeeks((p) => [...p, peek]);
+
+  // The conversation so far, in order: each answered node's line (gloss
+  // still behind its peek) with the learner's reply under it. Shown as a
+  // compact history above the current line, and under "thinking…" (owner
+  // fix, Nov 2026). No new API calls: it reads the answers already held.
+  const pastTurns: PastTurn[] = useMemo(() => {
+    if (!session) return [];
+    return answers.map((a) => {
+      const n = nodesById.get(a.nodeId);
+      return {
+        nodeId: a.nodeId,
+        speaker: speakerName(session, n?.speaker ?? ''),
+        text: n?.text ?? '',
+        gloss: n?.gloss ?? null,
+        lines: a.lines,
+      };
+    });
+  }, [answers, nodesById, session]);
 
   // Advance past a node: end nodes go to grading, anything else asks the
   // game master for the next checked line (§16.3).
@@ -254,18 +309,47 @@ export function Session(props: {
             peekStyle={props.settings.peekStyle}
             liveCaptions={props.settings.liveCaptions}
             onPeek={recordPeek}
+            past={pastTurns}
             onPlayed={() => advanceFrom(node.id, null)}
             onAskingDone={() => setPhase({ name: 'turn', nodeId: phase.nodeId, asking: false })}
             onAnswered={(lines) => advanceFrom(node.id, lines)}
           />
         );
       })()}
-      {phase.name === 'thinking' && (
-        <>
-          <h2>{speakerName(session, nodesById.get(phase.nodeId)?.speaker ?? '')} is thinking…</h2>
-          <WaitingDots status="The client is thinking about your reply." />
-        </>
-      )}
+      {phase.name === 'thinking' && (() => {
+        // The reply just given stays on screen under the character's line
+        // while the game master chooses the next line; earlier turns stay
+        // visible as a compact history above it (owner fix, Nov 2026).
+        const node = nodesById.get(phase.nodeId);
+        const speakerId = node?.speaker ?? '';
+        const cast = session.cast.find((c) => c.id === speakerId);
+        const name = speakerName(session, speakerId);
+        const reply = answers.find((a) => a.nodeId === phase.nodeId)?.lines ?? null;
+        const earlier = pastTurns.filter((t) => t.nodeId !== phase.nodeId);
+        return (
+          <>
+            <h2>{name} is thinking…</h2>
+            <ConversationHistory turns={earlier} onPeek={recordPeek} />
+            {node && (
+              <div className="question">
+                <SessionPortrait
+                  portrait={cast?.portrait ?? ''} name={name}
+                  description={cast?.description ?? ''}
+                />
+                <div className="bubble">
+                  <p className="asker">{name}</p>
+                  <p>{node.text}</p>
+                  {node.gloss && (
+                    <GlossPeek gloss={node.gloss} noteId={node.noteIds[0] ?? node.id} onPeek={recordPeek} />
+                  )}
+                </div>
+              </div>
+            )}
+            <YouBubble lines={reply} />
+            <WaitingDots status="The client is thinking about your reply." />
+          </>
+        );
+      })()}
       {phase.name === 'grading' && (
         <SessionGrading
           packId={props.packId}
@@ -457,6 +541,7 @@ function TurnScreen(props: {
   peekStyle: Settings['peekStyle'];
   liveCaptions: boolean;
   onPeek: (peek: Peek) => void;
+  past: PastTurn[];
   onPlayed: () => void;
   onAskingDone: () => void;
   onAnswered: (lines: Line[]) => void;
@@ -554,6 +639,7 @@ function TurnScreen(props: {
   return (
     <>
       <SceneImg scene={node.scene} label={`${props.speaker}'s scene`} />
+      <ConversationHistory turns={props.past} onPeek={props.onPeek} />
       <div className="question">
         <SessionPortrait portrait={props.portrait} name={props.speaker} description={props.speakerDescription} />
         <div className="bubble">
@@ -600,13 +686,9 @@ function TurnScreen(props: {
                 onDone={deliverAnswerLines}
                 onTypeInstead={() => fallBackToTyping(false)}
                 onMicUnavailable={() => fallBackToTyping(true)}
+                quietTranscribing
               />
-              {submitted && (
-                <>
-                  <p role="status">Reply sent…</p>
-                  <WaitingDots status="Reply sent. Transcribing your reply." />
-                </>
-              )}
+              {submitted && <YouBubble lines={null} transcribing />}
               <div className="sticky-action">
                 <button type="button" className="primary" disabled={!answerOpen || submitted} onClick={() => finishAnswer('done')}>
                   Done
@@ -620,6 +702,7 @@ function TurnScreen(props: {
                 placeholder="Type your reply — write as much as you like"
                 value={draft} onChange={setDraft}
               />
+              {submitted && <YouBubble lines={splitTextToLines(draftRef.current)} />}
               <div className="sticky-action">
                 <button
                   type="button" className="primary" disabled={submitted}

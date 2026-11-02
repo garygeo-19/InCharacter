@@ -185,7 +185,7 @@ test('coach tile replaces coming soon; Type session runs pushback branch to a qu
   // History is per part and per role: back home, the session is kept with
   // its own best score and a Play again action.
   await page.getByRole('button', { name: 'Home' }).click();
-  await expect(page.getByText('Keep teaching')).toBeVisible();
+  await expect(page.getByText('Keep going')).toBeVisible();
   await expect(page.getByText('Best 100')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Play again' })).toBeVisible();
 });

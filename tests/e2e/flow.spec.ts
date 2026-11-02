@@ -196,7 +196,7 @@ test('teach a class in Type mode, mocked grading', async ({ page }) => {
   await expect(page.getByText('Covered', { exact: true }).first()).toBeVisible();
 
   await page.getByRole('button', { name: 'Home' }).click();
-  await expect(page.getByText('Keep teaching')).toBeVisible();
+  await expect(page.getByText('Keep going')).toBeVisible();
   await expect(page.getByText('Best 63')).toBeVisible();
 });
 

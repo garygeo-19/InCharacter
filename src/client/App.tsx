@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import comingSoon from '../../content/coming-soon.json';
 import roles from '../../content/roles.json';
 import { friendlyErrorMessage } from '../shared/errors';
+import { packReadySummary, packReadyTotal, type ReadyCounts } from '../shared/ready';
 import { CastRow, ClassroomFigure } from './art';
 import { buildNotes, PackSchema, stripPrefix } from '../shared/notes';
 import { SCORING_CONFIG } from '../shared/scoring-config';
@@ -264,7 +265,7 @@ function Home(props: {
   onNextClass: (h: AttemptRecord) => void;
 }) {
   const { catalog } = props;
-  const [readyCounts, setReadyCounts] = useState<Record<string, number>>({});
+  const [readyCounts, setReadyCounts] = useState<Record<string, ReadyCounts>>({});
 
   useEffect(() => {
     if (!catalog) return;
@@ -274,8 +275,20 @@ function Home(props: {
         props.partsFor(p.id)
           .then((parts) => {
             if (!live) return;
-            const n = parts.lessons.flatMap((l) => l.parts).filter((x) => x.teachable && x.ready).length;
-            setReadyCounts((c) => (c[p.id] === n ? c : { ...c, [p.id]: n }));
+            // Everything ready in the pack, across roles — not just
+            // classroom classes (owner fix, Nov 2026).
+            const all = parts.lessons.flatMap((l) => l.parts);
+            const next: ReadyCounts = {
+              classes: all.filter((x) => x.teachable && x.ready).length,
+              roles: ROLE_ORDER.map((role) => ({
+                key: role,
+                title: roleTile(role).title,
+                count: all.filter((x) => x.sessions?.[role]).length,
+              })),
+            };
+            setReadyCounts((c) =>
+              JSON.stringify(c[p.id]) === JSON.stringify(next) ? c : { ...c, [p.id]: next },
+            );
           })
           .catch(() => {}),
       ),
@@ -288,7 +301,9 @@ function Home(props: {
     const list = (catalog ?? []).filter(
       (p) => !q || p.name.toLowerCase().includes(q) || p.id.includes(q),
     );
-    return [...list].sort((a, b) => (readyCounts[b.id] ?? 0) - (readyCounts[a.id] ?? 0));
+    // Packs with anything ready sort before packs with nothing ready.
+    const total = (id: string) => packReadyTotal(readyCounts[id] ?? { classes: 0, roles: [] });
+    return [...list].sort((a, b) => total(b.id) - total(a.id));
   }, [catalog, props.query, readyCounts]);
 
   return (
@@ -298,8 +313,8 @@ function Home(props: {
       </header>
 
       {props.history.length > 0 && (
-        <section aria-label="Keep teaching">
-          <h2>Keep teaching</h2>
+        <section aria-label="Keep going">
+          <h2>Keep going</h2>
           <div className="cards">
             {props.history.slice(0, 3).map((h) => {
               const role = h.role ?? 'teach';
@@ -347,9 +362,7 @@ function Home(props: {
                 <span className="fine">
                   {readyCounts[p.id] === undefined
                     ? '…'
-                    : readyCounts[p.id] > 0
-                      ? `${readyCounts[p.id]} classes ready`
-                      : 'Classes coming soon'}
+                    : packReadySummary(readyCounts[p.id])}
                 </span>
               </button>
             </li>
@@ -394,6 +407,67 @@ function PackView(props: {
   if (!pack) return <p>Loading…</p>;
   // A usable session replaces that pack's "coming soon" tile (§16.1).
   const soonTitles = comingSoonFor(pack.id);
+  // Ready tiles come first; a role with nothing ready sits after them,
+  // muted with "Coming soon" — shown, not hidden, so the classroom stays
+  // visible on packs like Atomic Habits (owner fix, Nov 2026).
+  const teachCount = ready ?? 0;
+  const teachReady = ready === null || teachCount > 0;
+  const tiles: { ready: boolean; el: ReactNode }[] = [
+    {
+      ready: teachReady,
+      el: teachReady ? (
+        <button type="button" className="tile primary-tile" key="teach" onClick={props.onTeach}>
+          <strong>Teach a class</strong>
+          <span className="fine">You teach. Four students listen. Three ask questions.</span>
+          {ready !== null && (
+            <span className="fine">{teachCount} {teachCount === 1 ? 'class' : 'classes'} ready</span>
+          )}
+        </button>
+      ) : (
+        <div className="tile soon" key="teach" aria-disabled>
+          <strong>Teach a class</strong>
+          <span className="fine">Coming soon</span>
+        </div>
+      ),
+    },
+    ...ROLE_ORDER.flatMap((role) => {
+      const tile = roleTile(role);
+      const count = roleReady?.[role] ?? 0;
+      if (roleReady && count > 0) {
+        return [{
+          ready: true,
+          el: (
+            <button type="button" className="tile primary-tile" key={role} onClick={() => props.onRole(role)}>
+              <strong>{tile.title}</strong>
+              <span className="fine">{tile.subtitle}</span>
+              <span className="fine">{count} session{count === 1 ? '' : 's'} ready</span>
+            </button>
+          ),
+        }];
+      }
+      if (!soonTitles.includes(tile.title)) return [];
+      return [{
+        ready: false,
+        el: (
+          <div className="tile soon" key={role} aria-disabled>
+            <strong>{tile.title}</strong>
+            <span className="fine">Coming soon</span>
+          </div>
+        ),
+      }];
+    }),
+    ...soonTitles
+      .filter((t) => !ROLE_ORDER.some((r) => roleTile(r).title === t))
+      .map((title) => ({
+        ready: false,
+        el: (
+          <div className="tile soon" key={title} aria-disabled>
+            <strong>{title}</strong>
+            <span className="fine">Coming soon</span>
+          </div>
+        ),
+      })),
+  ];
   return (
     <>
       <button type="button" className="secondary" onClick={props.onBack}>‹ Packs</button>
@@ -401,39 +475,8 @@ function PackView(props: {
         <h1>{pack.icon} {pack.name}</h1>
         {pack.description && <p className="lede">{pack.description}</p>}
       </header>
-      <button type="button" className="tile primary-tile" onClick={props.onTeach}>
-        <strong>Teach a class</strong>
-        <span className="fine">You teach. Four students listen. Three ask questions.</span>
-        {ready !== null && <span className="fine">{ready} classes ready</span>}
-      </button>
-      {ROLE_ORDER.map((role) => {
-        const tile = roleTile(role);
-        const count = roleReady?.[role] ?? 0;
-        if (roleReady && count > 0) {
-          return (
-            <button type="button" className="tile primary-tile" key={role} onClick={() => props.onRole(role)}>
-              <strong>{tile.title}</strong>
-              <span className="fine">{tile.subtitle}</span>
-              <span className="fine">{count} session{count === 1 ? '' : 's'} ready</span>
-            </button>
-          );
-        }
-        if (!soonTitles.includes(tile.title)) return null;
-        return (
-          <div className="tile soon" key={role} aria-disabled>
-            <strong>{tile.title}</strong>
-            <span className="fine">Coming soon</span>
-          </div>
-        );
-      })}
-      {soonTitles
-        .filter((t) => !ROLE_ORDER.some((r) => roleTile(r).title === t))
-        .map((title) => (
-          <div className="tile soon" key={title} aria-disabled>
-            <strong>{title}</strong>
-            <span className="fine">Coming soon</span>
-          </div>
-        ))}
+      {tiles.filter((t) => t.ready).map((t) => t.el)}
+      {tiles.filter((t) => !t.ready).map((t) => t.el)}
     </>
   );
 }

@@ -402,6 +402,27 @@ button:disabled { opacity: 0.45; cursor: default; }
 }
 .bubble p { margin: 0 0 6px; }
 .asker { font-weight: 700; }
+/* The learner's own reply under the character's line (owner fix, Nov 2026). */
+.answer { display: flex; gap: 12px; align-items: flex-start; margin: 12px 0; }
+.bubble.you { border-radius: 14px 4px 14px 14px; background: var(--wash); }
+/* The conversation so far: a compact scrolling history above the current
+   line, newest at the bottom. Instant jumps keep the newest turn visible
+   without moving the page. */
+.history {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.history-turn { border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.history-turn:last-child { border-bottom: none; padding-bottom: 0; }
+.history-line { margin: 0 0 4px; line-height: 1.5; }
+.history-line:last-child { margin-bottom: 0; }
 .drawer { margin: 12px 0; }
 .drawer summary { min-height: 44px; cursor: pointer; font-weight: 700; }
 
