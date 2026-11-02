@@ -3,7 +3,7 @@ import { cors } from 'hono/cors';
 import { z } from 'zod';
 import { parseUsableStatuses } from '../shared/bank';
 import { applyAnswersEvidence, applyClassEvidence } from '../shared/evidence';
-import { fetchCatalog, fetchPack, liveEntries } from '../shared/notes';
+import { buildNotes, fetchCatalog, fetchPack, liveEntries } from '../shared/notes';
 import { fallbackPick, validatePicks, type UsableQuestion } from '../shared/picker';
 import { questionAudioUrl } from '../shared/question-audio';
 import { resolveTurn } from '../shared/session';
@@ -425,7 +425,9 @@ export function createApp(
     try {
       const entry = await catalogEntry(meta.data.packId);
       const pack = await fetchPack(base, entry);
-      const { notes } = await classContent(base, entry, meta.data.partId, statuses);
+      // Keywords come from the part's notes alone: coach and travel parts
+      // have no question bank, so classContent (which needs one) would throw.
+      const notes = buildNotes(pack, meta.data.partId);
       const anchors = notes.flatMap((n) => n.anchors);
       checkBudget();
       const result = await withTimeout(
