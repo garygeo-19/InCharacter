@@ -163,7 +163,7 @@ async function frozenTimer(page: Page): Promise<[string, string]> {
   return [first ?? '', second ?? ''];
 }
 
-test('Done stops the answer timer and shows Answer sent while transcribing', async ({ page }) => {
+test('Done stops the answer timer and shows Transcribing in your reply bubble', async ({ page }) => {
   await fakeMic(page);
   // Class transcribes at once; the first answer takes 2.5 s so the
   // stopped timer is observable before the next question lands.
@@ -190,7 +190,7 @@ test('Done stops the answer timer and shows Answer sent while transcribing', asy
   await done.click();
 
   // The stopped state: frozen timer, disabled Done, waiting dots.
-  await expect(page.getByText('Answer sent…')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole('status').filter({ hasText: 'Transcribing…' }).first()).toBeAttached({ timeout: 10000 });
   await expect(done).toBeDisabled({ timeout: 10000 });
   const [before, after] = await frozenTimer(page);
   expect(after).toBe(before);
